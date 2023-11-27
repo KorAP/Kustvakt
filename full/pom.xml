@@ -12,6 +12,9 @@
 		<hibernate.ehcache.version>6.0.0.Alpha7</hibernate.ehcache.version>
 		<hibernate.version>6.1.7.Final</hibernate.version>
 		<spring.version>6.0.13</spring.version>
+		<!-- spring6.version is used in jersey and defined here 
+		to make sure that jersey uses the correct spring version-->
+		<spring6.version>${spring.version}</spring6.version>
 		<jetty.version>11.0.18</jetty.version>
 		<flyway.version>10.0.1</flyway.version>
 		<log4j.version>2.21.1</log4j.version>
@@ -40,21 +43,29 @@
 								<configuration>
 									<finalName>Kustvakt-full-${project.version}</finalName>
 									<transformers>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 											<mainClass>
 												de.ids_mannheim.korap.server.KustvaktServer
 											</mainClass>
+											<manifestEntries>
+												<Multi-Release>true</Multi-Release>
+											</manifestEntries>
 										</transformer>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-											<resource>META-INF/spring.handlers
-											</resource>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/spring.handlers</resource>
 										</transformer>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-											<resource>META-INF/spring.schemas
-											</resource>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/spring.schemas</resource>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/spring/aot.factories</resource>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/hk2-locator/default</resource>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/spring.tooling</resource>
 										</transformer>
 									</transformers>
 									<filters>
@@ -99,6 +110,9 @@
 											<mainClass>
 												de.ids_mannheim.korap.server.KustvaktLiteServer
 											</mainClass>
+											<manifestEntries>
+												<Multi-Release>true</Multi-Release>
+											</manifestEntries>
 										</transformer>
 										<transformer
 											implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
@@ -124,7 +138,6 @@
 												<exclude>org.glassfish.jersey.test-framework*</exclude>
 												<exclude>org.apache.velocity*</exclude>
 												<exclude>com.sun.mail</exclude>
-												<exclude>javax.activation</exclude>
 											</excludes>
 										</filter>
 									</filters>
@@ -255,28 +268,8 @@
 			<groupId>org.glassfish.jersey.ext</groupId>
 			<artifactId>jersey-spring6</artifactId>
 			<version>${jersey.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-web</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-beans</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-context</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-aop</artifactId>
-				</exclusion>
-			</exclusions>
+			<!-- as long as we set spring6.version property transitive deps are ok 
+			-->
 		</dependency>
 
 		<!-- JSON -->
@@ -422,9 +415,6 @@
 			<version>0.4</version>
 		</dependency>
 
-		<!--<dependency> <groupId>javax.annotation</groupId> <artifactId>javax.annotation-api</artifactId> 
-			<version>1.3.2</version> </dependency> -->
-
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Krill</artifactId>
@@ -483,16 +473,6 @@
 			<version>${spring.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
 		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-core</artifactId> 
 			<version>${spring.version}</version> </dependency> <dependency> <groupId>org.springframework.security</groupId> 
 			<artifactId>spring-security-web</artifactId> <version>${spring.version}</version> 
@@ -721,12 +701,6 @@
 			<groupId>jakarta.activation</groupId>
 			<artifactId>jakarta.activation-api</artifactId>
 			<version>2.1.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
 		</dependency>
 
 		<!-- OAuth -->

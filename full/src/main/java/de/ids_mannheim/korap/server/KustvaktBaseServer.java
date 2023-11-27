@@ -19,11 +19,11 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import jakarta.servlet.ServletContextListener;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,9 +40,10 @@ public abstract class KustvaktBaseServer {
     protected static KustvaktArgs kargs;
 
     public KustvaktBaseServer () {
-        rootPackages = "de.ids_mannheim.korap.core.web; "
-                + "de.ids_mannheim.korap.web; "
-                + "com.fasterxml.jackson.jaxrs.json;";
+        rootPackages = "de.ids_mannheim.korap.core.web;"
+                + "de.ids_mannheim.korap.web;"
+//                + "com.fasterxml.jackson.jaxrs.json;"
+                ;
 
         File d = new File(KustvaktConfiguration.DATA_FOLDER);
         if (!d.exists()) {
@@ -103,24 +104,21 @@ public abstract class KustvaktBaseServer {
 
         Server server = new Server();
 
+        String configLocation = "classpath:" + springConfig;
+        if (kargs.getSpringConfig() != null) {
+            configLocation = "file:" + kargs.getSpringConfig();
+        }
+        XmlWebApplicationContext context = new XmlWebApplicationContext();
+        context.setConfigLocation(configLocation);
+        
         ServletContextHandler contextHandler = new ServletContextHandler(
                 ServletContextHandler.NO_SESSIONS);
         contextHandler.setContextPath("/");
-
-        if (kargs.getSpringConfig() != null) {
-            contextHandler.setInitParameter("contextConfigLocation",
-                    "file:" + kargs.getSpringConfig());
-        }
-        else {
-            contextHandler.setInitParameter("contextConfigLocation",
-                    "classpath:" + this.springConfig);
-        }
-
-        ServletContextListener listener = new ContextLoaderListener();
-        contextHandler.addEventListener(listener);
+        contextHandler.addEventListener(new ContextLoaderListener(context));
         contextHandler.setInitParameter("adminToken", adminToken);
 
-        ServletHolder servletHolder = new ServletHolder(new ServletContainer());
+        ServletHolder servletHolder = new ServletHolder(
+                new ServletContainer());
         servletHolder.setInitParameter(ServerProperties.PROVIDER_PACKAGES,
                 rootPackages);
         servletHolder.setInitOrder(1);
