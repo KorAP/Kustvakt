@@ -707,7 +707,7 @@
 		<dependency>
 			<groupId>com.nimbusds</groupId>
 			<artifactId>oauth2-oidc-sdk</artifactId>
-			<version>11.6</version>
+			<version>11.8</version>
 		</dependency>
 
 		<!-- Project Lombok -->
