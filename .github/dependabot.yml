@@ -14,8 +14,8 @@ updates:
       - dependency-name: "org.eclipse.jetty:jetty-*"
         versions:
           - ">= 12.0.0"
-      # Hibernate >=12 is incompatible    
-      - dependency-name: "org.hibernate:hibernate-*"
+      # Hibernate >=6.2 is incompatible    
+      - dependency-name: "org.hibernate.orm:hibernate-*"
         versions:
           - ">= 6.2.0"
     open-pull-requests-limit: 50
