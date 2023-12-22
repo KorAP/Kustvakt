@@ -16,7 +16,7 @@
 		to make sure that jersey uses the correct spring version-->
 		<spring6.version>${spring.version}</spring6.version>
 		<jetty.version>11.0.18</jetty.version>
-		<flyway.version>10.0.1</flyway.version>
+		<flyway.version>10.4.0</flyway.version>
 		<log4j.version>2.22.0</log4j.version>
 		<krill.version>[0.61.3,)</krill.version>
 		<koral.version>[0.41,)</koral.version>
