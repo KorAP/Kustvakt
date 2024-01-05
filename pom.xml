@@ -250,13 +250,62 @@
 	</build>
 
 	<dependencies>
-		<!-- backport -->
 		<dependency>
-			<groupId>backport-util-concurrent</groupId>
-			<artifactId>backport-util-concurrent</artifactId>
-			<version>3.1</version>
+			<groupId>de.ids_mannheim.korap</groupId>
+			<artifactId>Krill</artifactId>
+			<version>${krill.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.jaxrs</groupId>
+					<artifactId>jackson-jaxrs-json-provider</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.glassfish.jersey.containers</groupId>
+					<artifactId>jersey-container-grizzly2-http</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-slf4j-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jul-to-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>de.ids_mannheim.korap</groupId>
+			<artifactId>Koral</artifactId>
+			<version>${koral.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-slf4j-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-jul</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
 		<!-- Jersey -->
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
@@ -271,7 +320,7 @@
 			<!-- as long as we set spring6.version property transitive deps are ok 
 			-->
 		</dependency>
-
+		
 		<!-- JSON -->
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
@@ -285,13 +334,6 @@
 			<groupId>net.minidev</groupId>
 			<artifactId>json-smart</artifactId>
 			<version>2.5.0</version>
-		</dependency>
-
-		<!-- Flyway -->
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>${flyway.version}</version>
 		</dependency>
 
 		<!-- Logging -->
@@ -340,120 +382,11 @@
 			<version>3.30.2-GA</version>
 		</dependency>
 
-		<!-- EM:done -->
-
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>2.12.5</version>
-		</dependency>
-		<dependency>
-			<groupId>de.ids_mannheim.korap</groupId>
-			<artifactId>Koral</artifactId>
-			<version>${koral.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.sonatype.sisu</groupId>
-					<artifactId>sisu-guava</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-servlet</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-slf4j-impl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-jul</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.42.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-dbcp2</artifactId>
-			<version>2.9.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-validator</groupId>
-			<artifactId>commons-validator</artifactId>
-			<version>1.8.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
+		<!-- Encryption -->
 		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>
 			<version>0.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>de.ids_mannheim.korap</groupId>
-			<artifactId>Krill</artifactId>
-			<version>${krill.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.jaxrs</groupId>
-					<artifactId>jackson-jaxrs-json-provider</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.glassfish.jersey.containers</groupId>
-					<artifactId>jersey-container-grizzly2-http</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.xerial</groupId>
-					<artifactId>sqlite-jdbc</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-slf4j-impl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>jul-to-slf4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.reflections</groupId>
-			<artifactId>reflections</artifactId>
-			<version>0.10.2</version>
 		</dependency>
 
 		<!-- Spring -->
@@ -473,11 +406,6 @@
 			<version>${spring.version}</version>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-core</artifactId> 
-			<version>${spring.version}</version> </dependency> <dependency> <groupId>org.springframework.security</groupId> 
-			<artifactId>spring-security-web</artifactId> <version>${spring.version}</version> 
-			</dependency> -->
-		<!-- EM: done -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -508,14 +436,6 @@
 			<version>${spring.version}</version>
 		</dependency>
 
-		<!-- end copy -->
-
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.2</version>
-		</dependency>
-
 		<!-- jetty -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
@@ -531,12 +451,6 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-webapp</artifactId>
 			<version>${jetty.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>asm</groupId>
-			<artifactId>asm</artifactId>
-			<version>3.3.1</version>
 		</dependency>
 
 		<!-- not part of public release <dependency> <groupId>KorAP-graphDB</groupId> 
@@ -559,12 +473,40 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- Database -->
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.15.1</version>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.42.0.0</version>
+		</dependency>
+		
+		<!-- MySql -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.30</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+			<version>2.9.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Flyway -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>${flyway.version}</version>
+		</dependency>
+		
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
@@ -599,6 +541,7 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 		
+		
 		<!-- Validation -->
 		<dependency>
 		    <groupId>org.hibernate.validator</groupId>
@@ -619,7 +562,6 @@
 			<version>3.1.0</version>
 		</dependency>
 
-		<!-- servlet -->
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
@@ -627,16 +569,33 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- Utilities -->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.12.5</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.15.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.8.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>1.11.0</version>
 		</dependency>
-		<!--<dependency> <groupId>de.ids_mannheim.korap</groupId> <artifactId>Kustvakt-core</artifactId> 
-			<version>${project.version}</version> </dependency> <dependency> <groupId>de.ids_mannheim.korap</groupId> 
-			<artifactId>Kustvakt-core</artifactId> <version>${project.version}</version> 
-			<classifier>tests</classifier> <type>test-jar</type> <scope>test</scope> 
-			</dependency> -->
 
 		<!-- LDAP -->
 		<dependency>
@@ -648,28 +607,6 @@
 			<groupId>com.unboundid</groupId>
 			<artifactId>unboundid-ldapsdk</artifactId>
 			<version>6.0.11</version>
-		</dependency>
-
-
-		<!-- MySql -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.30</version>
-		</dependency>
-
-		<!-- Jersey -->
-		<dependency>
-			<groupId>org.glassfish.jersey.test-framework</groupId>
-			<artifactId>jersey-test-framework-core</artifactId>
-			<version>${jersey.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
-			<artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-			<version>${jersey.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- velocity -->
@@ -716,8 +653,8 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.30</version>
 		</dependency>
-
-		<!-- Mockserver -->
+		
+		<!-- Test -->
 		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-netty</artifactId>
@@ -729,6 +666,27 @@
 			<artifactId>junit-jupiter</artifactId>
 			<version>5.10.1</version>
 			<scope>test</scope>
+		</dependency>
+		<!-- Jersey Test -->
+		<dependency>
+			<groupId>org.glassfish.jersey.test-framework</groupId>
+			<artifactId>jersey-test-framework-core</artifactId>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
+			<artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		
+		<!-- Used in KustvaktClassLoader.java-->
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.10.2</version>
 		</dependency>
 	</dependencies>
 </project>

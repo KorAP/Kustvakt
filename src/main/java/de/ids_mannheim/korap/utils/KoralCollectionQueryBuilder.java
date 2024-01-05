@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.utils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.response.Notifications;
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * convenience builder class for collection query

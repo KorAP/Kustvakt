@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.rewrite;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,7 +8,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * EM: not used anymore. This rewrite was to remove an empty koral:doc

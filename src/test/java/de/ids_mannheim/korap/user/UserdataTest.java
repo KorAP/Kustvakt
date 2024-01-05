@@ -3,21 +3,22 @@ package de.ids_mannheim.korap.user;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.validator.ApacheValidator;
-import edu.emory.mathcs.backport.java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author hanl, margaretha

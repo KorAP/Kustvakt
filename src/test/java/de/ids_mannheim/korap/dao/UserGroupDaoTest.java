@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +29,6 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration("classpath:test-config.xml")

@@ -2,11 +2,12 @@ package de.ids_mannheim.korap.misc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+
 import de.ids_mannheim.korap.web.utils.MapUtils;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 
