@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import de.ids_mannheim.korap.dto.ResourceDto;
 import de.ids_mannheim.korap.service.ResourceService;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -23,7 +22,7 @@ import jakarta.ws.rs.core.MediaType;
  */
 @Controller
 @Path("{version}/resource")
-@ResourceFilters({ APIVersionFilter.class, PiwikFilter.class })
+@ResourceFilters({ APIVersionFilter.class})
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ResourceController {
 

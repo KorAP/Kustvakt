@@ -30,7 +30,6 @@ import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -60,7 +59,7 @@ import jakarta.ws.rs.core.SecurityContext;
  */
 @Controller
 @Path("/{version}/auth")
-@ResourceFilters({ APIVersionFilter.class, PiwikFilter.class })
+@ResourceFilters({ APIVersionFilter.class})
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AuthenticationController {
 

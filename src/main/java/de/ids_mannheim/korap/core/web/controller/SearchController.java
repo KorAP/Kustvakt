@@ -27,7 +27,6 @@ import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import de.ids_mannheim.korap.web.utils.SearchResourceFilters;
 import jakarta.servlet.ServletContext;
@@ -55,7 +54,7 @@ import jakarta.ws.rs.core.SecurityContext;
 @Controller
 @Path("/")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
-        DemoUserFilter.class, PiwikFilter.class })
+        DemoUserFilter.class})
 public class SearchController {
 
     private static final boolean DEBUG = false;

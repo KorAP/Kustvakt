@@ -183,13 +183,6 @@
 	<bean id="authorizationDao"
 		class="de.ids_mannheim.korap.oauth2.dao.CachedAuthorizationDaoImpl" />
 
-	<!-- Filters -->
-	<!-- <bean id="authenticationFilter" class="de.ids_mannheim.korap.web.filter.AuthenticationFilter" 
-		> <property name="authenticationManager" ref="kustvakt_authenticationmanager"/> 
-		</bean> <bean id="piwikFilter" class="de.ids_mannheim.korap.web.filter.PiwikFilter" 
-		> <property name="authenticationManager" ref="kustvakt_authenticationmanager"/> 
-		</bean> -->
-
 	<!-- Services -->
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl" />

@@ -23,7 +23,6 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.QueryJson;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
@@ -62,7 +61,7 @@ import jakarta.ws.rs.core.SecurityContext;
 @Controller
 @Path("{version}/vc")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
-        BlockingFilter.class, PiwikFilter.class })
+        BlockingFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class VirtualCorpusController {
 
@@ -139,7 +138,7 @@ public class VirtualCorpusController {
     @GET
     @Path("~{createdBy}/{vcName}")
     @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
-            DemoUserFilter.class, PiwikFilter.class })
+            DemoUserFilter.class})
     public QueryDto retrieveVCByName (@Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("vcName") String vcName) {

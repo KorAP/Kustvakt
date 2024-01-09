@@ -15,7 +15,6 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -40,8 +39,8 @@ import jakarta.ws.rs.core.SecurityContext;
  */
 @Controller
 @Path("{version}/{username: ~[a-zA-Z0-9_.]+}/setting")
-@ResourceFilters({ AuthenticationFilter.class, APIVersionFilter.class,
-        PiwikFilter.class })
+@ResourceFilters({APIVersionFilter.class, BlockingFilter.class, 
+    AuthenticationFilter.class})
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class UserSettingController {
 
@@ -70,8 +69,6 @@ public class UserSettingController {
      */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
     public Response createDefaultSetting (@Context SecurityContext context,
             @PathParam("username") String username, Map<String, Object> map) {
 
@@ -99,8 +96,6 @@ public class UserSettingController {
      * @return the default setting of the given username
      */
     @GET
-    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
     public Response retrieveDefaultSetting (@Context SecurityContext context,
             @PathParam("username") String username) {
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
@@ -139,8 +134,6 @@ public class UserSettingController {
     @DELETE
     @Path("{key}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
     public Response deleteDefaultSettingEntry (@Context SecurityContext context,
             @PathParam("username") String username,
             @PathParam("key") String key) {
@@ -169,8 +162,6 @@ public class UserSettingController {
      * @return 200 if the request is successful
      */
     @DELETE
-    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
     public Response deleteDefaultSetting (@Context SecurityContext context,
             @PathParam("username") String username) {
 

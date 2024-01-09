@@ -12,7 +12,6 @@ import de.ids_mannheim.korap.core.service.StatisticService;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -36,7 +35,7 @@ import jakarta.ws.rs.core.SecurityContext;
  */
 @Controller
 @Path("{version}/statistics/")
-@ResourceFilters({ APIVersionFilter.class, PiwikFilter.class })
+@ResourceFilters({ APIVersionFilter.class})
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class StatisticController {
 

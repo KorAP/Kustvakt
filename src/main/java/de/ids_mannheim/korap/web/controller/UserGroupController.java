@@ -16,7 +16,6 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -47,7 +46,7 @@ import jakarta.ws.rs.core.SecurityContext;
 @Controller
 @Path("{version}/group")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
-        BlockingFilter.class, PiwikFilter.class })
+        BlockingFilter.class})
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class UserGroupController {
 
