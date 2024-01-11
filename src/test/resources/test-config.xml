@@ -66,11 +66,10 @@
 		<!--<property name="poolPreparedStatements" value="true"/> -->
 	</bean>
 
-	<!-- use SingleConnection only for testing! -->
-	<bean id="sqliteDataSource"
+<!-- <bean id="sqliteDataSource"
 		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
 		lazy-init="true">
-		<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
@@ -80,12 +79,12 @@
 			</props>
 		</property>
 
-		<!-- Sqlite can only have a single connection -->
+		Sqlite can only have a single connection
 		<property name="suppressClose">
 			<value>true</value>
 		</property>
 	</bean>
-
+ -->
 	<bean id="c3p0DataSource"
 		class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">

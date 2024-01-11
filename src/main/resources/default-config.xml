@@ -87,28 +87,6 @@
 		<property name="testConnectionOnCheckin" value="true" />
 	</bean>
 
-	<bean id="sqliteDataSource"
-		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
-		lazy-init="true">
-		<property name="driverClassName"
-			value="${jdbc.driverClassName}" />
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
-		<property name="password" value="${jdbc.password}" />
-		<property name="connectionProperties">
-			<props>
-				<prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
-			</props>
-		</property>
-
-		<!-- relevant for single connection datasource and sqlite -->
-		<property name="suppressClose">
-			<value>true</value>
-		</property>
-		<!--<property name="initialSize" value="2"/> -->
-		<!--<property name="poolPreparedStatements" value="true"/> -->
-	</bean>
-
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
 	<bean id="flywayConfig"
 		class="org.flywaydb.core.api.configuration.ClassicConfiguration">
@@ -118,7 +96,6 @@
 		<property name="locations"
 			value="#{'${jdbc.schemaPath}'.split(',')}" />
 		<property name="dataSource" ref="dataSource" />
-		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 		<property name="outOfOrder" value="true" />
 	</bean>
@@ -132,7 +109,6 @@
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
 		depends-on="flyway">
 		<property name="dataSource" ref="dataSource" />
-		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 
 		<property name="packagesToScan">
@@ -314,8 +290,7 @@
 	<!-- similarly, don't forget the PlatformTransactionManager -->
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<property name="dataSource" ref="sqliteDataSource" />
+		<property name="dataSource" ref="dataSource" />
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 	</bean>
 
