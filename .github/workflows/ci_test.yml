@@ -39,9 +39,9 @@ jobs:
 
       - name: Build and install Koral
         run: mvn --file Koral/pom.xml install
-      
+
       - name: Build and package Kustvakt full
-        run: mvn clean --file Kustvakt/full/pom.xml package 
-        
+        run: mvn clean --file Kustvakt/pom.xml package
+
       - name: Build and package Kustvakt lite
-        run: mvn clean --file Kustvakt/full/pom.xml package -P lite -DskipTests=true     
+        run: mvn clean --file Kustvakt/pom.xml package -P lite -DskipTests=true
