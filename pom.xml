@@ -18,8 +18,8 @@
 		<jetty.version>11.0.19</jetty.version>
 		<flyway.version>10.4.1</flyway.version>
 		<log4j.version>2.22.1</log4j.version>
-		<krill.version>[0.61.3,)</krill.version>
-		<koral.version>[0.41,)</koral.version>
+		<krill.version>[0.62.0,)</krill.version>
+		<koral.version>[0.42,)</koral.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -251,7 +251,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>de.ids_mannheim.korap</groupId>
+			<groupId>de.ids-mannheim.korap.krill</groupId>
 			<artifactId>Krill</artifactId>
 			<version>${krill.version}</version>
 			<exclusions>
@@ -283,7 +283,7 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>de.ids_mannheim.korap</groupId>
+			<groupId>de.ids-mannheim.korap.koral</groupId>
 			<artifactId>Koral</artifactId>
 			<version>${koral.version}</version>
 			<exclusions>
