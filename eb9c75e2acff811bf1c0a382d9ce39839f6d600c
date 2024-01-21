@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08423519_00a298b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2024-01-21T10:22:02Z",
+      "side": 1,
+      "message": "Bot commits together fix the CI workflow (tested)",
+      "revId": "eb9c75e2acff811bf1c0a382d9ce39839f6d600c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
