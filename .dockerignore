@@ -1,8 +1,9 @@
 *
 !/core
-!/full
-!/lite
 !/sample-index
+!/src
 !/wiki-index
+!/Changes*
+!/*.xml
 !/LICENSE
 !.dockerignore
