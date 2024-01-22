@@ -43,8 +43,7 @@ RUN curl -I https://github.com/KorAP/Krill/releases/latest | \
 RUN rm -r Krill-* v*.zip
 
 # Package lite
-RUN cd full && \
-    mvn clean package -P lite && \
+RUN mvn clean package -P lite && \
     find target/Kustvakt-lite-*.jar -exec mv {} ../built/Kustvakt-lite.jar ';'
 
 RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' full/src/main/resources/kustvakt-lite.conf \
