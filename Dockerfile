@@ -43,19 +43,17 @@ RUN curl -I https://github.com/KorAP/Krill/releases/latest | \
 RUN rm -r Krill-* v*.zip
 
 # Package lite
-RUN cd full && \
-    mvn clean package -P lite && \
-    find target/Kustvakt-lite-*.jar -exec mv {} ../built/Kustvakt-lite.jar ';'
+RUN mvn clean package -P lite && \
+    find target/Kustvakt-lite-*.jar -exec mv {} /kustvakt/built/Kustvakt-lite.jar ';'
 
-RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' full/src/main/resources/kustvakt-lite.conf \
+RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' src/main/resources/kustvakt-lite.conf \
     > built/kustvakt-lite.conf
 
 # Package full
-RUN cd full && \
-    mvn clean package -DskipTests=true && \
-    find target/Kustvakt-full-*.jar -exec mv {} ../built/Kustvakt-full.jar ';'
+RUN mvn clean package -DskipTests=true && \
+    find target/Kustvakt-full-*.jar -exec mv {} /kustvakt/built/Kustvakt-full.jar ';'
 
-RUN cat full/src/main/resources/kustvakt.conf | \
+RUN cat src/main/resources/kustvakt.conf | \
     sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' | \
     sed 's!\(ldap\.config\s*=\).\+!\1\/kustvakt\/ldap\/ldap\.conf!' | \
     sed 's!\(oauth2\.initial\.super\.client\s*=\).\+!\1\/true!' | \
@@ -63,7 +61,7 @@ RUN cat full/src/main/resources/kustvakt.conf | \
     > built/kustvakt.conf
 
 RUN sed  's!\(ldifFile\s*=\).\+!\1\/kustvakt\/ldap\/ldap.ldif!' \
-    full/src/main/resources/embedded-ldap-example.conf \
+    src/main/resources/embedded-ldap-example.conf \
     > built/ldap.conf
 
 RUN cat full/src/main/resources/example-users.ldif \
@@ -78,7 +76,8 @@ RUN apk del git \
 RUN cd ${M2_HOME} && rm -r .m2
 
 # Cleanup
-RUN rm -r full && \
+RUN rm -r src && \
+    rm -r tools && \
     rm -r wiki-index
 
 FROM busybox:latest AS example-index
