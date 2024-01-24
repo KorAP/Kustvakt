@@ -16,6 +16,23 @@
       "message": "ci test running fine",
       "revId": "e9dd9966020416fcd187f4ec06ad5e7b5304ccae",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af44d4c4_7bc54cee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2024-01-24T12:30:27Z",
+      "side": 1,
+      "message": "IDs work fine - local maven repo looks good. Both full and lite can succesfully be packaged.",
+      "revId": "e9dd9966020416fcd187f4ec06ad5e7b5304ccae",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
