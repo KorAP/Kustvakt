@@ -22,12 +22,14 @@ jobs:
         with:
           repository: KorAP/Krill
           path: Krill
+          ref: v0.61.3
 
       - name: Checkout Koral
         uses: actions/checkout@v2
         with:
           repository: KorAP/Koral
           path: Koral
+          ref: v0.41
 
       - name: Set up JDK 17
         uses: actions/setup-java@v1
