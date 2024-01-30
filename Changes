@@ -1,6 +1,13 @@
 # version 0.72.1-SNAPSHOT
 
-# version 0.72-SNAPSHOT
+- Moved the content of the full folder to the root folder
+- Removed Piwik
+- Removed unused libraries
+- Cleaned up spring configs
+- Updated Krill and Koral with new groupIds
+- Updated Github workflow
+
+# version 0.72
 
 - Replaced javax.ws to jakarta.ws namespace (#648)
 - Upgrading Jersey 2.40 to 3.x (#646)
