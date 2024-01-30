@@ -29,17 +29,15 @@ Clone the latest version of Kustvakt
 git clone git@github.com:KorAP/Kustvakt.git
 </pre>
 
-Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository according to the required versions specified in ```Kustvakt/full/pom.xml```. For packaging Kustvakt, change into the `Kustvakt` folder.
+Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository according to the required versions specified in ```Kustvakt/pom.xml```. For packaging Kustvakt, change into the `Kustvakt` folder.
 
 Packaging Kustvakt full version
 <pre>
-cd full
 mvn clean package
 </pre>
 
 Packaging Kustvakt lite version
 <pre>
-cd full
 mvn package -P lite
 </pre>
 The jar file is located in the ```target/``` folder.
@@ -51,9 +49,9 @@ The jar file is located in the ```target/``` folder.
 java -jar target/Kustvakt-full-[version].jar    
 </pre>
 
-will run Kustvakt full version with the example [kustvakt.conf](https://github.com/KorAP/Kustvakt/blob/master/full/src/main/resources/kustvakt.conf) configuration file included. See [Customizing kustvakt configuration](https://github.com/KorAP/Kustvakt/edit/master/README.md#customizing-kustvakt-configuration).
+will run Kustvakt full version with the example [kustvakt.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt.conf) configuration file included. See [Customizing kustvakt configuration](https://github.com/KorAP/Kustvakt/edit/master/README.md#customizing-kustvakt-configuration).
 
-Kustvakt full version requires a Krill index and [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). By default, Kustvakt uses the [sample-index](https://github.com/KorAP/Kustvakt/tree/master/sample-index) located in the parent directory of the jar file and [the embedded LDAP server](https://github.com/KorAP/Kustvakt/blob/master/full/src/main/resources/embedded-ldap-example.conf) example.
+Kustvakt full version requires a Krill index and [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). By default, Kustvakt uses the [sample-index](https://github.com/KorAP/Kustvakt/tree/master/sample-index) located in the parent directory of the jar file and [the embedded LDAP server](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/embedded-ldap-example.conf) example.
 
 ### Running Kustvakt with a custom Spring XML configuration
 
@@ -112,12 +110,12 @@ curl -H "Content-Type: application/x-www-form-urlencoded"
 
 # Customizing Kustvakt configuration
 
-Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/kustvakt.conf``` or ```lite/src/main/resources/kustvakt-lite.conf```), to the same  folder as the Kustvakt jar files  (```/target```). Please do not change the name of the configuration file.
+Copy the default Kustvakt configuration file (e.g. ```src/main/resources/kustvakt.conf``` or ```/src/main/resources/kustvakt-lite.conf```), to the same  folder as the Kustvakt jar files  (```/target```). Please do not change the name of the configuration file.
 
 ### Setting Index Directory
 
 Set krill.indexDir in the configuration file to the location of your Krill index (relative path to the jar). In Kustvakt's root directory, there is a sample index, e.g.
-<pre>krill.indexDir = ../../sample-index</pre>
+<pre>krill.indexDir = sample-index</pre>
 
 
 ### Changing Kustvakt Server Port and Host
