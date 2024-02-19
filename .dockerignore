@@ -1,7 +1,9 @@
 *
 !/core
 !/sample-index
+!/src
 !/wiki-index
 !/Changes*
+!/*.xml
 !/LICENSE
 !.dockerignore
