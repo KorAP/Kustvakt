@@ -4,6 +4,5 @@
 !/src
 !/wiki-index
 !/Changes*
-!/*.xml
 !/LICENSE
 !.dockerignore
