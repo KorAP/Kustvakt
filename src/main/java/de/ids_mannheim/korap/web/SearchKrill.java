@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.lucene.store.MMapDirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -54,7 +53,7 @@ public class SearchKrill {
                     jlog.error("Index not found: " + path + "!");
                     System.exit(-1);
                 }
-                index = new KrillIndex(new MMapDirectory(Paths.get(path)));
+                index = new KrillIndex(Paths.get(path));
             };
         }
         catch (IOException e) {
