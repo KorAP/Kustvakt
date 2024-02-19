@@ -20,6 +20,7 @@
 		<log4j.version>2.22.1</log4j.version>
 		<krill.version>[0.62.0,)</krill.version>
 		<koral.version>[0.42,)</koral.version>
+		<lucene.version>5.0.0</lucene.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -281,6 +282,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<dependency>
+	      <artifactId>lucene-core</artifactId>
+	      <groupId>org.apache.lucene</groupId>
+	      <type>jar</type>
+	      <version>${lucene.version}</version>
+	    </dependency>
+    
 		
 		<dependency>
 			<groupId>de.ids-mannheim.korap.koral</groupId>
