@@ -1,4 +1,4 @@
-# version 0.72.1-SNAPSHOT
+# version 0.73
 
 - Moved the content of the full folder to the root folder
 - Removed Piwik
@@ -6,6 +6,8 @@
 - Cleaned up spring configs
 - Updated Krill and Koral with new groupIds
 - Updated Github workflow
+- Updated search Krill and removed Lucene
+- Updated readme
 
 # version 0.72
 
