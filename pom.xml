@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids-mannheim.korap.kustvakt</groupId>
 	<artifactId>Kustvakt</artifactId>
-	<version>0.73</version>
+	<version>0.73.1-SNAPSHOT</version>
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -544,6 +544,12 @@
 		
 		<!-- Validation -->
 		<dependency>
+		    <groupId>jakarta.validation</groupId>
+		    <artifactId>jakarta.validation-api</artifactId>
+		    <version>3.0.2</version>
+		</dependency>
+
+		<dependency>
 		    <groupId>org.hibernate.validator</groupId>
 		    <artifactId>hibernate-validator</artifactId>
 		    <version>8.0.1.Final</version>
@@ -552,7 +558,6 @@
 		    <groupId>org.glassfish</groupId>
 		    <artifactId>jakarta.el</artifactId>
 		    <version>4.0.2</version>
-		    <scope>test</scope>
 		</dependency>
 
 		<!-- servlet -->
