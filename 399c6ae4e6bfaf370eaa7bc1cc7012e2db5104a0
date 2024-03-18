@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "143b1cf4_05023e17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2024-03-18T16:57:33Z",
+      "side": 1,
+      "message": "Comment from dependabot:\n`This automated pull request fixes a security vulnerability (high severity).`",
+      "revId": "399c6ae4e6bfaf370eaa7bc1cc7012e2db5104a0",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
