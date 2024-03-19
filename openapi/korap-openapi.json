@@ -1,0 +1,465 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Kustvakt - OpenAPI 3.0",
+    "description": "Kustvakt server is a user and policy management component for KorAP, capable of rewriting queries for policy based document restrictions.",
+    "license": {
+      "name": "BSD-2 License",
+      "url": "https://raw.githubusercontent.com/KorAP/Kustvakt/master/LICENSE"
+    },
+    "version": "1.0.11"
+  },
+  "externalDocs": {
+    "description": "Kustvakt on Github",
+    "url": "https://github.com/KorAP/Kustvakt"
+  },
+  "servers": [
+    {
+      "url": "https://korap.ids-mannheim.de/api/v1.0"
+    }
+  ],
+  "tags": [
+    {
+      "name": "search",
+      "externalDocs": {
+        "description": "More documentation",
+        "url": "https://github.com/KorAP/Kustvakt/wiki/"
+      }
+    }
+  ],
+  "paths": {
+    "/search": {
+      "get": {
+        "tags": [
+          "search"
+        ],
+        "summary": "Search the given query over all corpora or a virtual corpus.",
+        "description": "Returns query results according to the given parameters. Without authorization, it is possible to search only metadata of all corpora by setting access-rewrite-disabled=true.",
+        "operationId": "search",
+        "security": [
+          {
+            "main_instance_authentication": [
+              "search"
+            ]
+          },
+          {
+            "test_instance_authentication": [
+              "search"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Search query depends on query language.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ql",
+            "in": "query",
+            "required": true,
+            "description": "Query language",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "poliqarp",
+                "cosmas2",
+                "annis",
+                "cql",
+                "fcsql"
+              ]
+            }
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "required": false,
+            "description": "CQL version number, not applicable for other query language.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1.1",
+                "1.2"
+              ]
+            }
+          },
+          {
+            "name": "cq",
+            "in": "query",
+            "required": false,
+            "description": "Define a virtual corpus (collection of texts) in which the search should be done. If not specified, search will be done over all corpora.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "creationDate": {
+                "summary": "Search in all documents with textClass wissenschaft or politik",
+                "value": "textClass=wissenschaft | textClass=politik"
+              },
+              "corpusSigle": {
+                "summary": "Search in all documents with corpusSigle GOE and created since 1820",
+                "value": "corpusSigle=GOE & creationDate since 1820"
+              }
+            }
+          },
+          {
+            "name": "context",
+            "in": "query",
+            "required": false,
+            "description": "Determine the size of the result context. The default context shows 6 tokens before and after a match.",
+            "schema": {
+              "type": "string",
+              "default": "6-token,6-token"
+            },
+            "examples": {
+              "sentence": {
+                "summary": "Show sentence where a match occurs.",
+                "value": "sentence"
+              },
+              "paragraph": {
+                "summary": "Show paragraph where a match occurs.",
+                "value": "paragraph"
+              },
+              "token": {
+                "summary": "Set the number of tokens before and after a match.",
+                "value": "3-token,3-token"
+              },
+              "char": {
+                "summary": "Set the number of characters before and after a match.",
+                "value": "10-chars,10-chars"
+              }
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Determine which metadata fields should be shown in the results. Multiple fields are separated by comma.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "single": {
+                "summary": "show a single field",
+                "value": "title"
+              },
+              "multiple": {
+                "summary": "show multiple fields",
+                "value": "title, author, textClass, pubDate"
+              }
+            }
+          },
+          {
+            "name": "engine",
+            "in": "query",
+            "required": false,
+            "description": "Determine which search engine should be used. Network is currently not available.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "lucene",
+                "network"
+              ],
+              "default": "lucene"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Determine the number of results per page.",
+            "schema": {
+              "type": "integer",
+              "default": 25
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Determine the start page parameter for paging. If page and offset are both set, offset will be used.",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Determine the start index parameter for paging. If page and offset are both set, offset will be used.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "cutoff",
+            "in": "query",
+            "required": false,
+            "description": "Determine if the search results should be limited to one page.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "access-rewrite-disabled",
+            "in": "query",
+            "required": false,
+            "description": "Determine if access rewrite should be disabled. If set true, searching within copyrighted data for unauthenticated users is allowed, but only the public metadata of the results (without text snippets) are included in the response.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "show-tokens",
+            "in": "query",
+            "required": false,
+            "description": "Determine if the match snippets should be shown as tokens in the results.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "show-snippet",
+            "in": "query",
+            "required": false,
+            "description": "Determine if the match snippets should be shown.",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad query parameter"
+          },
+          "401": {
+            "description": "Invalid authorization"
+          }
+        }
+      }
+    },
+    "/corpus/{corpus_id}/{doc_id}/{text_id}/{match_id}": {
+      "get": {
+        "tags": [
+          "matchInfo"
+        ],
+        "summary": "Retrieve match information",
+        "description": "Returns annotations of a specific match",
+        "operationId": "matchInfo",
+        "parameters": [
+          {
+            "name": "corpus_id",
+            "in": "path",
+            "description": "The corpus id of a match",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "doc_id",
+            "in": "path",
+            "description": "The document id of a match",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "text_id",
+            "in": "path",
+            "description": "The text id of a match",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "match_id",
+            "in": "path",
+            "description": "The match id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "foundry",
+            "in": "query",
+            "required": false,
+            "description": "Retrieve annotations with all or specific foundries only. Without specifying this parameter, no foundry will be retrieved.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "all foundries": {
+                "summary": "Retrieve annotations all foundries",
+                "value": "foundry=*"
+              },
+              "single foundry": {
+                "summary": "Retrieve annotations with tt foundry only",
+                "value": "foundry=tt"
+              },
+              "multiple foundry": {
+                "summary": "Retrieve annotations with corenlp or tt foundries only",
+                "value": "foundry=corenlp&foundry=tt"
+              }
+            }
+          },
+          {
+            "name": "layer",
+            "in": "query",
+            "required": false,
+            "description": "Retrieve annotations with specific layers only",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "single foundry": {
+                "summary": "Retrieve annotations with part of speech layer only",
+                "value": "layer=p"
+              },
+              "multiple foundry": {
+                "summary": "Retrieve annotations with part of speech and lemma layers only",
+                "value": "layer=p&foundry=l"
+              }
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "required": false,
+            "description": "Determine if spans should be retrieve.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        },
+        "security": [
+          {
+            "main_instance_authentication": [
+              "match_info"
+            ]
+          },
+          {
+            "test_instance_authentication": [
+              "match_info"
+            ]
+          }
+        ]
+      }
+    },
+    "/corpus/{corpus_id}/{doc_id}/{text_id}/": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "summary": "Retrieve metadata of a text",
+        "description": "Retrieve metadata of a text identified by a text sigle consisting of corpus_id, doc_id, and text_id.",
+        "operationId": "metadata",
+        "parameters": [
+          {
+            "name": "corpus_id",
+            "in": "path",
+            "description": "The corpus id of a match",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "doc_id",
+            "in": "path",
+            "description": "The document id of a match",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "text_id",
+            "in": "path",
+            "description": "The text id of a match",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Retrieve only speficied metadata fields of the text. By default, all metadata fields are retrieved.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "single foundry": {
+                "summary": "Retrieve only the author of the text",
+                "value": "fields=author"
+              },
+              "multiple foundry": {
+                "summary": "Retrieve the author, the textTypeArt and the title of the text",
+                "value": "fields=author,textTypeArt,title"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "main_instance_authentication": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://korap.ids-mannheim.de/settings/oauth/authorize",
+            "tokenUrl": "https://korap.ids-mannheim.de/api/v1.0/oauth2/token",
+            "scopes": {
+              "search": "search query",
+              "match_info": "retrieve match annotations"
+            }
+          }
+        }
+      },
+      "test_instance_authentication": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://korap.ids-mannheim.de/instance/test/settings/oauth/authorize",
+            "tokenUrl": "https://korap.ids-mannheim.de/instance/test/api/v1.0/oauth2/token",
+            "scopes": {
+              "search": "search query",
+              "match_info": "retrieve match annotations"
+            }
+          }
+        }
+      }
+    }
+  }
+}
