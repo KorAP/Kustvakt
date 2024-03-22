@@ -1,5 +1,10 @@
 # version 0.73.1-SNAPSHOT
 
+- Fixed jakarta validation error.
+- Added openapi doc (#744)
+- Moved service.properties to src/main/resources/properties 
+- Moved free-resources.json to src/main/resources/json
+- Enables inputting free-resources.json from data folder
 
 
 # version 0.73

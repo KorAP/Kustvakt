@@ -42,13 +42,13 @@ public class FreeResourceParser {
 
     public void run () throws IOException, KustvaktException {
         InputStream is = null;
-        File f = new File(FREE_RESOURCE_FILE);
+        File f = new File("data/"+FREE_RESOURCE_FILE);
         if (f.exists()) {
             is = new FileInputStream(f);
         }
         else {
             is = FreeResourceParser.class.getClassLoader()
-                    .getResourceAsStream(FREE_RESOURCE_FILE);
+                    .getResourceAsStream("json/"+FREE_RESOURCE_FILE);
         }
 
         JsonNode node = mapper.readTree(is);
