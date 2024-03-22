@@ -5,6 +5,9 @@
 - Moved service.properties to src/main/resources/properties 
 - Moved free-resources.json to src/main/resources/json
 - Enables inputting free-resources.json from data folder
+- Changed loading external kustvakt.conf and jdbc.properties 
+  to use /data folder (#598)
+
 
 
 # version 0.73

@@ -1,13 +1,18 @@
 package de.ids_mannheim.korap.server;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 import java.util.Scanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -22,17 +27,20 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.dao.AnnotationDao;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author hanl
- * @date 01/06/2015
+ * @author hanl, margaretha
+ * 
  */
 public abstract class KustvaktBaseServer {
 
+    private Logger log = LogManager.getLogger(KustvaktBaseServer.class);
+    
     protected static KustvaktConfiguration config;
     protected static String springConfig = "default-config.xml";
 
@@ -76,6 +84,28 @@ public abstract class KustvaktBaseServer {
         return kargs;
     }
 
+    protected void loadProperties (String path, String defaultPath) throws IOException {
+        File f = new File(path);
+        Properties properties = new Properties();
+
+        InputStream in = null;
+        if (!f.exists()) {
+            log.info("Loading kustvakt configuration from "+defaultPath);
+            in = KustvaktServer.class.getClassLoader()
+                    .getResourceAsStream(defaultPath);
+        }
+        else {
+            log.info("Loading kustvakt configuration from "+path);
+            in = new FileInputStream(f);
+        }
+
+        properties.load(in);
+        in.close();
+        
+        config = new KustvaktConfiguration();
+        config.loadBasicProperties(properties);
+    }
+    
     protected void start ()
             throws KustvaktException, IOException, NoSuchAlgorithmException {
 
