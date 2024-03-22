@@ -29,6 +29,7 @@
 			<array>
 				<value>classpath:kustvakt.conf</value>
 				<value>file:./kustvakt.conf</value>
+				<value>file:./data/kustvakt.conf</value>
 			</array>
 		</property>
 	</bean>
@@ -40,12 +41,14 @@
 			<array>
 				<value>classpath:properties/jdbc.properties</value>
 				<value>file:./jdbc.properties</value>
+				<value>file:./data/jdbc.properties</value>
 				<value>classpath:properties/mail.properties</value>
 				<value>file:./mail.properties</value>
 				<value>classpath:properties/hibernate.properties</value>
 
 				<value>classpath:kustvakt.conf</value>
 				<value>file:./kustvakt.conf</value>
+				<value>file:./data/kustvakt.conf</value>
 			</array>
 		</property>
 	</bean>
