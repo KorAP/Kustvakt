@@ -55,7 +55,7 @@ public class ServiceInfo {
                     .valueOf((String) props.get("kustvakt.cache"));
             this.cache_store = (String) props.get("kustvakt.cache_store");
 
-            this.krillVersion = (String) props.get("krill.version");
+//            this.krillVersion = (String) props.get("krill.version");
 
             QuerySerializer s = new QuerySerializer();
             this.koralVersion = s.getVersion();
@@ -74,7 +74,7 @@ public class ServiceInfo {
     }
 
     private static InputStream getStream () throws IOException {
-        String path = "service.properties";
+        String path = "properties/service.properties";
         InputStream stream = ConfigLoader.loadConfigStream(path);
         if (stream == null)
             throw new IOException(
