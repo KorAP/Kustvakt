@@ -20,12 +20,12 @@ public class FreeResourceControllerTest extends SpringJerseyTest {
                 .request().get();
         String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity).get(0);
-        assertEquals(n.at("/resourceId").asText(), "WPD17");
-        assertEquals(n.at("/titles/de").asText(),
-                "Deutsche Wikipedia Artikel 2017");
-        assertEquals(n.at("/titles/en").asText(),
-                "German Wikipedia Articles 2017");
-        assertEquals(1, n.at("/languages").size());
-        assertEquals(6, n.at("/layers").size());
+        assertEquals("WPD17", n.at("/resourceId").asText());
+        assertEquals("Deutsche Wikipedia Artikel 2017",
+                n.at("/titles/de").asText());
+        assertEquals("German Wikipedia Articles 2017",
+                n.at("/titles/en").asText());
+        assertEquals(n.at("/languages").size(), 1);
+        assertEquals(n.at("/layers").size(), 6);
     }
 }
