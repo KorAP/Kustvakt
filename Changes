@@ -7,7 +7,7 @@
 - Enables inputting free-resources.json from data folder
 - Changed loading external kustvakt.conf and jdbc.properties 
   to use /data folder (#598)
-
+- Added KoralQuery check when updating VC (solved #676)
 
 
 # version 0.73
