@@ -167,11 +167,11 @@ as Kustvakt itself – be under the [BSD-2 License](https://raw.githubuserconten
 
 # Publication
 
-Diewald, Nils/Hanl, Michael/Margaretha, Eliza/Bingel, Joachim/Kupietz, Marc/Bański, Piotr/Witt, Andreas (2016):
-    KorAP Architecture – Diving in the Deep Sea of Corpus Data. In: Calzolari, Nicoletta/Choukri, Khalid/Declerck, Thierry/Goggi, Sara/Grobelnik, Marko/Maegaard, Bente/Mariani, Joseph/Mazo, Helene/Moreno, Asuncion/Odijk, Jan/Piperidis, Stelios (Hrsg.): Proceedings of the Tenth International Conference on Language Resources and Evaluation (LREC 2016), Portorož, Slovenia. Paris: European Language Resources Association (ELRA), 2016. S. 3586-3591.
+Kupietz, Marc / Diewald, Nils / Margaretha, Eliza (2022): Building Paths to Corpus Data. A Multi-Level Least Effort and Maximum Return Approach. In: Fišer, Darja / Witt, Andreas (Hrsg.): CLARIN: The Infrastructure for Language Resources, Berlin, Boston: De Gruyter, 2022, S. 163-190. https://doi.org/10.1515/9783110767377-007
 
-Bański, Piotr/Diewald, Nils/Hanl, Michael/Kupietz, Marc/Witt, Andreas (2014):
-    Access Control by Query Rewriting. The Case of KorAP. In: Proceedings of the Ninth Conference on International Language Resources and Evaluation (LREC’14). European Language Resources Association (ELRA), 2014. S. 3817-3822.
+Diewald, Nils / Hanl, Michael / Margaretha, Eliza / Bingel, Joachim / Kupietz, Marc / Bański, Piotr / Witt, Andreas (2016): KorAP Architecture – Diving in the Deep Sea of Corpus Data. In: Calzolari, Nicoletta / Choukri, Khalid / Declerck, Thierry / Goggi, Sara/Grobelnik, Marko / Maegaard, Bente / Mariani, Joseph / Mazo, Helene / Moreno, Asuncion / Odijk, Jan / Piperidis, Stelios (Hrsg.): Proceedings of the Tenth International Conference on Language Resources and Evaluation (LREC 2016), Portorož, Slovenia. Paris: European Language Resources Association (ELRA), 2016. S. 3586-3591. 
+
+Bański, Piotr / Diewald, Nils, Hanl, Michael, Kupietz, Marc / Witt, Andreas (2014): Access Control by Query Rewriting. The Case of KorAP. In: Proceedings of the Ninth Conference on International Language Resources and Evaluation (LREC’14). European Language Resources Association (ELRA), 2014. S. 3817-3822.
 
 
 # References
