@@ -73,6 +73,9 @@
 											<artifact>*:*</artifact>
 											<excludes>
 												<exclude>db/lite/**</exclude>
+												<exclude>META-INF/*.SF</exclude>
+								                <exclude>META-INF/*.DSA</exclude>
+								                <exclude>META-INF/*.RSA</exclude>
 											</excludes>
 										</filter>
 									</filters>
