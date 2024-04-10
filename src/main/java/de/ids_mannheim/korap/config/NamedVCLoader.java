@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.QueryService;
@@ -64,6 +65,11 @@ public class NamedVCLoader implements Runnable {
         }
     }
 
+    public void loadVCToCache (String filename, String filePath)
+            throws IOException, QueryException, KustvaktException {
+        loadVCToCache(filename,filePath,null);
+    }
+    
     /**
      * Used for testing
      * 
@@ -73,17 +79,14 @@ public class NamedVCLoader implements Runnable {
      * @throws QueryException
      * @throws KustvaktException
      */
-    public void loadVCToCache (String filename, String filePath)
-            throws IOException, QueryException, KustvaktException {
+    public void loadVCToCache (String filename, String filePath, String json)
+            throws IOException, QueryException {
 
-        InputStream is = NamedVCLoader.class.getResourceAsStream(filePath);
-        String json = IOUtils.toString(is, "utf-8");
-        if (json != null) {
-            cacheVC(filename, json);
-            vcService.storeQuery("system", filename, ResourceType.SYSTEM,
-                    QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
-                    "system", null, null);
+        if (json==null || json.isEmpty()) {
+            InputStream is = NamedVCLoader.class.getResourceAsStream(filePath);
+            json = IOUtils.toString(is, "utf-8");
         }
+        processVC(filename, json);
     }
 
     public void loadVCToCache () throws IOException, QueryException {
@@ -109,10 +112,59 @@ public class NamedVCLoader implements Runnable {
             filename = strArr[0];
             String json = strArr[1];
             if (json != null) {
-                cacheVC(filename, json);
-                storeVCinDB(filename, json);
+                processVC(filename, json);
             }
         }
+    }
+    
+    /**
+     * Stores and caches VC if the given VC does not exist.
+     * Updates VC in the database and re-caches it, if the given VC exists.
+     * Updates VC if there is any change in the index.
+     * 
+     * In this method, it will be checked if
+     * <ol>
+     *  <li> VC exists in the database</li>
+     *  <li> VC exists in the cache </li>
+     *  <li> KoralQuery of the given VC differs from an existing VC with
+     * the same id. </li>
+     *  <li> Index has been changed</li>
+     * </ol>
+     * 
+     * Koral Query
+     * 
+     * @param vcId
+     * @param json
+     * @throws IOException
+     * @throws QueryException
+     */
+    private void processVC (String vcId, String json)
+            throws IOException, QueryException {
+        boolean updateCache = false;
+        try {
+            // if VC exists in the DB
+            QueryDO existingVC = vcService.searchQueryByName("system", vcId, "system",
+                    QueryType.VIRTUAL_CORPUS);
+            
+            String koralQuery = existingVC.getKoralQuery();
+            // if existing VC is different from input
+            if (json.hashCode() != koralQuery.hashCode()) {
+                updateCache = true;
+                // updateVCinDB
+                storeVCinDB(vcId, json, existingVC);
+            }
+        }
+        catch (KustvaktException e) {
+            // VC doesn't exist in the DB
+            if (e.getStatusCode() == StatusCodes.NO_RESOURCE_FOUND) {
+                storeVCinDB(vcId, json, null);
+            }
+            else {
+                throw new RuntimeException(e);
+            }    
+        }
+        
+        cacheVC(vcId, json, updateCache);
     }
 
     private String[] readFile (File file, String filename) throws IOException {
@@ -152,12 +204,18 @@ public class NamedVCLoader implements Runnable {
      * @param koralQuery
      * @throws IOException
      * @throws QueryException
+     * @throws KustvaktException 
      */
-    private void cacheVC (String vcId, String koralQuery)
+    private void cacheVC (String vcId, String koralQuery, boolean updateVC)
             throws IOException, QueryException {
         config.setVcInCaching(vcId);
-        if (VirtualCorpusCache.contains(vcId)) {
+        if (updateVC) {
+            jlog.info("Updating {} in cache ", vcId);
+            VirtualCorpusCache.delete(vcId);
+        }
+        else if (VirtualCorpusCache.contains(vcId)) {
             jlog.info("Checking {} in cache ", vcId);
+            
         }
         else {
             jlog.info("Storing {} in cache ", vcId);
@@ -172,32 +230,22 @@ public class NamedVCLoader implements Runnable {
     }
 
     /**
-     * Stores the VC if it doesn't exist in the database.
+     * Stores new VC or updates existing VC
      * 
      * @param vcId
      * @param koralQuery
      */
-    private void storeVCinDB (String vcId, String koralQuery) {
+    private void storeVCinDB (String vcId, String koralQuery, QueryDO existingVC) {
         try {
-            vcService.searchQueryByName("system", vcId, "system",
-                    QueryType.VIRTUAL_CORPUS);
+            String info = (existingVC == null) ? "Storing" : "Updating";
+            jlog.info("{} {} in database ", info, vcId);
+            
+            vcService.storeQuery(existingVC, "system", vcId, ResourceType.SYSTEM,
+                    QueryType.VIRTUAL_CORPUS, koralQuery, null, null, null,
+                    true, "system", null, null);
         }
         catch (KustvaktException e) {
-            if (e.getStatusCode() == StatusCodes.NO_RESOURCE_FOUND) {
-                try {
-                    jlog.info("Storing {} in database ", vcId);
-                    vcService.storeQuery("system", vcId, ResourceType.SYSTEM,
-                            QueryType.VIRTUAL_CORPUS, koralQuery, null, null,
-                            null, true, "system", null, null);
-                }
-                catch (KustvaktException e1) {
-                    throw new RuntimeException(e1);
-                }
-            }
-            else {
-                throw new RuntimeException(e);
-            }
+            throw new RuntimeException(e);
         }
-
     }
 }

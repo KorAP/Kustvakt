@@ -313,6 +313,16 @@ public class QueryService {
             String definition, String description, String status,
             boolean isCached, String queryCreator, String query,
             String queryLanguage) throws KustvaktException {
+        storeQuery(null, username, queryName, type, queryType, koralQuery,
+                definition, description, status, isCached, queryCreator, query,
+                queryLanguage);
+    }
+    
+    public void storeQuery (QueryDO existingQuery, String username, String queryName,
+            ResourceType type, QueryType queryType, String koralQuery,
+            String definition, String description, String status,
+            boolean isCached, String queryCreator, String query,
+            String queryLanguage) throws KustvaktException {
         ParameterChecker.checkNameValue(queryName, "queryName");
         ParameterChecker.checkObjectValue(type, "type");
 
@@ -348,9 +358,16 @@ public class QueryService {
 
         int queryId = 0;
         try {
-            queryId = queryDao.createQuery(queryName, type, queryType,
-                    requiredAccess, koralQuery, definition, description, status,
-                    isCached, queryCreator, query, queryLanguage);
+            if (existingQuery==null) {
+                queryId = queryDao.createQuery(queryName, type, queryType,
+                        requiredAccess, koralQuery, definition, description,
+                        status, isCached, queryCreator, query, queryLanguage);
+            }
+            else {
+                queryDao.editQuery(existingQuery, queryName, type,
+                        requiredAccess, koralQuery, definition, description,
+                        status, isCached, query, queryLanguage);
+            }
 
         }
         catch (Exception e) {
