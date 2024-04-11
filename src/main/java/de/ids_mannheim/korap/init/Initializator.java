@@ -6,7 +6,9 @@ import java.util.EnumSet;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.annotation.FreeResourceParser;
+import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -37,6 +39,8 @@ public class Initializator {
     public Initializator () {}
 
     public void init () throws IOException, QueryException, KustvaktException {
+        VirtualCorpusCache.CACHE_LOCATION = KustvaktConfiguration.DATA_FOLDER
+                + "/vc-cache";
         setInitialAccessScope();
         resourceParser.run();
 
@@ -50,6 +54,8 @@ public class Initializator {
     }
 
     public void initTest () throws IOException, KustvaktException {
+        VirtualCorpusCache.CACHE_LOCATION = KustvaktConfiguration.DATA_FOLDER
+                + "/vc-cache";
         setInitialAccessScope();
         if (config.createInitialSuperClient()) {
             clientService.createInitialTestSuperClient();
