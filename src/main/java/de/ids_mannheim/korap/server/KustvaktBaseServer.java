@@ -27,7 +27,6 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.dao.AnnotationDao;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import lombok.Getter;
@@ -114,11 +113,11 @@ public abstract class KustvaktBaseServer {
         }
 
         String adminToken = "";
-        File f = new File("adminToken");
+        File f = new File("data/adminToken");
         if (!f.exists()) {
             RandomCodeGenerator random = new RandomCodeGenerator();
             adminToken = random.createRandomCode(config);
-            FileOutputStream fos = new FileOutputStream(new File("adminToken"));
+            FileOutputStream fos = new FileOutputStream(f);
             OutputStreamWriter writer = new OutputStreamWriter(fos,
                     StandardCharsets.UTF_8.name());
             writer.append("token=");
