@@ -4,7 +4,7 @@
 
 	<defaultCache eternal='true' overflowToDisk='false' />
 	<!--maxBytesLocalHeap="200M" -->
-	<diskStore path="./cache_store" />
+	<diskStore path="./data/cache_store" />
 
 
 	<!-- EM -->

@@ -10,6 +10,7 @@
 - Added KoralQuery check when updating VC (solved #676)
 - Setup vc-cache in the data folder (#598)
 - Changed generating adminToken in the data folder (#598).
+- Moved disk store path cache_store into the data folder (#598)
 
 
 # version 0.73
