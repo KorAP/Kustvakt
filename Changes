@@ -12,7 +12,8 @@
 - Changed generating adminToken in the data folder (#598).
 - Moved disk store path cache_store into the data folder (#598)
 - Fixed invalid signature of the uber jar.
-
+- Updated configurations of the lite version to use the 
+  data folder (#598)
 
 # version 0.73
 
