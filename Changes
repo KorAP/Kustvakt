@@ -11,6 +11,7 @@
 - Setup vc-cache in the data folder (#598)
 - Changed generating adminToken in the data folder (#598).
 - Moved disk store path cache_store into the data folder (#598)
+- Fixed invalid signature of the uber jar.
 
 
 # version 0.73

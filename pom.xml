@@ -141,6 +141,9 @@
 												<exclude>org.glassfish.jersey.test-framework*</exclude>
 												<exclude>org.apache.velocity*</exclude>
 												<exclude>com.sun.mail</exclude>
+												<exclude>META-INF/*.SF</exclude>
+								                <exclude>META-INF/*.DSA</exclude>
+								                <exclude>META-INF/*.RSA</exclude>
 											</excludes>
 										</filter>
 									</filters>
