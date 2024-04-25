@@ -14,6 +14,7 @@
 - Fixed invalid signature of the uber jar.
 - Updated configurations of the lite version to use the 
   data folder (#598)
+- Setup logs files to be generated inside the data folder (#598)
 
 # version 0.73
 
