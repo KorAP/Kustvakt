@@ -2,9 +2,9 @@
 
 [![DOI](https://zenodo.org/badge/104361763.svg)](https://zenodo.org/badge/latestdoi/104361763)
 
-Kustvakt is a user and policy management component for KorAP (Diewald et al., 2016). It manages user access to resources (i.e. corpus data) typically bound with some licensing schemes. The licensing schemes of IDS resources provided through KorAP (DeReKo) are very complex involving the user access location and purposes (Kupietz & Lüngen, 2014). To manage user access to resources, Kustvakt performs query rewriting with document restrictions (Bański et al., 2014).
+Kustvakt is a user rights management component for KorAP managing access to linguistic resources (corpus data) typically bound with some licensing agreements (Diewald et al., 2016). KorAP provides user access to The Mannheim German Reference Corpus (DeReKo) at the Leibniz Institut für Deutsche Sprache (IDS Mannheim) that has complex licensing schemes with heterogenous restrictions involving access methods and purposes (Kupietz & Lüngen, 2014). To manage access to resources, Kustvakt implements query rewriting (Bański et al., 2014) and authorization using OAuth2 (Kupietz et al., 2022). User access also includes automated access through applications on behalf of users.
 
-Kustvakt acts as a middleware in KorAP binding other components, such as [Koral](https://github.com/KorAP/Koral) a query serializer and [Krill](https://github.com/KorAP/Krill) a search component, together. As the KorAP's API provider, it provides services, e.g. searching and retrieving annotation data of a match/hit, that can be used by a KorAP client, e.g. [Kalamar](https://github.com/KorAP/Kalamar) (a KorAP web user interface) and [KorapSRU](https://github.com/KorAP/KorapSRU) (the CLARIN FCS endpoint for KorAP).
+Kustvakt acts as a middleware in KorAP binding other components, such as [Koral](https://github.com/KorAP/Koral) a query serializer and [Krill](https://github.com/KorAP/Krill) a search component, together. As the KorAP's API provider, it provides web-services, e.g. searching and retrieving annotation data of matches, that can be used by a KorAP client, e.g. [Kalamar](https://github.com/KorAP/Kalamar) (a KorAP web user interface), [KorapSRU](https://github.com/KorAP/KorapSRU) (the CLARIN FCS endpoint for KorAP) and the [RKorAPClient](https://github.com/KorAP/RKorAPClient) (a package to access KorAP from R).
 
 
 # Versions
@@ -52,7 +52,7 @@ java -jar target/Kustvakt-full-[version].jar
 
 will run Kustvakt full version with the example [kustvakt.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt.conf) configuration file included. See [Customizing kustvakt configuration](https://github.com/KorAP/Kustvakt/edit/master/README.md#customizing-kustvakt-configuration).
 
-Kustvakt full version requires a Krill index and [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). By default, Kustvakt uses the [sample-index](https://github.com/KorAP/Kustvakt/tree/master/sample-index) located in the parent directory of the jar file and [the embedded LDAP server](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/embedded-ldap-example.conf) example.
+Kustvakt full version requires a Krill index and an [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). By default, Kustvakt uses the [sample-index](https://github.com/KorAP/Kustvakt/tree/master/sample-index) located at the same directory of the jar file, and [the embedded LDAP server](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/embedded-ldap-example.conf) example.
 
 
 ### Running Kustvakt with a custom Spring XML configuration
@@ -116,7 +116,7 @@ curl -H "Content-Type: application/x-www-form-urlencoded"
 
 # Customizing Kustvakt configuration
 
-Copy the default Kustvakt configuration file ([kustvakt.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt.conf)  or [kustvakt-lite.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt-lite.conf), to the folder where the Kustvakt jar files are (e.g. target). Please do not change the name of the configuration file.
+Copy the default Kustvakt configuration file ([kustvakt.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt.conf)  or [kustvakt-lite.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt-lite.conf), to the data folder at the project directory. Please do not change the name of the configuration file.
 
 ### Setting Index Directory
 
