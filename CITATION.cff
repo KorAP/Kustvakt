@@ -1,0 +1,39 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Kustvakt
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Eliza Margaretha
+    family-names: Illig
+    orcid: 'https://orcid.org/0009-0000-0466-7783'
+    affiliation: Leibniz Institute for the German Language
+  - given-names: Nils
+    family-names: Diewald
+    affiliation: Leibniz Institute for the German Language
+    orcid: 'https://orcid.org/0000-0002-2993-9180'
+  - given-names: Marc
+    family-names: Kupietz
+    orcid: 'https://orcid.org/0000-0001-8997-8256'
+    affiliation: Leibniz Institute for the German Language
+  - given-names: Micheal
+    family-names: Hanl
+  - given-names: Franck
+    family-names: Bodmer
+    email: bodmer@ids-mannheim.de
+    affiliation: Leibniz Institute for the German Language
+repository-code: 'https://github.com/KorAP/Kustvakt'
+url: 'https://korap.ids-mannheim.de'
+abstract: >-
+  Kustvakt is a user and policy management component for
+  KorAP, capable of rewriting queries for policy based
+  document restrictions. 
+keywords:
+  - access control
+  - query rewriting
+  - OAuth 2.0
+license: BSD-2-Clause
