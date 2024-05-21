@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91315a3f_f4419ff4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2024-05-21T08:45:05Z",
+      "side": 1,
+      "message": "I think email addresses are obsolete when an ORCID is given. I try to avoid publishing email addresses in verbatim to limit spam.\n\nOtherwise: Great! I think it\u0027s fine to name you as the sole author and everyone else just being a contributor, but that\u0027s up to you of course.",
+      "revId": "2df521dd927819a243bce16cc566eb689828dee1",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
