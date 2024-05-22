@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids-mannheim.korap.kustvakt</groupId>
 	<artifactId>Kustvakt</artifactId>
-	<version>0.73.1</version>
+	<version>0.73.2-SNAPSHOT</version>
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,7 +18,7 @@
 		<jetty.version>11.0.19</jetty.version>
 		<flyway.version>10.6.0</flyway.version>
 		<log4j.version>2.22.1</log4j.version>
-		<krill.version>[0.62.3,)</krill.version>
+		<krill.version>[0.62.4,)</krill.version>
 		<koral.version>[0.42,)</koral.version>
 	</properties>
 	<profiles>
