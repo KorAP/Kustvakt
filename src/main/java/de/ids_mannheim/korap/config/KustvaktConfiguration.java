@@ -16,6 +16,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.ids_mannheim.korap.util.KrillProperties;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
@@ -41,6 +44,9 @@ public class KustvaktConfiguration {
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
     public static final String DATA_FOLDER = "data";
 
+    public final static Logger log = LoggerFactory
+            .getLogger(KustvaktConfiguration.class);
+    
     private String vcInCaching;
 
     private String indexDir;
@@ -139,6 +145,7 @@ public class KustvaktConfiguration {
      */
     protected void load (Properties properties) throws Exception {
         loadBasicProperties(properties);
+        loadKrillProperties(properties);
 
         apiWelcomeMessage = properties.getProperty("api.welcome.message",
                 "Welcome to KorAP API!");
@@ -213,6 +220,26 @@ public class KustvaktConfiguration {
 
         // network endpoint
         networkEndpointURL = properties.getProperty("network.endpoint.url", "");
+    }
+
+    private void loadKrillProperties (Properties properties) {
+        try {
+            String maxTokenMatch = properties.getProperty("krill.match.max.token");
+            if (maxTokenMatch != null) {
+                KrillProperties.maxTokenMatchSize = Integer.parseInt(maxTokenMatch);
+            }
+    
+            String maxTokenContext = properties
+                    .getProperty("krill.context.max.token");
+            if (maxTokenContext != null) {
+                KrillProperties.maxTokenContextSize = Integer
+                        .parseInt(maxTokenContext);
+            }
+        }
+        catch (NumberFormatException e) {
+            log.error("A Krill property expects numerical values: "
+                    + e.getMessage());
+        };
     }
 
     @Deprecated

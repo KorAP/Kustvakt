@@ -35,7 +35,7 @@ public class SearchKrill {
     private static final boolean DEBUG = false;
 
     public static KrillIndex index;
-
+    
     /**
      * Constructor
      */
@@ -60,7 +60,7 @@ public class SearchKrill {
             jlog.error("Unable to loadSubTypes index:" + e.getMessage());
         };
     };
-
+    
     public KrillIndex getIndex () {
         return index;
     };

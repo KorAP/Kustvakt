@@ -1,5 +1,8 @@
 # version 0.73.2-SNAPSHOT
 
+- Added tests for the DNB scenario with custom max match 
+  and context size. (#745)
+
 # version 0.73.1
 
 - Fixed jakarta validation error.
