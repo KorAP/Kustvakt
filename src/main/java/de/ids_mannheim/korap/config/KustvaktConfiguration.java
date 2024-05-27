@@ -46,7 +46,7 @@ public class KustvaktConfiguration {
 
     public final static Logger log = LoggerFactory
             .getLogger(KustvaktConfiguration.class);
-    
+
     private String vcInCaching;
 
     private String indexDir;
@@ -56,6 +56,9 @@ public class KustvaktConfiguration {
     private List<String> queryLanguages;
 
     private String serverHost;
+
+    private int maxTokenContext;
+    private int maxTokenMatch;
 
     private int maxhits;
     private int returnhits;
@@ -220,6 +223,25 @@ public class KustvaktConfiguration {
 
         // network endpoint
         networkEndpointURL = properties.getProperty("network.endpoint.url", "");
+
+        maxTokenContext = parsePropertyToInt(properties,
+                "max.token.context.size", 0);
+    }
+
+    private int parsePropertyToInt (Properties properties, String propertyName,
+            int defaultValue) {
+        int value = defaultValue;
+        String property = properties.getProperty(propertyName);
+        try {
+            if (property != null) {
+                value = Integer.parseInt(property);
+            }
+        }
+        catch (NumberFormatException e) {
+            log.error(propertyName + " expects numerical values: "
+                    + e.getMessage());
+        }
+        return value;
     }
 
     @Deprecated

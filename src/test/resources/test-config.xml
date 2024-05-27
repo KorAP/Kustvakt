@@ -40,11 +40,15 @@
 			<array>
 				<value>classpath:test-jdbc.properties</value>
 				<value>file:./test-jdbc.properties</value>
+				<value>file:./data/test-jdbc.properties</value>
 				<value>classpath:properties/mail.properties</value>
 				<value>file:./mail.properties</value>
+				<value>file:./data/mail.properties</value>
 				<value>classpath:test-hibernate.properties</value>
+				<value>file:./data/test-hibernate.properties</value>
 				<value>file:./kustvakt-test.conf</value>
 				<value>classpath:kustvakt-test.conf</value>
+				<value>file:./data/kustvakt-test.conf</value>
 			</array>
 		</property>
 	</bean>
@@ -196,6 +200,9 @@
 		class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite" />
 	<bean id="queryReferenceRewrite"
 		class="de.ids_mannheim.korap.rewrite.QueryReferenceRewrite" />
+	<bean id="queryContextRewrite"
+		class="de.ids_mannheim.korap.rewrite.QueryContextRewrite" />
+		
 
 	<util:list id="rewriteTasks"
 		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
@@ -203,6 +210,7 @@
 		<ref bean="collectionRewrite" />
 		<ref bean="virtualCorpusRewrite" />
 		<ref bean="queryReferenceRewrite" />
+		<ref bean="queryContextRewrite" />
 	</util:list>
 
 	<bean id="rewriteHandler"

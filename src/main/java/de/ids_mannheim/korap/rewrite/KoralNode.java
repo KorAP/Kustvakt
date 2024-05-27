@@ -269,4 +269,11 @@ public class KoralNode {
         return this.wrapNode(this.node.get(i));
     }
 
+    public int asInt() {
+        return this.node.asInt();
+    }
+    
+    public String asText(){
+        return this.node.asText();
+    }
 }
