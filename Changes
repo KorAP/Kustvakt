@@ -2,6 +2,7 @@
 
 - Added tests for the DNB scenario with custom max match 
   and context size. (#745)
+- Implemented QueryContextRewrite (#755)  
 
 # version 0.73.1
 

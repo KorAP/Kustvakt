@@ -46,7 +46,7 @@ public class KustvaktConfiguration {
 
     public final static Logger log = LoggerFactory
             .getLogger(KustvaktConfiguration.class);
-    
+
     private String vcInCaching;
 
     private String indexDir;
@@ -56,6 +56,9 @@ public class KustvaktConfiguration {
     private List<String> queryLanguages;
 
     private String serverHost;
+
+    private int maxTokenContext;
+    private int maxTokenMatch;
 
     private int maxhits;
     private int returnhits;
@@ -123,6 +126,7 @@ public class KustvaktConfiguration {
         load(properties);
         //        readPipesFile("pipes");
         KrillProperties.setProp(properties);
+        loadKrillProperties(properties);
     }
 
     public KustvaktConfiguration () {}
@@ -145,7 +149,6 @@ public class KustvaktConfiguration {
      */
     protected void load (Properties properties) throws Exception {
         loadBasicProperties(properties);
-        loadKrillProperties(properties);
 
         apiWelcomeMessage = properties.getProperty("api.welcome.message",
                 "Welcome to KorAP API!");
@@ -220,26 +223,33 @@ public class KustvaktConfiguration {
 
         // network endpoint
         networkEndpointURL = properties.getProperty("network.endpoint.url", "");
+
+        maxTokenContext = parsePropertyToInt(properties,
+                "max.token.context.size", 0);
     }
 
     private void loadKrillProperties (Properties properties) {
+        KrillProperties.maxTokenMatchSize = parsePropertyToInt(properties,
+                "krill.match.max.token", KrillProperties.maxTokenMatchSize);
+
+        KrillProperties.maxTokenContextSize = parsePropertyToInt(properties,
+                "krill.context.max.token", KrillProperties.maxTokenContextSize);
+    }
+
+    private int parsePropertyToInt (Properties properties, String propertyName,
+            int defaultValue) {
+        int value = defaultValue;
+        String property = properties.getProperty(propertyName);
         try {
-            String maxTokenMatch = properties.getProperty("krill.match.max.token");
-            if (maxTokenMatch != null) {
-                KrillProperties.maxTokenMatchSize = Integer.parseInt(maxTokenMatch);
-            }
-    
-            String maxTokenContext = properties
-                    .getProperty("krill.context.max.token");
-            if (maxTokenContext != null) {
-                KrillProperties.maxTokenContextSize = Integer
-                        .parseInt(maxTokenContext);
+            if (property != null) {
+                value = Integer.parseInt(property);
             }
         }
         catch (NumberFormatException e) {
-            log.error("A Krill property expects numerical values: "
+            log.error(propertyName + " expects numerical values: "
                     + e.getMessage());
-        };
+        }
+        return value;
     }
 
     @Deprecated
