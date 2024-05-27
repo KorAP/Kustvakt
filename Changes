@@ -5,6 +5,7 @@
 - Cleaned up named-vc.  
 - Updated tests using the old match info web-services (#757)
 - Added deprecation warning for the old matchInfo service (#757)
+- Implemented QueryContextRewrite (#755)  
 
 # version 0.73.1
 
