@@ -91,17 +91,12 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertFalse(node.at("/error_description").isMissingNode());
-        // assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        // String clientId = node.at("/client_id").asText();
-        // assertTrue(node.at("/client_secret").isMissingNode());
-        // 
-        // deregisterClient(username, clientId);
     }
 
     private void testRetrievePluginInfo (String clientId,
             int refreshTokenExpiry)
             throws ProcessingException, KustvaktException {
-        JsonNode clientInfo = retrieveClientInfo(clientId, username);
+        JsonNode clientInfo = retrieveClientInfo(clientId, "other-user");
         assertEquals(clientId, clientInfo.at("/client_id").asText());
         assertEquals(clientInfo.at("/client_name").asText(), "Plugin");
         assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
@@ -109,10 +104,10 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertNotNull(clientInfo.at("/client_description").asText());
         assertNotNull(clientInfo.at("/source").asText());
         assertFalse(clientInfo.at("/permitted").asBoolean());
-        assertEquals(username, clientInfo.at("/registered_by").asText());
-        assertNotNull(clientInfo.at("/registration_date"));
-        assertEquals(refreshTokenExpiry,
-                clientInfo.at("/refresh_token_expiry").asInt());
+        assertTrue(clientInfo.at("/registered_by").isMissingNode());
+        assertTrue(clientInfo.at("/registration_date").isMissingNode());
+        assertTrue(clientInfo.at("/refresh_token_expiry").isMissingNode());
+        
     }
 
     private void testListUserRegisteredPlugins (String username,
@@ -264,10 +259,10 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/0/client_description").isMissingNode());
         assertFalse(node.at("/0/client_type").isMissingNode());
         assertFalse(node.at("/0/permitted").isMissingNode());
-        assertFalse(node.at("/0/registration_date").isMissingNode());
+        assertTrue(node.at("/0/registration_date").isMissingNode());
         assertFalse(node.at("/0/source").isMissingNode());
-        assertFalse(node.at("/0/refresh_token_expiry").isMissingNode());
-        // assertTrue(node.at("/1/refresh_token_expiry").isMissingNode());
+        assertTrue(node.at("/0/refresh_token_expiry").isMissingNode());
+        assertTrue(node.at("/1/client_redirect_uri").isMissingNode());
     }
 
     private JsonNode listPlugins (boolean permitted_only)

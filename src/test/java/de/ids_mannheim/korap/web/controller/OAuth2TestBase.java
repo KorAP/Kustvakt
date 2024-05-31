@@ -349,8 +349,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path(clientId).request()
-                //                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                //                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .post(Entity.form(form));

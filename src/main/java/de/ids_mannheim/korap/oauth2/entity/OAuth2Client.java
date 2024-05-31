@@ -49,6 +49,7 @@ public class OAuth2Client implements Comparable<OAuth2Client> {
     private String description;
     private String url;
 
+    // Source determines if a client is a plugin
     private String source;
     @Column(name = "is_permitted")
     private boolean isPermitted;
