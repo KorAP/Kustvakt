@@ -261,12 +261,50 @@ public class SearchController {
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans,
+            @DefaultValue("true") @QueryParam("show-snippet") String snippetStr,
+            @DefaultValue("false") @QueryParam("show-tokens") String tokensStr,
+            @QueryParam("expand") String expansion,
             // Highlights may also be a list of valid highlight classes
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
 
-        return retrieveMatchInfo(ctx, headers, locale, corpusId, docId, textId,
-                matchId, foundries, layers, spans, "true", "false", "sentence",
-                highlights);
+        TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
+        try {
+            scopeService.verifyScope(tokenContext, OAuth2Scope.MATCH_INFO);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+
+        Boolean expandToSentence = true;
+        if (expansion != null
+                && (expansion.equals("false") || expansion.equals("null"))) {
+            expandToSentence = false;
+        }
+        spans = spans != null ? spans : false;
+        Boolean snippet = true;
+        Boolean tokens = false;
+        if (snippetStr != null
+                && (snippetStr.equals("false") || snippetStr.equals("null")))
+            snippet = false;
+
+        if (tokensStr != null && (tokensStr.equals("true")
+                || tokensStr.equals("1") || tokensStr.equals("yes")))
+            tokens = true;
+
+        highlights = highlights != null ? highlights : false;
+        if (layers == null || layers.isEmpty())
+            layers = new HashSet<>();
+
+        try {
+            String results = searchService.retrieveMatchInfo(corpusId, docId,
+                    textId, matchId, true, foundries,
+                    tokenContext.getUsername(), headers, layers, spans, snippet,
+                    tokens, expandToSentence, highlights, true);
+            return Response.ok(results).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
     @GET
@@ -320,7 +358,7 @@ public class SearchController {
             String results = searchService.retrieveMatchInfo(corpusId, docId,
                     textId, matchId, true, foundries,
                     tokenContext.getUsername(), headers, layers, spans, snippet,
-                    tokens, expandToSentence, highlights);
+                    tokens, expandToSentence, highlights, false);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {

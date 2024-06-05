@@ -203,7 +203,8 @@ public class SearchKrill {
     public String getMatch (String id, boolean info, List<String> foundries,
             List<String> layers, boolean includeSpans, boolean includeSnippet,
             boolean includeTokens, boolean includeHighlights,
-            boolean sentenceExpansion, Pattern licensePattern)
+            boolean sentenceExpansion, Pattern licensePattern, 
+            boolean isDeprecated)
             throws KustvaktException {
         Match km;
         if (index != null) {
@@ -222,6 +223,13 @@ public class SearchKrill {
         else {
             km = new Match();
             km.addError(601, "Unable to find index");
+        }
+        
+        if (isDeprecated) {
+            km.addWarning(StatusCodes.DEPRECATED,
+                    "This service is deprecated. Please use the following service"
+                    + " URL instead: {version}/corpus/{corpusId}/{docId}/"
+                    + "{textId}/{matchId}");
         }
         return km.toJsonString();
     };
