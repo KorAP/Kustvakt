@@ -23,7 +23,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
     public void testGetMatchInfoPublicCorpus () throws KustvaktException {
         Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784").path("p36-100")
-                .path("matchInfo").queryParam("foundry", "*").request().get();
+                .queryParam("foundry", "*").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -41,7 +41,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
     public void testGetMatchInfoNotAllowed () throws KustvaktException {
         Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846").path("p36875-36876")
-                .path("matchInfo").queryParam("foundry", "*").request().get();
+                .queryParam("foundry", "*").request().get();
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -58,7 +58,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
     public void testGetMatchInfoWithAuthentication () throws KustvaktException {
         Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846").path("p36875-36876")
-                .path("matchInfo").queryParam("foundry", "*").request()
+                .queryParam("foundry", "*").request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",

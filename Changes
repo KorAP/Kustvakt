@@ -2,7 +2,8 @@
 
 - Added tests for the DNB scenario with custom max match 
   and context size. (#745)
-- Clean up named-vc.  
+- Cleaned up named-vc.  
+- Updated tests using the old match info web-services (#757)
 
 # version 0.73.1
 

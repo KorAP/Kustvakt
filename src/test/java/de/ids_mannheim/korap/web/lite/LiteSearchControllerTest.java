@@ -171,7 +171,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Test
     public void testMatchInfoGetWithoutSpans () throws KustvaktException {
         Response response = target().path(API_VERSION)
-                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
+                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
                 .queryParam("foundry", "*").queryParam("spans", "false")
                 .request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -187,7 +187,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Test
     public void testMatchInfoGetWithoutHighlights () throws KustvaktException {
         Response response = target().path(API_VERSION)
-                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
+                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
                 .queryParam("foundry", "xy").queryParam("spans", "false")
                 .request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -223,7 +223,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Test
     public void testMatchInfoGetWithHighlights () throws KustvaktException {
         Response response = target().path(API_VERSION)
-                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
+                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
                 .queryParam("foundry", "xy").queryParam("spans", "false")
                 .queryParam("hls", "true").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -249,7 +249,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Test
     public void testMatchInfoGet2 () throws KustvaktException {
         Response response = target().path(API_VERSION)
-                .path("corpus/GOE/AGA/01784/p36-46/matchInfo")
+                .path("corpus/GOE/AGA/01784/p36-46")
                 .queryParam("foundry", "*").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
