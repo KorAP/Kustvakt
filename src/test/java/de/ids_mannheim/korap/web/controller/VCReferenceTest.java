@@ -9,14 +9,9 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
@@ -29,6 +24,11 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class VCReferenceTest extends SpringJerseyTest {
 
@@ -78,6 +78,9 @@ public class VCReferenceTest extends SpringJerseyTest {
         dao.deleteQuery(vc);
         vc = dao.retrieveQueryByName("named-vc2", "system");
         assertNull(vc);
+        
+        VirtualCorpusCache.delete("named-vc1");
+        assertFalse(VirtualCorpusCache.contains("named-vc1"));
     }
 
     private int testSearchWithoutRef_VC1 () throws KustvaktException {
