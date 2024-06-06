@@ -5,6 +5,7 @@
 - Cleaned up named-vc.  
 - Updated tests using the old match info web-services (#757)
 - Added deprecation warning for the old matchInfo service (#757)
+- Restrict registration info for plugins (solves #572)  
 
 # version 0.73.1
 
