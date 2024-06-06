@@ -341,17 +341,27 @@ public class OAuth2ClientService {
         return clientDao.retrieveClientById(clientId);
     }
 
-    public OAuth2ClientInfoDto retrieveClientInfo (String clientId)
+    public OAuth2ClientInfoDto retrieveClientInfo (String clientId, String username)
             throws KustvaktException {
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        //        if (adminDao.isAdmin(username)
-        //                || username.equals(client.getRegisteredBy())) {
-        return new OAuth2ClientInfoDto(client);
-        //        }
-        //        else {
-        //            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-        //                    "Unauthorized operation for user: " + username, username);
-        //        }
+        
+        // all client info is only available to the owner/admin
+        if (adminDao.isAdmin(username)
+                || username.equals(client.getRegisteredBy())) {
+            return new OAuth2ClientInfoDto(client);
+        }
+        // plugin info is available for all users inclusive guest
+        else if (isPlugin(client)) {
+                return new OAuth2ClientInfoDto(client, false);
+        } 
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+    }
+    
+    public boolean isPlugin (OAuth2Client client) {
+        return (client.getSource() != null && !client.getSource().isEmpty());
     }
 
     public OAuth2Client retrieveClient (String clientId)
@@ -376,7 +386,7 @@ public class OAuth2ClientService {
         }
 
         Collections.sort(uniqueClients);
-        return createClientDtos(uniqueClients);
+        return createClientDtos(uniqueClients,username);
     }
 
     public List<OAuth2ClientInfoDto> listUserRegisteredClients (String username)
@@ -384,15 +394,15 @@ public class OAuth2ClientService {
         List<OAuth2Client> userClients = clientDao
                 .retrieveUserRegisteredClients(username);
         Collections.sort(userClients);
-        return createClientDtos(userClients);
+        return createClientDtos(userClients,username);
     }
 
-    public List<OAuth2ClientInfoDto> listPlugins (boolean isPermitted)
+    public List<OAuth2ClientInfoDto> listPlugins (boolean isPermitted, String username)
             throws KustvaktException {
 
         List<OAuth2Client> plugins = clientDao.retrievePlugins(isPermitted);
         Collections.sort(plugins);
-        return createClientDtos(plugins);
+        return createClientDtos(plugins,username);
     }
 
     public List<InstalledPluginDto> listInstalledPlugins (String superClientId,
@@ -452,12 +462,18 @@ public class OAuth2ClientService {
     }
 
     private List<OAuth2ClientInfoDto> createClientDtos (
-            List<OAuth2Client> userClients) throws KustvaktException {
+            List<OAuth2Client> userClients, String username) throws KustvaktException {
         List<OAuth2ClientInfoDto> dtoList = new ArrayList<>(userClients.size());
+        boolean showAllInfo;
         for (OAuth2Client uc : userClients) {
-            if (uc.isSuper())
+            showAllInfo = false;
+            if (uc.isSuper()) {
                 continue;
-            OAuth2ClientInfoDto dto = new OAuth2ClientInfoDto(uc);
+            }
+            if (uc.getRegisteredBy().equals(username)) {
+                showAllInfo = true;
+            }
+            OAuth2ClientInfoDto dto = new OAuth2ClientInfoDto(uc, showAllInfo);
             dtoList.add(dto);
         }
         return dtoList;
