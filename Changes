@@ -2,6 +2,7 @@
 
 - Added tests for the DNB scenario with custom max match 
   and context size. (#745)
+- Restrict registration info for plugins (solves #572)  
 
 # version 0.73.1
 

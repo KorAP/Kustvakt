@@ -60,3 +60,4 @@ src\main\resources\Kustvakt.conf
 /old-jars/
 /data-backup
 /notes
+/docker

@@ -16,6 +16,8 @@ import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
+import de.ids_mannheim.korap.web.filter.DemoFilter;
+import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
@@ -158,17 +160,34 @@ public class OAuthClientController {
         }
     }
 
+    /**
+     * Returns information about the given client id. Only super
+     * clients are allowed to use this service.
+     * 
+     * @param securityContext
+     * @param clientId
+     *            plugin or OAuth2 client id
+     * @param superClientId
+     * @param superClientSecret
+     * @return OAuth2 client/plugin information
+     */
     @POST
     @Path("{client_id}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ APIVersionFilter.class })
+    @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
+            DemoUserFilter.class })
     public OAuth2ClientInfoDto retrieveClientInfo (
+            @Context SecurityContext securityContext,
             @PathParam("client_id") String clientId,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret) {
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             clientService.verifySuperClient(superClientId, superClientSecret);
-            return clientService.retrieveClientInfo(clientId);
+            scopeService.verifyScope(context, OAuth2Scope.CLIENT_INFO);
+            return clientService.retrieveClientInfo(clientId,
+                    context.getUsername());
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
