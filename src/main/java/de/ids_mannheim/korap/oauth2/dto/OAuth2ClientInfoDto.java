@@ -40,6 +40,7 @@ public class OAuth2ClientInfoDto {
     @JsonProperty("registered_by")
     private String registeredBy;
     @JsonProperty("refresh_token_expiry")
+    @JsonInclude(Include.NON_DEFAULT)
     private int refreshTokenExpiry; // in seconds
 
     @JsonProperty("permitted")
@@ -47,28 +48,41 @@ public class OAuth2ClientInfoDto {
     private JsonNode source;
 
     public OAuth2ClientInfoDto (OAuth2Client client) throws KustvaktException {
+        this(client,true);
+    }
+    
+    public OAuth2ClientInfoDto (OAuth2Client client, boolean showAllInfo) throws KustvaktException {
         this.setClientId(client.getId());
         this.setClientName(client.getName());
         this.setDescription(client.getDescription());
         this.setClientType(client.getType());
         this.setUrl(client.getUrl());
         this.setClientType(client.getType());
-        this.setRedirect_uri(client.getRedirectURI());
-        this.setSuper(client.isSuper());
         this.setPermitted(client.isPermitted());
-        this.setRegisteredBy(client.getRegisteredBy());
-
+        
         String source = client.getSource();
-        if (source != null && !source.isEmpty()) {
-            this.source = JsonUtils.readTree(source);
+        
+        if (showAllInfo) {
+            this.setSuper(client.isSuper());
+            this.setRedirect_uri(client.getRedirectURI());
+            this.setRegisteredBy(client.getRegisteredBy());
+            ZonedDateTime registrationDate = client.getRegistrationDate();
+            if (registrationDate != null) {
+                this.setRegistrationDate(registrationDate.toString());
+            }
+            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+                this.setRefreshTokenExpiry(client.getRefreshTokenExpiry());
+            }
+            
+            if (source != null && !source.isEmpty()) {
+                this.source = JsonUtils.readTree(source);
+            } 
         }
-        if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
-            this.setRefreshTokenExpiry(client.getRefreshTokenExpiry());
-        }
-        ZonedDateTime registrationDate = client.getRegistrationDate();
-        if (registrationDate != null) {
-            this.setRegistrationDate(registrationDate.toString());
-        }
+        else { //plugins
+            if (source != null && !source.isEmpty()) {
+                this.source = JsonUtils.readTree(source);
+            }
+        } 
     }
 
     public boolean isSuper () {

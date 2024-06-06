@@ -56,7 +56,7 @@ public class PluginController {
                     OAuth2Scope.LIST_USER_CLIENT);
 
             clientService.verifySuperClient(superClientId, superClientSecret);
-            return clientService.listPlugins(permittedOnly);
+            return clientService.listPlugins(permittedOnly, tokenContext.getUsername());
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

@@ -1,12 +1,16 @@
 package de.ids_mannheim.korap.web.filter;
 
 import java.security.Principal;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.glassfish.jersey.server.ContainerRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.security.context.KustvaktContext;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -39,7 +43,7 @@ public class DemoUserFilter implements ContainerRequestFilter {
         String authentication = request
                 .getHeaderString(ContainerRequest.AUTHORIZATION);
 
-        // means that this is the public service
+        // means that this is a public service
         if (authentication == null || authentication.isEmpty()) {
             Principal pr = null;
             SecurityContext securityContext = request.getSecurityContext();
@@ -58,9 +62,16 @@ public class DemoUserFilter implements ContainerRequestFilter {
         c.setUsername(demo.getUsername());
         c.setHostAddress(host);
         c.setUserAgent(agent);
-        c.setExpirationTime(
-                TimeUtils.plusSeconds(config.getShortTokenTTL()).getMillis());
+//        c.setExpirationTime(
+//                TimeUtils.plusSeconds(config.getShortTokenTTL()).getMillis());
         c.setTokenType(TokenType.BASIC);
+        
+        Set<String> scopeSet = new HashSet<>();
+        scopeSet.add(OAuth2Scope.SEARCH.toString());
+        scopeSet.add(OAuth2Scope.CLIENT_INFO.toString());
+        scopeSet.add(OAuth2Scope.MATCH_INFO.toString());
+        String scopes = String.join(" ", scopeSet);
+        c.addContextParameter(Attributes.SCOPE, scopes);
         return c;
     }
 }

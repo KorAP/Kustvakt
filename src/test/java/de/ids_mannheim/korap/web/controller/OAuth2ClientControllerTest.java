@@ -8,13 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
-import org.glassfish.jersey.server.ContainerRequest;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -63,15 +59,15 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     @Test
     public void testRetrieveClientInfo () throws KustvaktException {
-        // public client
+        // public client plugin
         JsonNode clientInfo = retrieveClientInfo(publicClientId, "system");
         assertEquals(publicClientId, clientInfo.at("/client_id").asText());
         assertEquals(clientInfo.at("/client_name").asText(),
                 "public client plugin with redirect uri");
         assertNotNull(clientInfo.at("/client_description"));
         assertNotNull(clientInfo.at("/client_url"));
-        assertEquals(clientInfo.at("/client_type").asText(), "PUBLIC");
-        assertEquals(clientInfo.at("/registered_by").asText(), "system");
+        assertEquals("PUBLIC", clientInfo.at("/client_type").asText());
+        assertEquals("system", clientInfo.at("/registered_by").asText());
         // confidential client
         clientInfo = retrieveClientInfo(confidentialClientId, "system");
         assertEquals(confidentialClientId,
@@ -81,15 +77,15 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientInfo.at("/client_url"));
         assertNotNull(clientInfo.at("/redirect_uri"));
         assertEquals(false, clientInfo.at("/super").asBoolean());
-        assertEquals(clientInfo.at("/client_type").asText(), "CONFIDENTIAL");
+        assertEquals("CONFIDENTIAL", clientInfo.at("/client_type").asText());
         // super client
         clientInfo = retrieveClientInfo(superClientId, "system");
         assertEquals(superClientId, clientInfo.at("/client_id").asText());
-        assertEquals(clientInfo.at("/client_name").asText(),
-                "super confidential client");
+        assertEquals("super confidential client",
+                clientInfo.at("/client_name").asText());
         assertNotNull(clientInfo.at("/client_url"));
         assertNotNull(clientInfo.at("/redirect_uri"));
-        assertEquals(clientInfo.at("/client_type").asText(), "CONFIDENTIAL");
+        assertEquals("CONFIDENTIAL", clientInfo.at("/client_type").asText());
         assertTrue(clientInfo.at("/super").asBoolean());
     }
 
