@@ -66,9 +66,10 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertNotNull(clientId);
         assertNotNull(clientSecret);
         testInstallPluginNotPermitted(clientId);
-        testRetrievePluginInfo(clientId, refreshTokenExpiry);
+        testRetrievePluginInfo(clientId);
         node = listPlugins(false);
         assertEquals(3, node.size());
+
         // permitted only
         node = listPlugins(true);
         assertEquals(2, node.size());
@@ -93,8 +94,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/error_description").isMissingNode());
     }
 
-    private void testRetrievePluginInfo (String clientId,
-            int refreshTokenExpiry)
+    private void testRetrievePluginInfo (String clientId)
             throws ProcessingException, KustvaktException {
         JsonNode clientInfo = retrieveClientInfo(clientId, "other-user");
         assertEquals(clientId, clientInfo.at("/client_id").asText());
@@ -113,7 +113,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     private void testListUserRegisteredPlugins (String username,
             String clientId, String clientName, int refreshTokenExpiry)
             throws ProcessingException, KustvaktException {
-        JsonNode node = listUserRegisteredClients(username);
+        JsonNode node = listUserClients(username);
         assertEquals(1, node.size());
         assertEquals(clientId, node.at("/0/client_id").asText());
         assertEquals(clientName, node.at("/0/client_name").asText());
@@ -457,8 +457,17 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         testSearchWithOAuth2Token(accessToken);
         testInstallConfidentialPlugin(superClientId, confidentialClientId2,
                 username);
+        
         node = retrieveUserInstalledPlugin(getSuperClientForm());
         assertEquals(2, node.size());
+        assertFalse(node.at("/0/name").isMissingNode());
+        assertFalse(node.at("/0/description").isMissingNode());
+        assertFalse(node.at("/0/url").isMissingNode());
+        assertFalse(node.at("/0/client_id").isMissingNode());
+        assertFalse(node.at("/0/super_client_id").isMissingNode());
+        assertFalse(node.at("/0/installed_date").isMissingNode());
+        assertTrue(node.at("/0/redirect_uri").isMissingNode());
+                
         Response response = uninstallPlugin(confidentialClientId, username);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = retrieveUserInstalledPlugin(getSuperClientForm());
