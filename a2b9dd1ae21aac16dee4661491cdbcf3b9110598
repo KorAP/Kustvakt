@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6ff4265_47dc4679",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2024-06-10T08:53:46Z",
+      "side": 1,
+      "message": "This commit depends on another commit in Krill https://korap.ids-mannheim.de/gerrit/c/KorAP/Krill/+/8661",
+      "revId": "a2b9dd1ae21aac16dee4661491cdbcf3b9110598",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
