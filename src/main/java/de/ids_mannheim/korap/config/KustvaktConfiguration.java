@@ -123,6 +123,7 @@ public class KustvaktConfiguration {
         load(properties);
         //        readPipesFile("pipes");
         KrillProperties.setProp(properties);
+        KrillProperties.updateConfigurations(properties);
     }
 
     public KustvaktConfiguration () {}
@@ -145,7 +146,6 @@ public class KustvaktConfiguration {
      */
     protected void load (Properties properties) throws Exception {
         loadBasicProperties(properties);
-        loadKrillProperties(properties);
 
         apiWelcomeMessage = properties.getProperty("api.welcome.message",
                 "Welcome to KorAP API!");
@@ -220,26 +220,6 @@ public class KustvaktConfiguration {
 
         // network endpoint
         networkEndpointURL = properties.getProperty("network.endpoint.url", "");
-    }
-
-    private void loadKrillProperties (Properties properties) {
-        try {
-            String maxTokenMatch = properties.getProperty("krill.match.max.token");
-            if (maxTokenMatch != null) {
-                KrillProperties.maxTokenMatchSize = Integer.parseInt(maxTokenMatch);
-            }
-    
-            String maxTokenContext = properties
-                    .getProperty("krill.context.max.token");
-            if (maxTokenContext != null) {
-                KrillProperties.maxTokenContextSize = Integer
-                        .parseInt(maxTokenContext);
-            }
-        }
-        catch (NumberFormatException e) {
-            log.error("A Krill property expects numerical values: "
-                    + e.getMessage());
-        };
     }
 
     @Deprecated
