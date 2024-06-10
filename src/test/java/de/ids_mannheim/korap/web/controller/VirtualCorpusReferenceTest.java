@@ -30,7 +30,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-public class VCReferenceTest extends SpringJerseyTest {
+public class VirtualCorpusReferenceTest extends SpringJerseyTest {
 
     @Autowired
     private NamedVCLoader vcLoader;
@@ -130,7 +130,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     public void testStatisticsWithRef () throws KustvaktException {
         String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
         Response response = target().path(API_VERSION).path("statistics")
-                .queryParam("corpusQuery", corpusQuery).request().get();
+                .queryParam("cq", corpusQuery).request().get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());
@@ -138,6 +138,19 @@ public class VCReferenceTest extends SpringJerseyTest {
         assertFalse(VirtualCorpusCache.contains("named-vc1"));
     }
 
+    @Test
+    public void testStatisticsWithUnknownVC () throws KustvaktException {
+        String corpusQuery = "referTo unknown-vc";
+        Response response = target().path(API_VERSION).path("statistics")
+                .queryParam("cq", corpusQuery).request().get();
+        String ent = response.readEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(0, node.at("/documents").asInt());
+        assertEquals(0, node.at("/tokens").asInt());
+        assertEquals(0, node.at("/sentences").asInt());
+    }
+    
     @Test
     public void testRefVcNotExist () throws KustvaktException {
         Response response = target().path(API_VERSION).path("search")
