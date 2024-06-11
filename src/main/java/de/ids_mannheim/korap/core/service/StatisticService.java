@@ -6,12 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.response.Notifications;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.web.SearchKrill;
@@ -24,8 +22,7 @@ public class StatisticService extends BasicService {
     @Autowired
     private KustvaktConfiguration config;
 
-    public String retrieveStatisticsForCorpusQuery (List<String> cqList,
-            boolean isDeprecated) throws KustvaktException {
+    public String retrieveStatisticsForCorpusQuery (List<String> cqList) throws KustvaktException {
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         String cq = combineMultipleCorpusQuery(cqList);
@@ -39,16 +36,6 @@ public class StatisticService extends BasicService {
             checkVC(json);
         }
         String stats = searchKrill.getStatistics(json);
-
-        if (isDeprecated) {
-            Notifications n = new Notifications();
-            n.addWarning(StatusCodes.DEPRECATED,
-                    "Parameter corpusQuery is deprecated in favor of cq.");
-            ObjectNode warning = (ObjectNode) n.toJsonNode();
-            ObjectNode node = (ObjectNode) JsonUtils.readTree(stats);
-            node.setAll(warning);
-            stats = node.toString();
-        }
 
         if (stats.contains("-1")) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND);

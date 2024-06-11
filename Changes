@@ -1,3 +1,7 @@
+# version 0.73.3-SNAPSHOT
+
+- Remove corpusQuery param in the statistics web-service (close #758).
+
 # version 0.73.2
 
 - Added tests for the DNB scenario with custom max match 

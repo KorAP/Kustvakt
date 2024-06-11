@@ -65,17 +65,11 @@ public class StatisticController {
      */
     @GET
     public Response getStatistics (@Context SecurityContext context,
-            @Context Locale locale, @QueryParam("cq") List<String> cq,
-            @QueryParam("corpusQuery") List<String> corpusQuery) {
+            @Context Locale locale, @QueryParam("cq") List<String> cq) {
 
         String stats;
-        boolean isDeprecated = false;
         try {
-            if (cq.isEmpty() && corpusQuery != null && !corpusQuery.isEmpty()) {
-                isDeprecated = true;
-                cq = corpusQuery;
-            }
-            stats = service.retrieveStatisticsForCorpusQuery(cq, isDeprecated);
+            stats = service.retrieveStatisticsForCorpusQuery(cq);
             if (DEBUG) {
                 jlog.debug("Stats: " + stats);
             }

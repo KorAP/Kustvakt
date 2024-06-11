@@ -4,16 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.databind.JsonNode;
 
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.LiteJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
 
@@ -28,15 +27,15 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         node = node.at("/collection");
-        assertEquals(node.at("/@type").asText(), "koral:docGroup");
-        assertEquals(node.at("/operation").asText(), "operation:and");
+        assertEquals("koral:docGroup",node.at("/@type").asText());
+        assertEquals("operation:and",node.at("/operation").asText());
         assertEquals(2, node.at("/operands").size());
-        assertEquals(node.at("/operands/0/@type").asText(), "koral:doc");
-        assertEquals(node.at("/operands/0/match").asText(), "match:eq");
-        assertEquals(node.at("/operands/0/key").asText(), "pubPlace");
-        assertEquals(node.at("/operands/0/value").asText(), "München");
-        assertEquals(node.at("/operands/1/key").asText(), "textSigle");
-        assertEquals(node.at("/operands/1/value").asText(), "GOE/AGA/01784");
+        assertEquals("koral:doc",node.at("/operands/0/@type").asText());
+        assertEquals("match:eq",node.at("/operands/0/match").asText());
+        assertEquals("pubPlace",node.at("/operands/0/key").asText());
+        assertEquals("München",node.at("/operands/0/value").asText());
+        assertEquals("textSigle",node.at("/operands/1/key").asText());
+        assertEquals("GOE/AGA/01784",node.at("/operands/1/value").asText());
     }
 
     @Test
@@ -55,22 +54,4 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
         assertTrue(node.at("/warnings").isMissingNode());
     }
 
-    @Test
-    public void testStatisticsWithMultipleCorpusQuery ()
-            throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("statistics")
-                .queryParam("corpusQuery", "textType=Autobiographie")
-                .queryParam("corpusQuery", "corpusSigle=GOE").request()
-                .method("GET");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(9, node.at("/documents").asInt());
-        assertEquals(527662, node.at("/tokens").asInt());
-        assertEquals(19387, node.at("/sentences").asInt());
-        assertEquals(514, node.at("/paragraphs").asInt());
-        assertEquals(StatusCodes.DEPRECATED, node.at("/warnings/0/0").asInt());
-        assertEquals(node.at("/warnings/0/1").asText(),
-                "Parameter corpusQuery is deprecated in favor of cq.");
-    }
 }

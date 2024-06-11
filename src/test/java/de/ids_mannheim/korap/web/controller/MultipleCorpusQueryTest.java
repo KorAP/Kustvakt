@@ -53,23 +53,4 @@ public class MultipleCorpusQueryTest extends SpringJerseyTest {
         assertEquals(258, node.at("/paragraphs").asInt());
         assertTrue(node.at("/warnings").isMissingNode());
     }
-
-    @Test
-    public void testStatisticsWithMultipleCorpusQuery ()
-            throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("statistics")
-                .queryParam("corpusQuery", "textType=Autobiographie")
-                .queryParam("corpusQuery", "corpusSigle=GOE").request()
-                .method("GET");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(9, node.at("/documents").asInt());
-        assertEquals(527662, node.at("/tokens").asInt());
-        assertEquals(19387, node.at("/sentences").asInt());
-        assertEquals(514, node.at("/paragraphs").asInt());
-        assertEquals(StatusCodes.DEPRECATED, node.at("/warnings/0/0").asInt());
-        assertEquals(node.at("/warnings/0/1").asText(),
-                "Parameter corpusQuery is deprecated in favor of cq.");
-    }
 }
