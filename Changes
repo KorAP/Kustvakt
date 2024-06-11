@@ -1,4 +1,4 @@
-# version 0.73.2-SNAPSHOT
+# version 0.73.2
 
 - Added tests for the DNB scenario with custom max match 
   and context size. (#745)
