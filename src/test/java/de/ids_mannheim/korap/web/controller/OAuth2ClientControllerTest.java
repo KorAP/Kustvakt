@@ -291,6 +291,13 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String clientId = node.at("/client_id").asText();
         assertNotNull(clientId);
         assertTrue(node.at("/client_secret").isMissingNode());
+        
+        node = listUserClients(username);
+        assertFalse(node.at("/0/client_redirect_uri").isMissingNode());
+        assertFalse(node.at("/0/registration_date").isMissingNode());
+        assertEquals(username,
+                node.at("/0/registered_by").asText());
+
         testRegisterClientUnauthorizedScope(clientId);
         testResetPublicClientSecret(clientId);
         testAccessTokenAfterDeregistration(clientId, null, "");
@@ -498,7 +505,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         return newClientSecret;
     }
 
-    private void requestAuthorizedClientList (String userAuthHeader)
+    private void testListAuthorizedClients (String userAuthHeader)
             throws KustvaktException {
         Form form = getSuperClientForm();
         form.param("authorized_only", "true");
@@ -510,8 +517,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
-        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
+        
         assertEquals(2, node.size());
         assertEquals(confidentialClientId, node.at("/0/client_id").asText());
         assertEquals(publicClientId, node.at("/1/client_id").asText());
@@ -528,7 +535,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         OAuth2ClientJson json = createOAuth2ClientJson(clientName,
                 OAuth2ClientType.PUBLIC, "Dory's client.");
         registerClient("dory", json);
-        JsonNode node = listUserRegisteredClients("dory");
+        JsonNode node = listUserClients("dory");
         assertEquals(1, node.size());
         assertEquals(clientName, node.at("/0/client_name").asText());
         assertEquals(OAuth2ClientType.PUBLIC.name(),
@@ -542,7 +549,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     private void testListConfidentialClient (String username, String clientId)
             throws ProcessingException, KustvaktException {
-        JsonNode node = listUserRegisteredClients(username);
+        JsonNode node = listUserClients(username);
         assertEquals(1, node.size());
         assertEquals(clientId, node.at("/0/client_id").asText());
         assertEquals(node.at("/0/client_name").asText(), "OAuth2ClientTest");
@@ -582,7 +589,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 confidentialClientId, clientSecret, code);
         String refreshToken = node.at("/refresh_token").asText();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        requestAuthorizedClientList(userAuthHeader);
+        testListAuthorizedClients(userAuthHeader);
         testListAuthorizedClientWithMultipleRefreshTokens(userAuthHeader);
         testListAuthorizedClientWithMultipleAccessTokens(userAuthHeader);
         testListWithClientsFromAnotherUser(userAuthHeader);
@@ -607,7 +614,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         Response response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        requestAuthorizedClientList(userAuthHeader);
+        testListAuthorizedClients(userAuthHeader);
     }
 
     private void testListAuthorizedClientWithMultipleAccessTokens (
@@ -617,7 +624,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         Response response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, "", code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        requestAuthorizedClientList(userAuthHeader);
+        testListAuthorizedClients(userAuthHeader);
     }
 
     private void testListWithClientsFromAnotherUser (String userAuthHeader)
@@ -637,8 +644,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken2 = node.at("/access_token").asText();
         String refreshToken = node.at("/refresh_token").asText();
-        requestAuthorizedClientList(aaaAuthHeader);
-        requestAuthorizedClientList(userAuthHeader);
+        testListAuthorizedClients(aaaAuthHeader);
+        testListAuthorizedClients(userAuthHeader);
         testRevokeAllTokenViaSuperClient(publicClientId, aaaAuthHeader,
                 accessToken1);
         testRevokeAllTokenViaSuperClient(confidentialClientId, aaaAuthHeader,

@@ -430,7 +430,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         assertEquals("SUCCESS", response.readEntity(String.class));
     }
 
-    protected JsonNode listUserRegisteredClients (String username)
+    protected JsonNode listUserClients (String username)
             throws ProcessingException, KustvaktException {
         Form form = getSuperClientForm();
         Response response = target().path(API_VERSION).path("oauth2")
