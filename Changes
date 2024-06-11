@@ -7,6 +7,7 @@
 - Added deprecation warning for the old matchInfo service (#757)
 - Fixed empty named VC path in configuration (solves #754)
 - Restrict registration info for plugins (solves #572)  
+- Removed redirect uri from InstalledPluginDto & updated tests.
 
 # version 0.73.1
 
