@@ -49,16 +49,11 @@
 		</property>
 	</bean>
 	
-	<!-- props are injected from default-config.xml -->
 	<bean id="kustvakt_config"
 		class="de.ids_mannheim.korap.config.FullConfiguration">
 		<constructor-arg name="properties" ref="props" />
 	</bean>
 	
-
-	<!-- <bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager' 
-		p:cacheManager-ref='ehcache' /> <bean id='ehcache' class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean' 
-		p:configLocation='classpath:ehcache.xml' p:shared='true' /> -->
 
 	<bean id="dataSource"
 		class="org.apache.commons.dbcp2.BasicDataSource" lazy-init="true">
@@ -73,13 +68,6 @@
 		<!--<property name="poolPreparedStatements" value="true"/> -->
 	</bean>
 
-	<!-- <bean id="sqliteDataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource" 
-		lazy-init="true"> <property name="driverClassName" value="${jdbc.driverClassName}" 
-		/> <property name="url" value="${jdbc.url}" /> <property name="username" 
-		value="${jdbc.username}" /> <property name="password" value="${jdbc.password}" 
-		/> <property name="connectionProperties"> <props> <prop key="date_string_format">yyyy-MM-dd 
-		HH:mm:ss</prop> </props> </property> Sqlite can only have a single connection 
-		<property name="suppressClose"> <value>true</value> </property> </bean> -->
 	<bean id="c3p0DataSource"
 		class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
@@ -102,7 +90,6 @@
 		<property name="baselineOnMigrate" value="false" />
 		<property name="locations"
 			value="#{'${jdbc.schemaPath}'.split(',')}" />
-		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
 		<property name="dataSource" ref="dataSource" />
 		<property name="outOfOrder" value="true" />
 	</bean>
@@ -112,11 +99,10 @@
 		<constructor-arg ref="flywayConfig" />
 	</bean>
 
-
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
+		
 		<property name="packagesToScan">
 			<array>
 				<value>de.ids_mannheim.korap.core.entity</value>
@@ -206,19 +192,13 @@
 		class="de.ids_mannheim.korap.rewrite.FoundryRewrite" />
 	<bean id="collectionRewrite"
 		class="de.ids_mannheim.korap.rewrite.CollectionRewrite" />
-	<bean id="collectionCleanRewrite"
-		class="de.ids_mannheim.korap.rewrite.CollectionCleanRewrite" />
 	<bean id="virtualCorpusRewrite"
 		class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite" />
-	<bean id="collectionConstraint"
-		class="de.ids_mannheim.korap.rewrite.CollectionConstraint" />
 	<bean id="queryReferenceRewrite"
 		class="de.ids_mannheim.korap.rewrite.QueryReferenceRewrite" />
 
 	<util:list id="rewriteTasks"
 		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
-		<!-- <ref bean="collectionConstraint" /> <ref bean="collectionCleanRewrite" 
-			/> -->
 		<ref bean="foundryRewrite" />
 		<ref bean="collectionRewrite" />
 		<ref bean="virtualCorpusRewrite" />
@@ -332,6 +312,8 @@
 	</bean>
 	<bean id="mailSender"
 		class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="username" value="${mail.username}" />
+		<property name="password" value="${mail.password}" />
 		<property name="session" ref="smtpSession" />
 	</bean>
 	<bean id="velocityEngine"
