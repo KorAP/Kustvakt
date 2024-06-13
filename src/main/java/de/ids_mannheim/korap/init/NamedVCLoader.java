@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.config;
+package de.ids_mannheim.korap.init;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.QueryDO;

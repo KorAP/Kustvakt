@@ -9,7 +9,6 @@ import de.ids_mannheim.korap.annotation.FreeResourceParser;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;

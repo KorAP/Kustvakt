@@ -11,11 +11,11 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import de.ids_mannheim.korap.collection.DocBits;
-import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.init.NamedVCLoader;
 import de.ids_mannheim.korap.util.QueryException;
 
 public class NamedVCLoaderTest extends SpringJerseyTest {

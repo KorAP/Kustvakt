@@ -1,6 +1,7 @@
 # version 0.73.3-SNAPSHOT
 
 - Remove corpusQuery param in the statistics web-service (close #758).
+- Moved NamedVCLoader to the init package.
 
 # version 0.73.2
 

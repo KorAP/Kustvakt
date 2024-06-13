@@ -16,11 +16,11 @@ import jakarta.ws.rs.core.Response.Status;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.init.NamedVCLoader;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
