@@ -60,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class OAuth2TestBase extends SpringJerseyTest {
 
     @Autowired
-    private AccessTokenDao tokenDao;
+    protected AccessTokenDao tokenDao;
     @Autowired
     private OAuth2ClientDao clientDao;
     @Autowired
@@ -255,6 +255,24 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         return requestToken(form);
     }
 
+    protected JsonNode requestTokenWithRefreshToken (String clientId,
+            String clientSecret, String refreshToken) throws KustvaktException {
+        Form form = new Form();
+        form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.param("client_id", clientId);
+        form.param("client_secret", clientSecret);
+        form.param("refresh_token", refreshToken);
+        Response response = target().path(API_VERSION).path("oauth2")
+                .path("token").request()
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
+        String entity = response.readEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        return JsonUtils.readTree(entity);
+    }
+    
     protected void testRequestTokenWithRevokedRefreshToken (String clientId,
             String clientSecret, String refreshToken) throws KustvaktException {
         Form form = new Form();
@@ -279,6 +297,44 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 node.at("/error").asText());
         assertEquals("Refresh token has been revoked",
                 node.at("/error_description").asText());
+    }
+    
+    protected void revokeTokenViaSuperClient (String token,
+            String userAuthHeader) {
+        Form form = new Form();
+        form.param("token", token);
+        form.param("super_client_id", superClientId);
+        form.param("super_client_secret", clientSecret);
+
+        Response response = target().path(API_VERSION).path("oauth2")
+                .path("revoke").path("super").request()
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .header(Attributes.AUTHORIZATION, userAuthHeader)
+                .post(Entity.form(form));
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("SUCCESS", response.readEntity(String.class));
+    }
+
+    protected void revokeToken (String token, String clientId,
+            String clientSecret, String tokenType) {
+        Form form = new Form();
+        form.param("token_type", tokenType);
+        form.param("token", token);
+        form.param("client_id", clientId);
+        if (clientSecret != null) {
+            form.param("client_secret", clientSecret);
+        }
+
+        Response response = target().path(API_VERSION).path("oauth2")
+                .path("revoke").request()
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("SUCCESS", response.readEntity(String.class));
     }
 
     protected Response registerClient (String username, OAuth2ClientJson json)
@@ -392,55 +448,21 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 node.at("/errors/0/1").asText());
     }
 
-    protected void testRevokeTokenViaSuperClient (String token,
-            String userAuthHeader) {
-        Form form = new Form();
-        form.param("token", token);
-        form.param("super_client_id", superClientId);
-        form.param("super_client_secret", clientSecret);
-
-        Response response = target().path(API_VERSION).path("oauth2")
-                .path("revoke").path("super").request()
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .header(Attributes.AUTHORIZATION, userAuthHeader)
-                .post(Entity.form(form));
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertEquals("SUCCESS", response.readEntity(String.class));
-    }
-
-    protected void testRevokeToken (String token, String clientId,
-            String clientSecret, String tokenType) {
-        Form form = new Form();
-        form.param("token_type", tokenType);
-        form.param("token", token);
-        form.param("client_id", clientId);
-        if (clientSecret != null) {
-            form.param("client_secret", clientSecret);
-        }
-
-        Response response = target().path(API_VERSION).path("oauth2")
-                .path("revoke").request()
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(form));
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertEquals("SUCCESS", response.readEntity(String.class));
-    }
-
-    protected JsonNode listUserClients (String username)
+    protected JsonNode listUserClients (String username, String filterBy)
             throws ProcessingException, KustvaktException {
         Form form = getSuperClientForm();
+        
+        if (filterBy != null) {
+            form.param("filter_by", filterBy);
+        }
         Response response = target().path(API_VERSION).path("oauth2")
-                .path("client").path("list").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pwd"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(form));
-
+            .path("client").path("list").request()
+            .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                    .createBasicAuthorizationHeaderValue(username, "pwd"))
+            .header(HttpHeaders.CONTENT_TYPE,
+                    ContentType.APPLICATION_FORM_URLENCODED)
+            .post(Entity.form(form));
+        
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         String entity = response.readEntity(String.class);
