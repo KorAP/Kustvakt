@@ -113,7 +113,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     private void testListUserRegisteredPlugins (String username,
             String clientId, String clientName, int refreshTokenExpiry)
             throws ProcessingException, KustvaktException {
-        JsonNode node = listUserClients(username);
+        JsonNode node = listUserClients(username, "owned_only");
         assertEquals(1, node.size());
         assertEquals(clientId, node.at("/0/client_id").asText());
         assertEquals(clientName, node.at("/0/client_name").asText());

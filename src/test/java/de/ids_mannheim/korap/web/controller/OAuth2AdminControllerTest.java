@@ -114,7 +114,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         String accessToken = node.at("/access_token").asText();
-        testRevokeToken(accessToken, publicClientId, null, ACCESS_TOKEN_TYPE);
+        revokeToken(accessToken, publicClientId, null, ACCESS_TOKEN_TYPE);
         int accessTokensAfter = accessDao.retrieveInvalidAccessTokens().size();
         assertEquals(accessTokensAfter, accessTokensBefore + 1);
         target().path(API_VERSION).path("admin").path("oauth2").path("token")

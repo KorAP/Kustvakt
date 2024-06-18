@@ -78,10 +78,15 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
                 confidentialClientId, clientSecret, code);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertNotNull(node.at("/access_token").asText());
-        assertNotNull(node.at("/refresh_token").asText());
+        String token = node.at("/access_token").asText();
+        String refreshToken = node.at("/refresh_token").asText();
         assertEquals(TokenType.BEARER.displayName(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
+        
+        revokeToken(token, confidentialClientId, clientSecret,
+                ACCESS_TOKEN_TYPE);
+        revokeToken(refreshToken, confidentialClientId, clientSecret,
+                REFRESH_TOKEN_TYPE);
     }
 }

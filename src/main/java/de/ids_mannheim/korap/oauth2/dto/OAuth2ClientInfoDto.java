@@ -19,7 +19,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  *
  */
 @JsonInclude(Include.NON_EMPTY)
-public class OAuth2ClientInfoDto {
+public class OAuth2ClientInfoDto implements Comparable<OAuth2ClientInfoDto>{
     @JsonProperty("super")
     private boolean isSuper;
 
@@ -84,6 +84,12 @@ public class OAuth2ClientInfoDto {
             }
         } 
     }
+    
+    @Override
+    public int compareTo (OAuth2ClientInfoDto o) {
+        return this.getClientName().compareTo(o.getClientName());
+    }
+
 
     public boolean isSuper () {
         return isSuper;

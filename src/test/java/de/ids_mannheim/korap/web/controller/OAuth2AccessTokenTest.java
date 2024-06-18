@@ -6,16 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
-import com.nimbusds.oauth2.sdk.GrantType;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -24,6 +17,8 @@ import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
@@ -38,7 +33,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue(confidentialClientId,
                         clientSecret);
     }
-
+    
     @Test
     public void testScopeWithSuperClient () throws KustvaktException {
         Response response = requestTokenWithDoryPassword(superClientId,
@@ -65,6 +60,8 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 confidentialClientId, clientSecret, code);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String token = node.at("/access_token").asText();
+        String refreshToken = node.at("/refresh_token").asText();
+        
         assertTrue(node.at("/scope").asText()
                 .contains(OAuth2Scope.VC_INFO.toString()));
         // test list vc using the token
@@ -73,6 +70,11 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(4, node.size());
+        
+        revokeToken(token, confidentialClientId, clientSecret,
+                ACCESS_TOKEN_TYPE);
+        revokeToken(refreshToken, confidentialClientId, clientSecret,
+                REFRESH_TOKEN_TYPE);
     }
 
     @Test
@@ -84,9 +86,15 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken = node.at("/access_token").asText();
+        String refreshToken = node.at("/refresh_token").asText();
         testScopeNotAuthorized(accessToken);
         testScopeNotAuthorize2(accessToken);
         testSearchWithOAuth2Token(accessToken);
+        
+        revokeToken(accessToken, confidentialClientId, clientSecret,
+                ACCESS_TOKEN_TYPE);
+        revokeToken(refreshToken, confidentialClientId, clientSecret,
+                REFRESH_TOKEN_TYPE);
     }
 
     private void testScopeNotAuthorized (String accessToken)
@@ -140,17 +148,14 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
                 confidentialClientId, code, clientAuthHeader);
         String accessToken = node.at("/access_token").asText();
-        Form form = new Form();
-        form.param("token", accessToken);
-        form.param("client_id", confidentialClientId);
-        form.param("client_secret", "secret");
-        Response response = target().path(API_VERSION).path("oauth2")
-                .path("revoke").request()
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String refreshToken = node.at("/refresh_token").asText();
+        
+        revokeToken(accessToken, confidentialClientId, clientSecret,
+                ACCESS_TOKEN_TYPE);
         testSearchWithRevokedAccessToken(accessToken);
+        
+        revokeToken(refreshToken, confidentialClientId, clientSecret,
+                REFRESH_TOKEN_TYPE);
     }
 
     @Test
@@ -161,7 +166,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 publicClientId, "", code);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken = node.at("/access_token").asText();
-        testRevokeTokenViaSuperClient(accessToken, userAuthHeader);
+        revokeTokenViaSuperClient(accessToken, userAuthHeader);
         testSearchWithRevokedAccessToken(accessToken);
     }
 
@@ -174,23 +179,18 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 confidentialClientId, code, clientAuthHeader);
         String accessToken = node.at("/access_token").asText();
         String refreshToken = node.at("/refresh_token").asText();
-        Form form = new Form();
-        form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
-        form.param("client_id", confidentialClientId);
-        form.param("client_secret", "secret");
-        form.param("refresh_token", refreshToken);
-        Response response = target().path(API_VERSION).path("oauth2")
-                .path("token").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(form));
-        String entity = response.readEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        node = JsonUtils.readTree(entity);
-        assertNotNull(node.at("/access_token").asText());
-        assertTrue(!refreshToken.equals(node.at("/refresh_token").asText()));
+
+        node = requestTokenWithRefreshToken(confidentialClientId, clientSecret,
+                refreshToken);
+        String newAccessToken = node.at("/access_token").asText();
+        String newRefreshToken = node.at("/refresh_token").asText();
+        assertTrue(!refreshToken.equals(newRefreshToken));
+
         testSearchWithRevokedAccessToken(accessToken);
+        revokeToken(newAccessToken, confidentialClientId, clientSecret,
+                ACCESS_TOKEN_TYPE);
+        revokeToken(newRefreshToken, confidentialClientId, clientSecret,
+                REFRESH_TOKEN_TYPE);
     }
 
     @Test
@@ -201,6 +201,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
                 confidentialClientId, code, clientAuthHeader);
         String userAuthToken = node.at("/access_token").asText();
+        String refreshToken = node.at("/refresh_token").asText();
         Response response = requestAuthorizationCode("code",
                 confidentialClientId, "", "search", "",
                 "Bearer " + userAuthToken);
@@ -210,6 +211,11 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 node.at("/errors/0/0").asInt());
         assertEquals(node.at("/errors/0/1").asText(),
                 "Scope authorize is not authorized");
+
+        revokeToken(userAuthToken, confidentialClientId, clientSecret,
+                ACCESS_TOKEN_TYPE);
+        revokeToken(refreshToken, confidentialClientId, clientSecret,
+                REFRESH_TOKEN_TYPE);
     }
 
     @Test
@@ -227,5 +233,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         String code = requestAuthorizationCode(superClientId,
                 "Bearer " + userAuthToken);
         assertNotNull(code);
+        
+        revokeTokenViaSuperClient(userAuthToken, userAuthHeader);
     }
 }
