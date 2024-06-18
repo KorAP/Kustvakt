@@ -102,6 +102,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertFalse(clientId.contains("a"));
         testListConfidentialClient(username, clientId);
         testConfidentialClientInfo(clientId, username);
+//        testListAllUserClients(username);
         testResetConfidentialClientSecret(clientId, clientSecret);
         deregisterClient(username, clientId);
     }
@@ -292,7 +293,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientId);
         assertTrue(node.at("/client_secret").isMissingNode());
         
-        node = listUserClients(username);
+        node = listUserClients(username,"owned_only");
         assertFalse(node.at("/0/client_redirect_uri").isMissingNode());
         assertFalse(node.at("/0/registration_date").isMissingNode());
         assertEquals(username,
@@ -508,7 +509,10 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     private void testListAuthorizedClients (String userAuthHeader)
             throws KustvaktException {
         Form form = getSuperClientForm();
-        form.param("authorized_only", "true");
+        // deprecated, use filter_by = authorized_only instead
+//        form.param("authorized_only", "true");
+        
+        form.param("filter_by", "authorized_only");
         Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("list").request()
                 .header(Attributes.AUTHORIZATION, userAuthHeader)
@@ -535,7 +539,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         OAuth2ClientJson json = createOAuth2ClientJson(clientName,
                 OAuth2ClientType.PUBLIC, "Dory's client.");
         registerClient("dory", json);
-        JsonNode node = listUserClients("dory");
+        JsonNode node = listUserClients("dory","owned_only");
         assertEquals(1, node.size());
         assertEquals(clientName, node.at("/0/client_name").asText());
         assertEquals(OAuth2ClientType.PUBLIC.name(),
@@ -544,12 +548,16 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertFalse(node.at("/0/registration_date").isMissingNode());
         assertTrue(node.at("/refresh_token_expiry").isMissingNode());
         String clientId = node.at("/0/client_id").asText();
+        
+//        testListAllUserClients("dory");
         testDeregisterPublicClient(clientId, "dory");
     }
 
     private void testListConfidentialClient (String username, String clientId)
             throws ProcessingException, KustvaktException {
-        JsonNode node = listUserClients(username);
+        // means authorized_only = false
+        // this is deprecated, filter_by = owned_only should be use instead.
+        JsonNode node = listUserClients(username,"");
         assertEquals(1, node.size());
         assertEquals(clientId, node.at("/0/client_id").asText());
         assertEquals(node.at("/0/client_name").asText(), "OAuth2ClientTest");
@@ -566,8 +574,27 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertTrue(node.at("/0/source").isMissingNode());
     }
 
+    // not ready until the behavior for (filterBy=null || filterBy.isEmpty) is set
+    private void testListAllUserClients (String username) throws KustvaktException {
+        // authorize
+        String userAuthHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue(username, "password");
+        String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
+        Response response = requestTokenWithAuthorizationCodeAndForm(
+                confidentialClientId, this.clientSecret, code);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
+        String accessToken = node.at("/access_token").asText();
+        
+        node = listUserClients(username,null);
+        assertEquals(2, node.size());
+        
+        testRevokeAllTokenViaSuperClient(confidentialClientId, userAuthHeader,
+                accessToken);
+    }
+    
     @Test
-    public void testListUserClients () throws KustvaktException {
+    public void testListAuthorizedUserClients () throws KustvaktException {
         String username = "pearl";
         String password = "pwd";
         userAuthHeader = HttpAuthorizationHandler

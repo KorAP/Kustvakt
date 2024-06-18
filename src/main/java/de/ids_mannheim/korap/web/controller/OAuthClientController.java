@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
@@ -16,7 +18,6 @@ import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.filter.DemoFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
@@ -220,7 +221,8 @@ public class OAuthClientController {
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,
-            @FormParam("authorized_only") boolean authorizedOnly) {
+            @FormParam("authorized_only") boolean authorizedOnly, // deprecated
+            @FormParam("filter_by") String filterBy) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
@@ -230,12 +232,34 @@ public class OAuthClientController {
                     OAuth2Scope.LIST_USER_CLIENT);
 
             clientService.verifySuperClient(superClientId, superClientSecret);
+            
+            List<OAuth2ClientInfoDto> clients = null; 
+            
             if (authorizedOnly) {
-                return clientService.listUserAuthorizedClients(username);
+                clients = clientService.listUserAuthorizedClients(username);
             }
             else {
-                return clientService.listUserRegisteredClients(username);
+                if (filterBy !=null && !filterBy.isEmpty()) {
+                    if (filterBy.equals("authorized_only")) {
+                        clients = clientService.listUserAuthorizedClients(username);
+                    }
+                    else if (filterBy.equals("owned_only")) {
+                        clients = clientService.listUserRegisteredClients(username); 
+                    }
+                    else {
+                        throw new KustvaktException(
+                                StatusCodes.UNSUPPORTED_VALUE, "filter_by");
+                    }
+                }
+                else {               
+//                    clients = clientService.listUserAuthorizedClients(username);
+//                    clients.addAll(clientService.listUserRegisteredClients(username));
+                
+                    clients = clientService.listUserRegisteredClients(username);
+                }
             }
+            
+            return clients;
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
