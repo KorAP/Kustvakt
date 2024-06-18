@@ -4,6 +4,8 @@
 - Moved NamedVCLoader to the init package.
 - Clean up Spring XML configs.
 - Fix some logging to write to file instead of stdout.
+- Introduce filter_by and deprecate authorized_only in OAuth2
+  client list (close #579)
 
 # version 0.73.2
 
