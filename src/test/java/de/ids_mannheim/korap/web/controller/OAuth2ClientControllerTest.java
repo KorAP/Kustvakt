@@ -102,6 +102,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertFalse(clientId.contains("a"));
         testListConfidentialClient(username, clientId);
         testConfidentialClientInfo(clientId, username);
+        testListUserClients(username);
         testResetConfidentialClientSecret(clientId, clientSecret);
         deregisterClient(username, clientId);
     }
@@ -544,6 +545,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertFalse(node.at("/0/registration_date").isMissingNode());
         assertTrue(node.at("/refresh_token_expiry").isMissingNode());
         String clientId = node.at("/0/client_id").asText();
+        
+        testListUserClients("dory");
         testDeregisterPublicClient(clientId, "dory");
     }
 
@@ -566,8 +569,25 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertTrue(node.at("/0/source").isMissingNode());
     }
 
+    private void testListUserClients (String username) throws KustvaktException {
+        // authorize
+        String userAuthHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue(username, "password");
+        String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
+        Response response = requestTokenWithAuthorizationCodeAndForm(
+                confidentialClientId, this.clientSecret, code);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
+        String accessToken = node.at("/access_token").asText();
+        node = listUserClients(username);
+        assertEquals(2, node.size());
+        
+        testRevokeAllTokenViaSuperClient(confidentialClientId, userAuthHeader,
+                accessToken);
+    }
+    
     @Test
-    public void testListUserClients () throws KustvaktException {
+    public void testListAuthorizedUserClients () throws KustvaktException {
         String username = "pearl";
         String password = "pwd";
         userAuthHeader = HttpAuthorizationHandler

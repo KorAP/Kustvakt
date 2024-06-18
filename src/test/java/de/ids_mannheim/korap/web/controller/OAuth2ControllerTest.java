@@ -57,7 +57,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(TokenType.BEARER.displayName(),
                 node.at("/token_type").asText());
         assertEquals(31536000, node.at("/expires_in").asInt());
-        testRevokeToken(accessToken, publicClientId, null, ACCESS_TOKEN_TYPE);
+        revokeToken(accessToken, publicClientId, null, ACCESS_TOKEN_TYPE);
         assertTrue(node.at("/refresh_token").isMissingNode());
     }
 
@@ -487,7 +487,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertTrue(!newRefreshToken.equals(refreshToken));
         testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
                 refreshToken);
-        testRevokeToken(newRefreshToken, clientId, clientSecret,
+        revokeToken(newRefreshToken, clientId, clientSecret,
                 REFRESH_TOKEN_TYPE);
         testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
                 newRefreshToken);
@@ -654,24 +654,24 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE,
                 confidentialClientId);
         assertEquals(2, node.size());
-        testRevokeToken(refreshToken1, superClientId, clientSecret,
+        revokeToken(refreshToken1, superClientId, clientSecret,
                 REFRESH_TOKEN_TYPE);
-        testRevokeToken(node.at("/0/token").asText(), confidentialClientId,
+        revokeToken(node.at("/0/token").asText(), confidentialClientId,
                 clientSecret, REFRESH_TOKEN_TYPE);
-        testRevokeToken(node.at("/1/token").asText(), confidentialClientId2,
+        revokeToken(node.at("/1/token").asText(), confidentialClientId2,
                 clientSecret, REFRESH_TOKEN_TYPE);
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(1, node.size());
-        testRevokeTokenViaSuperClient(node.at("/0/token").asText(),
+        revokeTokenViaSuperClient(node.at("/0/token").asText(),
                 userAuthHeader);
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
         // try revoking a token belonging to another user
         // should not return any errors
-        testRevokeTokenViaSuperClient(refreshToken5, userAuthHeader);
+        revokeTokenViaSuperClient(refreshToken5, userAuthHeader);
         node = requestTokenList(darlaAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(1, node.size());
-        testRevokeTokenViaSuperClient(refreshToken5, darlaAuthHeader);
+        revokeTokenViaSuperClient(refreshToken5, darlaAuthHeader);
         node = requestTokenList(darlaAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
     }
@@ -702,7 +702,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         // list refresh tokens
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
-        testRevokeTokenViaSuperClient(accessToken1, userAuthHeader);
+        revokeTokenViaSuperClient(accessToken1, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
         // System.out.println(node);
         assertEquals(1, node.size());
@@ -715,7 +715,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertNotNull(node.at("/0/client_name").asText());
         assertNotNull(node.at("/0/client_description").asText());
         assertNotNull(node.at("/0/client_url").asText());
-        testRevokeTokenViaSuperClient(accessToken2, userAuthHeader);
+        revokeTokenViaSuperClient(accessToken2, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
         assertEquals(0, node.size());
     }

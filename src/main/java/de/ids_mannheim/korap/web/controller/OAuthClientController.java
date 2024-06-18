@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.filter.DemoFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
@@ -230,12 +230,16 @@ public class OAuthClientController {
                     OAuth2Scope.LIST_USER_CLIENT);
 
             clientService.verifySuperClient(superClientId, superClientSecret);
-            if (authorizedOnly) {
-                return clientService.listUserAuthorizedClients(username);
+            
+            List<OAuth2ClientInfoDto> clients = clientService
+                    .listUserAuthorizedClients(username);
+            if (!authorizedOnly) {
+                List<OAuth2ClientInfoDto> userRegisteredClients =
+                clientService.listUserRegisteredClients(username);
+                clients.addAll(userRegisteredClients);
+                Collections.sort(clients);
             }
-            else {
-                return clientService.listUserRegisteredClients(username);
-            }
+            return clients;
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
