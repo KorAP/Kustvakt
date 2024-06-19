@@ -3,6 +3,7 @@
 - Remove corpusQuery param in the statistics web-service (close #758).
 - Moved NamedVCLoader to the init package.
 - Clean up Spring XML configs.
+- Fix some logging to write to file instead of stdout.
 
 # version 0.73.2
 

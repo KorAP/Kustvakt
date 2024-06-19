@@ -192,7 +192,10 @@ public class LdapAuth3 {
                 System.out.print("Binding: OK.\n");
         }
         catch (LDAPException e) {
-            System.err.printf("Error: login: Binding failed: '%s'!\n", e);
+//            System.err.printf("Error: login: Binding failed: '%s'!\n", e);
+            String error = String.format("Error: login: Binding failed: "
+                    + "'%s'!\n", e);
+            jlog.error(error);
             ldapTerminate(lc);
             return new LdapAuth3Result(null, LDAP_AUTH_RINTERR);
         }
@@ -246,7 +249,10 @@ public class LdapAuth3 {
                 }
             }
             catch (LDAPException e) {
-                System.err.printf("Error: login: Binding failed: '%s'!\n", e);
+//                System.err.printf("Error: login: Binding failed: '%s'!\n", e);
+                String error = String.format("Error: login: Binding failed: "
+                        + "'%s'!\n", e);
+                jlog.error(error);
                 ldapTerminate(lc);
                 return new LdapAuth3Result(null, LDAP_AUTH_RUNKNOWN);
             }
