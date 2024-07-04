@@ -135,7 +135,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
                 .post(Entity.json("{ \"collection\" : {\"@type\": "
                         + "\"koral:doc\", \"key\": \"availability\", \"match\": "
                         + "\"match:eq\", \"type\": \"type:regex\", \"value\": "
-                        + "\"CC-BY.*\"} }"));
+                        + "\"CC.*\"} }"));
         assertEquals(response.getHeaders().getFirst("X-Index-Revision"),
                 "Wes8Bd4h1OypPqbWF5njeQ==");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());

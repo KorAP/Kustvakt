@@ -24,7 +24,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/operands/0/key").asText(),
                 "availability");
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
                 "operation:insertion");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
@@ -45,7 +45,7 @@ public class AvailabilityTest extends SpringJerseyTest {
                 "availability");
         assertEquals(
                 node.at("/collection/operands/0/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(
                 node.at("/collection/operands/0/operands/1/operands/0/match")
                         .asText(),
@@ -88,7 +88,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(node.at("/operands/0/match").asText(), "match:eq");
         assertEquals(node.at("/operands/0/type").asText(), "type:regex");
         assertEquals(node.at("/operands/0/key").asText(), "availability");
-        assertEquals(node.at("/operands/0/value").asText(), "CC-BY.*");
+        assertEquals(node.at("/operands/0/value").asText(), "CC.*");
         assertEquals(node.at("/operands/1/operands/0/match").asText(),
                 "match:eq");
         assertEquals(node.at("/operands/1/operands/0/type").asText(),
@@ -118,7 +118,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(node.at("/operands/0/match").asText(), "match:eq");
         assertEquals(node.at("/operands/0/type").asText(), "type:regex");
         assertEquals(node.at("/operands/0/key").asText(), "availability");
-        assertEquals(node.at("/operands/0/value").asText(), "CC-BY.*");
+        assertEquals(node.at("/operands/0/value").asText(), "CC.*");
         assertEquals(
                 node.at("/operands/1/operands/1/operands/0/match").asText(),
                 "match:eq");
@@ -184,7 +184,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testAvailabilityRegexNoRewrite () throws KustvaktException {
         Response response = searchQuery(
-                "availability = /CC-BY.*/ & availability = /ACA.*/");
+                "availability = /CC.*/ & availability = /ACA.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String json = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(json);
@@ -197,7 +197,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/operands/0/key").asText(),
                 "availability");
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(node.at("/collection/operands/1/match").asText(),
                 "match:eq");
         assertEquals(node.at("/collection/operands/1/value").asText(), "ACA.*");
@@ -215,7 +215,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testNegationAvailabilityFreeUnauthorized ()
             throws KustvaktException {
-        Response response = searchQuery("availability != /CC-BY.*/");
+        Response response = searchQuery("availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         checkAndFree(response.readEntity(String.class));
     }
@@ -232,7 +232,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     public void testNegationAvailabilityWithOperationOrUnauthorized ()
             throws KustvaktException {
         Response response = searchQuery(
-                "availability = /CC-BY.*/ | availability != /CC-BY.*/");
+                "availability = /CC.*/ | availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         checkAndFree(response.readEntity(String.class));
     }
@@ -241,7 +241,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     public void testComplexNegationAvailabilityFreeUnauthorized ()
             throws KustvaktException {
         Response response = searchQuery(
-                "textClass=politik & availability != /CC-BY.*/");
+                "textClass=politik & availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         checkAndFree(response.readEntity(String.class));
     }
@@ -338,7 +338,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testAvailabilityOr () throws KustvaktException {
         Response response = searchQuery(
-                "availability=/CC-BY.*/ | availability=/ACA.*/");
+                "availability=/CC.*/ | availability=/ACA.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         checkAndFree(response.readEntity(String.class));
     }
@@ -346,7 +346,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testRedundancyOrPub () throws KustvaktException {
         Response response = searchQueryWithIP(
-                "availability=/CC-BY.*/ | availability=/ACA.*/ | availability=/QAO-NC/",
+                "availability=/CC.*/ | availability=/ACA.*/ | availability=/QAO-NC/",
                 "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String json = response.readEntity(String.class);
@@ -358,7 +358,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testAvailabilityOrCorpusSigle () throws KustvaktException {
         Response response = searchQuery(
-                "availability=/CC-BY.*/ | corpusSigle=GOE");
+                "availability=/CC.*/ | corpusSigle=GOE");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         checkAndFree(response.readEntity(String.class));
     }

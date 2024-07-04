@@ -81,7 +81,7 @@ public class TotalResultTest extends SpringJerseyTest {
                 + "\"foundry\"}]}},\"@context\":\"http://korap.ids-mannheim.de/ns"
                 + "/koral/0.3/context.jsonld\",\"collection\":{\"@type\":\"koral:"
                 + "doc\",\"match\":\"match:eq\",\"type\":\"type:regex\",\"value\":"
-                + "\"CC-BY.*\",\"key\":\"availability\",\"rewrites\":[{\"@type\":"
+                + "\"CC.*\",\"key\":\"availability\",\"rewrites\":[{\"@type\":"
                 + "\"koral:rewrite\",\"src\":\"Kustvakt\",\"operation\":\"operation:"
                 + "insertion\",\"scope\":\"availability(FREE)\"}]}}";
         int cacheKey = searchService.createTotalResultCacheKey(query);
