@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75211b0c_ca4ac3b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2024-07-04T14:46:44Z",
+      "side": 1,
+      "message": "Should resolve the issue with PBT (availability\u003d\"CC BY-NC-SA 4.0\") not being usable, and is in general better, as also, e.g., CC-0 is matched.",
+      "revId": "e34c8cb7f386ccbb8c15125fd130ef964b99f347",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
