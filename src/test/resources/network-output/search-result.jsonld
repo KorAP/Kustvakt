@@ -58,7 +58,7 @@
         "@type": "koral:doc",
         "match": "match:eq",
         "type": "type:regex",
-        "value": "CC-BY.*",
+        "value": "CC.*",
         "key": "availability",
         "rewrites": [
             {
