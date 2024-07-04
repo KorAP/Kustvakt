@@ -180,7 +180,7 @@ public class CollectionRewriteTest extends SpringJerseyTest {
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
         assertEquals(node.at("/collection/key").asText(), "availability");
-        assertEquals(node.at("/collection/value").asText(), "CC-BY.*");
+        assertEquals(node.at("/collection/value").asText(), "CC.*");
         assertEquals(node.at("/collection/rewrites/0/@type").asText(),
                 "koral:rewrite");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
@@ -204,7 +204,7 @@ public class CollectionRewriteTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/operands/0/key").asText(),
                 "availability");
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(node.at("/collection/operands/1/operands/0/key").asText(),
                 "docSigle");
         assertEquals(node.at("/collection/operands/1/operands/1/key").asText(),

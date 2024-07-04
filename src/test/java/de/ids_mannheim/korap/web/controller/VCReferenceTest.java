@@ -125,7 +125,7 @@ public class VCReferenceTest extends SpringJerseyTest {
 
     @Test
     public void testStatisticsWithRef () throws KustvaktException {
-        String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
+        String corpusQuery = "availability = /CC.*/ & referTo named-vc1";
         Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("corpusQuery", corpusQuery).request().get();
         String ent = response.readEntity(String.class);
@@ -169,7 +169,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(node.at("/collection/operands/1/@type").asText(),
                 "koral:doc");
         assertEquals(node.at("/collection/operands/1/value").asText(), "GOE");

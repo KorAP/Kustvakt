@@ -117,7 +117,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertNotNull(node);
         assertEquals(node.at("/collection/@type").asText(), "koral:doc");
         assertEquals(node.at("/collection/key").asText(), "availability");
-        assertEquals(node.at("/collection/value").asText(), "CC-BY.*");
+        assertEquals(node.at("/collection/value").asText(), "CC.*");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
                 "availability(FREE)");
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
@@ -180,7 +180,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertNotEquals(0, node.path("matches").size());
         assertEquals(node.at("/collection/@type").asText(), "koral:doc");
         assertEquals(node.at("/collection/key").asText(), "availability");
-        assertEquals(node.at("/collection/value").asText(), "CC-BY.*");
+        assertEquals(node.at("/collection/value").asText(), "CC.*");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
                 "availability(FREE)");
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
@@ -200,7 +200,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertNotEquals(0, node.path("matches").size());
         assertEquals(node.at("/collection/@type").asText(), "koral:doc");
         assertEquals(node.at("/collection/key").asText(), "availability");
-        assertEquals(node.at("/collection/value").asText(), "CC-BY.*");
+        assertEquals(node.at("/collection/value").asText(), "CC.*");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
                 "availability(FREE)");
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
@@ -225,7 +225,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertNotEquals(0, node.path("matches").size());
         assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(
                 node.at("/collection/operands/1/operands/0/value").asText(),
                 "ACA.*");
@@ -257,7 +257,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         // System.out.println(node);
         assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(
                 node.at("/collection/operands/1/operands/0/value").asText(),
                 "ACA.*");
@@ -290,7 +290,7 @@ public class SearchControllerTest extends SpringJerseyTest {
                 "operation:and");
         assertEquals(2, node.at("/collection/operands").size());
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(node.at("/collection/operands/1/value").asText(),
                 "gingko");
         assertEquals(node.at("/collection/operands/1/match").asText(),
@@ -321,7 +321,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/operands/0/key").asText(),
                 "availability");
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(node.at("/collection/operands/1/operands/0/key").asText(),
                 "textClass");
         assertEquals(node.at("/collection/operands/1/operands/1/key").asText(),
@@ -346,7 +346,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertNotEquals(0, node.path("matches").size());
         assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
         assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC-BY.*");
+                "CC.*");
         assertEquals(node.at("/collection/operands/1/value").asText(), "ACA.*");
         assertEquals(node.at("/collection/operation").asText(), "operation:or");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),

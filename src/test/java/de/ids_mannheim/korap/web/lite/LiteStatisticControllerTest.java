@@ -103,7 +103,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
                 .post(Entity.json("{ \"collection\" : {\"@type\": "
                         + "\"koral:doc\", \"key\": \"availability\", \"match\": "
                         + "\"match:eq\", \"type\": \"type:regex\", \"value\": "
-                        + "\"CC-BY.*\"} }"));
+                        + "\"CC.*\"} }"));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         assertEquals(response.getHeaders().getFirst("X-Index-Revision"),
