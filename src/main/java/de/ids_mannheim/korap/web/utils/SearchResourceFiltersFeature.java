@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Priority;
 import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.FeatureContext;
@@ -21,6 +19,7 @@ import jakarta.ws.rs.ext.Provider;
  * classes for a resource method annotated with
  * {@link ResourceFilters}.
  */
+@Deprecated
 @Provider
 @Component
 public class SearchResourceFiltersFeature implements DynamicFeature {

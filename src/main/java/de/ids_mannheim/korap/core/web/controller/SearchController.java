@@ -28,7 +28,6 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
-import de.ids_mannheim.korap.web.utils.SearchResourceFilters;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.DefaultValue;
@@ -150,7 +149,7 @@ public class SearchController {
     @POST
     @Path("{version}/search")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @SearchResourceFilters
+    //@SearchResourceFilters
     public Response searchPost (@Context SecurityContext context,
             @Context Locale locale, @Context HttpHeaders headers,
             String jsonld) {
@@ -210,7 +209,7 @@ public class SearchController {
     @GET
     @Path("{version}/search")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @SearchResourceFilters
+    //@SearchResourceFilters
     public Response searchGet (@Context SecurityContext securityContext,
             @Context HttpServletRequest request, @Context HttpHeaders headers,
             @Context Locale locale, @QueryParam("q") String q,
@@ -246,12 +245,13 @@ public class SearchController {
         return Response.ok(result).build();
     }
 
+    // EM: unified resource filter and search resource filters
     // EM: legacy support
     @Deprecated
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
-    @SearchResourceFilters
+    //@SearchResourceFilters
     public Response getMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,
@@ -310,7 +310,7 @@ public class SearchController {
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}")
-    @SearchResourceFilters
+    //@SearchResourceFilters
     public Response retrieveMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,

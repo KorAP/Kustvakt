@@ -1,5 +1,6 @@
 # version 0.73.3-SNAPSHOT
 
+- Unified ResourceFilters and SearchResourceFilters.
 - Remove corpusQuery param in the statistics web-service (close #758).
 - Moved NamedVCLoader to the init package.
 - Clean up Spring XML configs.

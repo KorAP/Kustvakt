@@ -74,6 +74,10 @@ public class KustvaktConfiguration {
     private int validationStringLength;
     @Deprecated
     private int validationEmaillength;
+    
+    // EM: determine if search and match info services restricted 
+    // to logged in users. This replaces @SearchResourceFilters
+    private boolean isLoginRequired;
 
     private byte[] sharedSecret;
     private int longTokenTTL;
@@ -191,6 +195,9 @@ public class KustvaktConfiguration {
                 .getProperty("default.foundry.structure", "base");
 
         // security configuration
+        isLoginRequired = Boolean
+                .valueOf(properties.getProperty("login.required", "false"));
+
         inactiveTime = TimeUtils.convertTimeToSeconds(
                 properties.getProperty("security.idleTimeoutDuration", "10M"));
         allowMultiLogIn = Boolean

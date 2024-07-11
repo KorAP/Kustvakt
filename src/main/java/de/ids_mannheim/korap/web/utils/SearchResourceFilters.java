@@ -21,6 +21,7 @@ import java.lang.annotation.Target;
  * overrides
  * the class value.
  */
+@Deprecated
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SearchResourceFilters {}
