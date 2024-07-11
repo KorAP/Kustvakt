@@ -1,4 +1,4 @@
-# version 0.73.3-SNAPSHOT
+# version 0.74-SNAPSHOT
 
 - Unified ResourceFilters and SearchResourceFilters.
 - Remove corpusQuery param in the statistics web-service (close #758).
