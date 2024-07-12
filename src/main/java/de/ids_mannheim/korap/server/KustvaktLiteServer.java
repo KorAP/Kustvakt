@@ -3,6 +3,8 @@ package de.ids_mannheim.korap.server;
 public class KustvaktLiteServer extends KustvaktBaseServer {
 
     public static void main (String[] args) throws Exception {
+        System.setProperty("log4j.configurationFile", "data/log4j2.properties, log4j2.properties");
+        
         KustvaktLiteServer server = new KustvaktLiteServer();
         kargs = server.readAttributes(args);
 

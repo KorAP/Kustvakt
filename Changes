@@ -7,6 +7,7 @@
 - Change CC RE from CC-BY.* to CC.* (kupietz)
 - Unified ResourceFilters and SearchResourceFilters.
 - Fixed supported versions in the configs & changed delimiter to comma.
+- Setup log4j2 config (#753)
 
 # version 0.73.2
 
