@@ -1,11 +1,12 @@
 # version 0.74-SNAPSHOT
 
-- Unified ResourceFilters and SearchResourceFilters.
 - Remove corpusQuery param in the statistics web-service (close #758).
 - Moved NamedVCLoader to the init package.
 - Clean up Spring XML configs.
 - Fix some logging to write to file instead of stdout.
 - Change CC RE from CC-BY.* to CC.* (kupietz)
+- Unified ResourceFilters and SearchResourceFilters.
+- Fixed supported versions in the configs & changed delimiter to comma.
 
 # version 0.73.2
 

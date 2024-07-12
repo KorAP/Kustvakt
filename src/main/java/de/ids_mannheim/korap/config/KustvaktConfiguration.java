@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +162,8 @@ public class KustvaktConfiguration {
         this.supportedVersions = new HashSet<>();
         if (!supportedVersions.isEmpty()) {
             List<String> versionArray = Arrays
-                    .asList(supportedVersions.split(" "));
+                    .stream(supportedVersions.split(",")).map(String::trim)
+                    .collect(Collectors.toList());
             this.supportedVersions.addAll(versionArray);
         }
         this.supportedVersions.add(currentVersion);
