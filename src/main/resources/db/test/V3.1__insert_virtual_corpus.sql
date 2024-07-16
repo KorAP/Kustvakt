@@ -1,63 +1,63 @@
 -- dummy data only for testing
 
 -- user groups
-INSERT INTO user_group(name,status,created_by) 
-	VALUES ("marlin-group","ACTIVE","marlin");
+INSERT INTO user_group(name,status,created_by,created_date) 
+	VALUES ("marlin-group","ACTIVE","marlin",CURRENT_TIMESTAMP);
 	
-INSERT INTO user_group(name,status,created_by) 
-	VALUES ("dory-group","ACTIVE","dory");
+--INSERT INTO user_group(name,status,created_by,created_date) 
+--	VALUES ("dory-group","ACTIVE","dory",CURRENT_TIMESTAMP);
 
-INSERT INTO user_group(name,status,created_by) 
-	VALUES ("auto-group","HIDDEN","system");
+INSERT INTO user_group(name,status,created_by,created_date) 
+	VALUES ("auto-group","HIDDEN","system",CURRENT_TIMESTAMP);
 
 --INSERT INTO user_group(name,status,created_by) 
 --	VALUES ("all users","HIDDEN","system");
 
-INSERT INTO user_group(name,status,created_by, deleted_by) 
-	VALUES ("deleted-group","DELETED","dory", "dory");
+--INSERT INTO user_group(name,status,created_by,deleted_by,created_date) 
+--	VALUES ("deleted-group","DELETED","dory", "dory",CURRENT_TIMESTAMP);
 
 
 
 -- user group members
-INSERT INTO user_group_member(user_id, group_id, status, created_by)
-	SELECT "marlin",
-		(SELECT id from user_group where name = "marlin-group"),
-		"ACTIVE","marlin";
-
-INSERT INTO user_group_member(user_id, group_id, status, created_by)
-	SELECT "dory",
-		(SELECT id from user_group where name = "marlin-group"),
-		"ACTIVE","marlin";
-		
-INSERT INTO user_group_member(user_id, group_id, status, created_by)
-	SELECT "dory",
-		(SELECT id from user_group where name = "dory-group"),
-		"ACTIVE","dory";
-
-INSERT INTO user_group_member(user_id, group_id, status, created_by)
-	SELECT "nemo",
-		(SELECT id from user_group where name = "dory-group"),
-		"ACTIVE","dory";
-
-INSERT INTO user_group_member(user_id, group_id, status, created_by)
-	SELECT "marlin",
-		(SELECT id from user_group where name = "dory-group"),
-		"PENDING","dory";
-	
-INSERT INTO user_group_member(user_id, group_id, status, created_by, deleted_by)
-	SELECT "pearl",
-		(SELECT id from user_group where name = "dory-group"),
-		"DELETED","dory", "pearl";
-
-INSERT INTO user_group_member(user_id, group_id, status, created_by)
-	SELECT "pearl",
-		(SELECT id from user_group where name = "auto-group"),
-		"ACTIVE","system";
-
-INSERT INTO user_group_member(user_id, group_id, status, created_by)
-	SELECT "dory",
-		(SELECT id from user_group where name = "deleted-group"),
-		"ACTIVE","dory";
+--INSERT INTO user_group_member(user_id, group_id, status, created_by)
+--	SELECT "marlin",
+--		(SELECT id from user_group where name = "marlin-group"),
+--		"ACTIVE","marlin";
+--
+--INSERT INTO user_group_member(user_id, group_id, status, created_by)
+--	SELECT "dory",
+--		(SELECT id from user_group where name = "marlin-group"),
+--		"ACTIVE","marlin";
+--		
+--INSERT INTO user_group_member(user_id, group_id, status, created_by)
+--	SELECT "dory",
+--		(SELECT id from user_group where name = "dory-group"),
+--		"ACTIVE","dory";
+--
+--INSERT INTO user_group_member(user_id, group_id, status, created_by)
+--	SELECT "nemo",
+--		(SELECT id from user_group where name = "dory-group"),
+--		"ACTIVE","dory";
+--
+--INSERT INTO user_group_member(user_id, group_id, status, created_by)
+--	SELECT "marlin",
+--		(SELECT id from user_group where name = "dory-group"),
+--		"PENDING","dory";
+--	
+--INSERT INTO user_group_member(user_id, group_id, status, created_by, deleted_by)
+--	SELECT "pearl",
+--		(SELECT id from user_group where name = "dory-group"),
+--		"DELETED","dory", "pearl";
+--
+--INSERT INTO user_group_member(user_id, group_id, status, created_by)
+--	SELECT "pearl",
+--		(SELECT id from user_group where name = "auto-group"),
+--		"ACTIVE","system";
+--
+--INSERT INTO user_group_member(user_id, group_id, status, created_by)
+--	SELECT "dory",
+--		(SELECT id from user_group where name = "deleted-group"),
+--		"ACTIVE","dory";
 
 		
 -- virtual corpora
@@ -86,11 +86,11 @@ INSERT INTO query(name, type, query_type, required_access, created_by, descripti
 	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');	
 	
 -- virtual corpus access
-INSERT INTO query_access(query_id, user_group_id, status, created_by) 
-	SELECT 
-		(SELECT id from query where name = "group-vc"), 
-		(SELECT id from user_group where name = "dory-group"), 
-		"ACTIVE", "dory";
+--INSERT INTO query_access(query_id, user_group_id, status, created_by) 
+--	SELECT 
+--		(SELECT id from query where name = "group-vc"), 
+--		(SELECT id from user_group where name = "dory-group"), 
+--		"ACTIVE", "dory";
 
 --INSERT INTO query_access(query_id, user_group_id, status, created_by) 
 --	SELECT 
@@ -98,17 +98,17 @@ INSERT INTO query_access(query_id, user_group_id, status, created_by)
 --		(SELECT id from user_group where name = "all users"),
 --		"ACTIVE", "system";
 
-INSERT INTO query_access(query_id, user_group_id, status, created_by) 
-	SELECT 
-		(SELECT id from query where name = "published-vc"),
-		(SELECT id from user_group where name = "marlin-group"),
-		"ACTIVE", "marlin";
+--INSERT INTO query_access(query_id, user_group_id, status, created_by) 
+--	SELECT 
+--		(SELECT id from query where name = "published-vc"),
+--		(SELECT id from user_group where name = "marlin-group"),
+--		"ACTIVE", "marlin";
 
-INSERT INTO query_access(query_id, user_group_id, status, created_by) 
-	SELECT 
-		(SELECT id from query where name = "published-vc"),
-		(SELECT id from user_group where name = "auto-group"),
-		"HIDDEN", "system";
+--INSERT INTO query_access(query_id, user_group_id, status, created_by) 
+--	SELECT 
+--		(SELECT id from query where name = "published-vc"),
+--		(SELECT id from user_group where name = "auto-group"),
+--		"HIDDEN", "system";
 
 	
 -- Summary user VC Lists
