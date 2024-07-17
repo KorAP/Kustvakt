@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.RoleDao;
@@ -115,7 +116,7 @@ public class UserGroupService {
     private List<UserGroupMember> retrieveMembers (int groupId, String username)
             throws KustvaktException {
         List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
-                groupId, PredefinedRole.USER_GROUP_ADMIN.getId());
+                groupId, PredefinedRole.USER_GROUP_ADMIN_DELETE);
 
         List<UserGroupMember> members = null;
         for (UserGroupMember admin : groupAdmins) {
@@ -165,17 +166,23 @@ public class UserGroupService {
     public List<UserGroupMember> retrieveQueryAccessAdmins (UserGroup userGroup)
             throws KustvaktException {
         List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
-                userGroup.getId(), PredefinedRole.VC_ACCESS_ADMIN.getId());
+                userGroup.getId(), PredefinedRole.QUERY_ADMIN_DELETE);
         return groupAdmins;
     }
 
-    private void setMemberRoles () {
+    private void setMemberRoles (UserGroup userGroup) {
         if (memberRoles == null) {
+            
+            Role r1 = new Role(PredefinedRole.USER_GROUP_MEMBER_DELETE,
+                    PrivilegeType.DELETE, userGroup);
+            Role r2 = new Role(PredefinedRole.QUERY_MEMBER_READ,
+                    PrivilegeType.DELETE, userGroup);
+            roleDao.addRole(r1);
+            roleDao.addRole(r2);
+            
             memberRoles = new HashSet<Role>(2);
-            memberRoles.add(roleDao.retrieveRoleById(
-                    PredefinedRole.USER_GROUP_MEMBER.getId()));
-            memberRoles.add(roleDao
-                    .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
+            memberRoles.add(r1);
+            memberRoles.add(r2);
         }
     }
 
@@ -407,7 +414,7 @@ public class UserGroupService {
 
         List<UserGroupMember> userGroupAdmins = groupMemberDao
                 .retrieveMemberByRole(userGroup.getId(),
-                        PredefinedRole.USER_GROUP_ADMIN.getId());
+                        PredefinedRole.USER_GROUP_ADMIN_DELETE);
 
         for (UserGroupMember admin : userGroupAdmins) {
             if (username.equals(admin.getUserId())) {
@@ -432,7 +439,7 @@ public class UserGroupService {
             throws KustvaktException {
 
         ParameterChecker.checkStringValue(username, "userId");
-        ParameterChecker.checkStringValue(groupName, "groupId");
+        ParameterChecker.checkStringValue(groupName, "groupName");
 
         UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName,
                 false);
@@ -471,7 +478,7 @@ public class UserGroupService {
 
             if (expiration.isAfter(now)) {
                 member.setStatus(GroupMemberStatus.ACTIVE);
-                setMemberRoles();
+                setMemberRoles(userGroup);
                 member.setRoles(memberRoles);
                 groupMemberDao.updateMember(member);
             }
@@ -564,7 +571,7 @@ public class UserGroupService {
     }
 
     public void editMemberRoles (String username, String groupName,
-            String memberUsername, List<Integer> roleIds)
+            String memberUsername, List<PredefinedRole> roleIds)
             throws KustvaktException {
 
         ParameterChecker.checkStringValue(username, "username");
@@ -591,7 +598,7 @@ public class UserGroupService {
 
             Set<Role> roles = new HashSet<>();
             for (int i = 0; i < roleIds.size(); i++) {
-                roles.add(roleDao.retrieveRoleById(roleIds.get(i)));
+                roles.add(roleDao.retrieveRoleByName(roleIds.get(i)));
             }
             member.setRoles(roles);
             groupMemberDao.updateMember(member);
@@ -604,7 +611,7 @@ public class UserGroupService {
     }
 
     public void addMemberRoles (String username, String groupName,
-            String memberUsername, List<Integer> roleIds)
+            String memberUsername, List<PredefinedRole> roleNames)
             throws KustvaktException {
 
         ParameterChecker.checkStringValue(username, "username");
@@ -630,8 +637,8 @@ public class UserGroupService {
             }
 
             Set<Role> roles = member.getRoles();
-            for (int i = 0; i < roleIds.size(); i++) {
-                roles.add(roleDao.retrieveRoleById(roleIds.get(i)));
+            for (PredefinedRole role : roleNames) {
+                roles.add(roleDao.retrieveRoleByName(role));
             }
             member.setRoles(roles);
             groupMemberDao.updateMember(member);

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.Role_;
 import de.ids_mannheim.korap.entity.UserGroupMember;
@@ -104,9 +105,8 @@ public class UserGroupMemberDao {
     }
 
     @SuppressWarnings("unchecked")
-    public List<UserGroupMember> retrieveMemberByRole (int groupId, int roleId)
-            throws KustvaktException {
-        ParameterChecker.checkIntegerValue(roleId, "roleId");
+    public List<UserGroupMember> retrieveMemberByRole (int groupId,
+            PredefinedRole role) throws KustvaktException {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -121,7 +121,7 @@ public class UserGroupMemberDao {
                         groupId),
                 criteriaBuilder.equal(root.get(UserGroupMember_.status),
                         GroupMemberStatus.ACTIVE),
-                criteriaBuilder.equal(memberRole.get(Role_.id), roleId));
+                criteriaBuilder.equal(memberRole.get(Role_.NAME), role));
 
         query.select(root);
         query.where(predicate);
@@ -131,9 +131,9 @@ public class UserGroupMemberDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(
-                    StatusCodes.NO_RESULT_FOUND, "No member with role " + roleId
+                    StatusCodes.NO_RESULT_FOUND, "No member with role " + role.name()
                             + " is found in group " + groupId,
-                    String.valueOf(roleId));
+                    role.name());
         }
     }
 
