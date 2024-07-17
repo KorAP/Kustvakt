@@ -28,6 +28,7 @@ import jakarta.persistence.criteria.Root;
  * @author margaretha
  *
  */
+@Deprecated
 @Transactional
 @Repository
 public class PrivilegeDao {
