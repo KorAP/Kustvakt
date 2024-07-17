@@ -21,6 +21,7 @@ import lombok.Setter;
  * @author margaretha
  *
  */
+@Deprecated
 @Getter
 @Setter
 @Entity
