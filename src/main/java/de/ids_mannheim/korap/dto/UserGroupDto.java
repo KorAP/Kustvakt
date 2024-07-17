@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,5 +31,5 @@ public class UserGroupDto {
     private List<UserGroupMemberDto> members;
 
     private GroupMemberStatus userMemberStatus;
-    private List<String> userRoles;
+    private List<PredefinedRole> userRoles;
 }

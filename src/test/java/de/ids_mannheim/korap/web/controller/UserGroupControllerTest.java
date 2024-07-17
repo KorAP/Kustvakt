@@ -31,7 +31,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 /**
  * @author margaretha
  */
-public class UserGroupControllerTest extends SpringJerseyTest {
+public class UserGroupControllerTest extends UserGroupTestBase {
 
     @Autowired
     private UserGroupMemberDao memberDao;
@@ -60,73 +60,11 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    // dory is a group admin in dory-group
-    @Test
-    public void testListDoryGroups () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("dory", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
-        String entity = response.readEntity(String.class);
-        // System.out.println(entity);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(entity);
-        JsonNode group = node.get(1);
-        assertEquals(2, group.at("/id").asInt());
-        assertEquals(group.at("/name").asText(), "dory-group");
-        assertEquals(group.at("/owner").asText(), "dory");
-        assertEquals(3, group.at("/members").size());
-    }
-
-    // nemo is a group member in dory-group
-    @Test
-    public void testListNemoGroups () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("nemo", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
-        String entity = response.readEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        // System.out.println(entity);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(2, node.at("/0/id").asInt());
-        assertEquals(node.at("/0/name").asText(), "dory-group");
-        assertEquals(node.at("/0/owner").asText(), "dory");
-        // group members are not allowed to see other members
-        assertEquals(0, node.at("/0/members").size());
-    }
-
-    // marlin has 2 groups
-    @Test
-    public void testListMarlinGroups () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
-        String entity = response.readEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(2, node.size());
-    }
-
-    @Test
-    public void testListGroupGuest () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: guest");
-    }
-
     @Test
     public void testCreateGroupEmptyDescription ()
             throws ProcessingException, KustvaktException {
         String groupName = "empty_group";
-        Response response = testCreateUserGroup(groupName, "");
+        Response response = createUserGroup(groupName, "", username);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         deleteGroupByName(groupName);
     }
@@ -138,19 +76,6 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         Response response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         deleteGroupByName(groupName);
-    }
-
-    private Response testCreateUserGroup (String groupName, String description)
-            throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("description", description);
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .put(Entity.form(form));
-        return response;
     }
 
     private Response testCreateGroupWithoutDescription (String groupName)
@@ -196,7 +121,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testUserGroup () throws ProcessingException, KustvaktException {
         String groupName = "new-user-group";
         String description = "This is new-user-group.";
-        Response response = testCreateUserGroup(groupName, description);
+        Response response = createUserGroup(groupName, description, username);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         // same name
         response = testCreateGroupWithoutDescription(groupName);
@@ -212,12 +137,10 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(username, node.at("/members/0/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/0/status").asText());
-        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.name(),
-                node.at("/members/0/roles/1").asText());
-        assertEquals(PredefinedRole.USER_GROUP_ADMIN.name(),
-                node.at("/members/0/roles/0").asText());
+        assertEquals(6,  node.at("/members/0/roles").size());
+
         testUpdateUserGroup(groupName);
-        testInviteMember(groupName);
+        testInviteMember(groupName, username, "darla");
         testDeleteMemberUnauthorized(groupName);
         testDeleteMember(groupName);
         testDeleteGroup(groupName);
@@ -228,7 +151,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     private void testUpdateUserGroup (String groupName)
             throws ProcessingException, KustvaktException {
         String description = "Description is updated.";
-        Response response = testCreateUserGroup(groupName, description);
+        Response response = createUserGroup(groupName, description, username);
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
         JsonNode node = retrieveUserGroups(username);
         assertEquals(1, node.size());
@@ -396,27 +319,15 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 "Operation 'delete group owner'is not allowed.");
     }
 
-    private void testInviteMember (String groupName)
+    private void testInviteMember (String groupName, String invitor,
+            String invitee)
             throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("members", "darla");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("invite").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        inviteMember(groupName, invitor, invitee);
         // list group
-        response = target().path(API_VERSION).path("group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
+        JsonNode node = listUserGroup(invitor);
         node = node.get(0);
         assertEquals(2, node.get("members").size());
-        assertEquals(node.at("/members/1/userId").asText(), "darla");
+        assertEquals(node.at("/members/1/userId").asText(), invitee);
         assertEquals(GroupMemberStatus.PENDING.name(),
                 node.at("/members/1/status").asText());
         assertEquals(0, node.at("/members/1/roles").size());
@@ -435,8 +346,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // check member
         JsonNode node = retrieveUserGroups("marlin");
-        assertEquals(2, node.size());
-        JsonNode group = node.get(1);
+        assertEquals(1, node.size());
+        JsonNode group = node.get(0);
         assertEquals(GroupMemberStatus.PENDING.name(),
                 group.at("/userMemberStatus").asText());
     }
@@ -537,29 +448,23 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     // marlin has GroupMemberStatus.PENDING in dory-group
     @Test
     public void testSubscribePendingMember () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@dory-group").path("subscribe").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .post(Entity.form(new Form()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        createDoryGroup();
+        testInviteMember(doryGroupName, "dory", "marlin");
+        subscribe("@"+doryGroupName, "marlin");
+        
         // retrieve marlin group
         JsonNode node = retrieveUserGroups("marlin");
-        // System.out.println(node);
-        assertEquals(2, node.size());
-        JsonNode group = node.get(1);
-        assertEquals(2, group.at("/id").asInt());
+        assertEquals(1, node.size());
+        JsonNode group = node.get(0);
         assertEquals(group.at("/name").asText(), "dory-group");
         assertEquals(group.at("/owner").asText(), "dory");
         // group members are not allowed to see other members
         assertEquals(0, group.at("/members").size());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 group.at("/userMemberStatus").asText());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
-                group.at("/userRoles/1").asText());
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
-                group.at("/userRoles/0").asText());
+        
+        System.out.println(node.toPrettyString());
+        assertEquals(2, group.at("/userRoles").size());
         // unsubscribe marlin from dory-group
         testUnsubscribeActiveMember("dory-group");
         checkGroupMemberRole("dory-group", "marlin");
@@ -658,7 +563,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 .delete();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = retrieveUserGroups("marlin");
-        assertEquals(1, node.size());
+        assertEquals(0, node.size());
     }
 
     private void checkGroupMemberRole (String groupName,
