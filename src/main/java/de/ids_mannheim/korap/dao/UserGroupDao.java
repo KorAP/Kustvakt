@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.dao;
 
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import de.ids_mannheim.korap.entity.Role;
@@ -52,9 +54,6 @@ public class UserGroupDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    private RoleDao roleDao;
-
     public int createGroup (String name, String description, String createdBy,
             UserGroupStatus status) throws KustvaktException {
         ParameterChecker.checkStringValue(name, "name");
@@ -66,14 +65,16 @@ public class UserGroupDao {
         group.setDescription(description);
         group.setStatus(status);
         group.setCreatedBy(createdBy);
+        group.setCreatedDate(ZonedDateTime.now());
         entityManager.persist(group);
-
-        Set<Role> roles = new HashSet<Role>();
-        roles.add(roleDao
-                .retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId()));
-        roles.add(roleDao
-                .retrieveRoleById(PredefinedRole.VC_ACCESS_ADMIN.getId()));
-
+        entityManager.flush();
+        
+        Set<Role> roles = createUserGroupAdminRoles(group);
+        for (Role role : roles) {
+            entityManager.persist(role);
+        }
+        entityManager.flush();
+        
         UserGroupMember owner = new UserGroupMember();
         owner.setUserId(createdBy);
         owner.setCreatedBy(createdBy);
@@ -81,8 +82,26 @@ public class UserGroupDao {
         owner.setGroup(group);
         owner.setRoles(roles);
         entityManager.persist(owner);
-
+        entityManager.flush();
+        
         return group.getId();
+    }
+    
+    private Set<Role> createUserGroupAdminRoles (UserGroup group) {
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(new Role(PredefinedRole.USER_GROUP_ADMIN_DELETE,
+                PrivilegeType.DELETE, group));
+        roles.add(new Role(PredefinedRole.USER_GROUP_ADMIN_READ,
+                PrivilegeType.READ, group));
+        roles.add(new Role(PredefinedRole.USER_GROUP_ADMIN_WRITE,
+                PrivilegeType.WRITE, group));
+        roles.add(new Role(PredefinedRole.QUERY_ADMIN_DELETE,
+                PrivilegeType.DELETE, group));
+        roles.add(new Role(PredefinedRole.QUERY_ADMIN_READ,
+                PrivilegeType.READ, group));
+        roles.add(new Role(PredefinedRole.QUERY_ADMIN_WRITE,
+                PrivilegeType.WRITE, group));
+        return roles;
     }
 
     public void deleteGroup (int groupId, String deletedBy,
