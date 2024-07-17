@@ -571,7 +571,7 @@ public class UserGroupService {
     }
 
     public void editMemberRoles (String username, String groupName,
-            String memberUsername, List<PredefinedRole> roleIds)
+            String memberUsername, List<PredefinedRole> roleList)
             throws KustvaktException {
 
         ParameterChecker.checkStringValue(username, "username");
@@ -597,8 +597,8 @@ public class UserGroupService {
             }
 
             Set<Role> roles = new HashSet<>();
-            for (int i = 0; i < roleIds.size(); i++) {
-                roles.add(roleDao.retrieveRoleByName(roleIds.get(i)));
+            for (int i = 0; i < roleList.size(); i++) {
+                roles.add(roleDao.retrieveRoleByName(roleList.get(i)));
             }
             member.setRoles(roles);
             groupMemberDao.updateMember(member);
@@ -651,7 +651,7 @@ public class UserGroupService {
     }
 
     public void deleteMemberRoles (String username, String groupName,
-            String memberUsername, List<Integer> roleIds)
+            String memberUsername, List<PredefinedRole> rolesToBeDeleted)
             throws KustvaktException {
 
         ParameterChecker.checkStringValue(username, "username");
@@ -669,7 +669,7 @@ public class UserGroupService {
             Set<Role> roles = member.getRoles();
             Iterator<Role> i = roles.iterator();
             while (i.hasNext()) {
-                if (roleIds.contains(i.next().getId())) {
+                if (rolesToBeDeleted.contains(i.next().getName())) {
                     i.remove();
                 }
             }

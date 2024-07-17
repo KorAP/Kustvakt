@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.usergroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,7 +21,7 @@ public class UserGroupListTest extends UserGroupTestBase{
         inviteMember(doryGroupName, "dory", "marlin");
         inviteMember(doryGroupName, "dory", "nemo");
         
-        JsonNode node = listUserGroup("dory");
+        JsonNode node = listUserGroups("dory");
         JsonNode group = node.get(0);
         assertEquals(group.at("/name").asText(), "dory-group");
         assertEquals(group.at("/owner").asText(), "dory");
@@ -29,12 +29,15 @@ public class UserGroupListTest extends UserGroupTestBase{
         
         testListNemoGroups();
         testListMarlinGroups();
+        
+        deleteGroupByName(doryGroupName,"dory");
+        deleteGroupByName(marlinGroupName, "marlin");
     }
     
     public void testListNemoGroups () throws KustvaktException {
-        subscribe("@"+doryGroupName, "nemo");
+        subscribe(doryGroupName, "nemo");
 
-        JsonNode node = listUserGroup("nemo");
+        JsonNode node = listUserGroups("nemo");
         assertEquals(node.at("/0/name").asText(), "dory-group");
         assertEquals(node.at("/0/owner").asText(), "dory");
         // group members are not allowed to see other members
@@ -44,9 +47,9 @@ public class UserGroupListTest extends UserGroupTestBase{
     // marlin has 2 groups
     public void testListMarlinGroups () throws KustvaktException {
         createMarlinGroup();
-        subscribe("@"+doryGroupName, "marlin");
+        subscribe(doryGroupName, "marlin");
         
-        JsonNode node = listUserGroup("marlin");
+        JsonNode node = listUserGroups("marlin");
         assertEquals(2, node.size());
     }
     

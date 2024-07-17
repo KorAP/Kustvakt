@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.usergroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,12 +33,23 @@ public class UserGroupTestBase extends SpringJerseyTest {
         return response;
     }
 
-    protected JsonNode listUserGroup (String username)
+    protected void deleteGroupByName (String groupName,String username)
+            throws KustvaktException {
+        Response response = target().path(API_VERSION).path("group")
+                .path("@" + groupName).request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    protected JsonNode listUserGroups (String username)
             throws KustvaktException {
         Response response = target().path(API_VERSION).path("group").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         return node;
@@ -61,10 +72,20 @@ public class UserGroupTestBase extends SpringJerseyTest {
     protected void subscribe (String groupName, String username)
             throws KustvaktException {
         Response response = target().path(API_VERSION).path("group")
-                .path(groupName).path("subscribe").request()
+                .path("@"+groupName).path("subscribe").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .post(Entity.form(new Form()));
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+    
+    protected void addMemberRole (String groupName, String username,
+            Form form) throws KustvaktException {
+        Response response = target().path(API_VERSION).path("group")
+                .path("@"+groupName).path("role").path("add").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
