@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.dto.UserGroupMemberDto;
 import de.ids_mannheim.korap.entity.Role;
@@ -39,7 +40,7 @@ public class UserGroupConverter {
         dto.setUserMemberStatus(userMemberStatus);
 
         if (roleSet != null) {
-            dto.setUserRoles(convertRoleSetToStringList(roleSet));
+            dto.setUserRoles(convertRoleToPredefinedRoles(roleSet));
         }
 
         if (members != null) {
@@ -51,7 +52,7 @@ public class UserGroupConverter {
                 memberDto.setUserId(member.getUserId());
                 memberDto.setStatus(member.getStatus());
                 memberDto.setRoles(
-                        convertRoleSetToStringList(member.getRoles()));
+                        convertRoleToPredefinedRoles(member.getRoles()));
                 memberDtos.add(memberDto);
             }
             dto.setMembers(memberDtos);
@@ -63,8 +64,8 @@ public class UserGroupConverter {
         return dto;
     }
 
-    private List<String> convertRoleSetToStringList (Set<Role> roleSet) {
-        List<String> roles = new ArrayList<>(roleSet.size());
+    private List<PredefinedRole> convertRoleToPredefinedRoles (Set<Role> roleSet) {
+        List<PredefinedRole> roles = new ArrayList<>(roleSet.size());
         for (Role r : roleSet) {
             roles.add(r.getName());
         }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
@@ -240,7 +241,7 @@ public class UserGroupController {
     public Response editMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleId") List<Integer> roleIds) {
+            @FormParam("roleId") List<PredefinedRole> roleIds) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
@@ -274,14 +275,14 @@ public class UserGroupController {
     public Response addMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleId") List<Integer> roleIds) {
+            @FormParam("roleId") List<PredefinedRole> roles) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
             service.addMemberRoles(context.getUsername(), groupName,
-                    memberUsername, roleIds);
+                    memberUsername, roles);
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {

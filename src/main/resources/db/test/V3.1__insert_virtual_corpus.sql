@@ -1,8 +1,8 @@
 -- dummy data only for testing
 
 -- user groups
-INSERT INTO user_group(name,status,created_by,created_date) 
-	VALUES ("marlin-group","ACTIVE","marlin",CURRENT_TIMESTAMP);
+--INSERT INTO user_group(name,status,created_by,created_date) 
+--	VALUES ("marlin-group","ACTIVE","marlin",CURRENT_TIMESTAMP);
 	
 --INSERT INTO user_group(name,status,created_by,created_date) 
 --	VALUES ("dory-group","ACTIVE","dory",CURRENT_TIMESTAMP);
