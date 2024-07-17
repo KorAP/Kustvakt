@@ -1,24 +1,17 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.usergroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.MediaType;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.dao.UserGroupMemberDao;
@@ -27,46 +20,30 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * @author margaretha
  */
 public class UserGroupControllerTest extends UserGroupTestBase {
 
-    @Autowired
-    private UserGroupMemberDao memberDao;
-
     private String username = "UserGroupControllerTest";
 
     private String admin = "admin";
 
-    private JsonNode retrieveUserGroups (String username)
-            throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
-        String entity = response.readEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        return JsonUtils.readTree(entity);
-    }
-
-    private void deleteGroupByName (String groupName) throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    }
-
+    
     @Test
     public void testCreateGroupEmptyDescription ()
             throws ProcessingException, KustvaktException {
         String groupName = "empty_group";
         Response response = createUserGroup(groupName, "", username);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        deleteGroupByName(groupName);
+        deleteGroupByName(groupName,username);
     }
 
     @Test
@@ -75,7 +52,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         String groupName = "missing-desc-group";
         Response response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        deleteGroupByName(groupName);
+        deleteGroupByName(groupName,username);
     }
 
     private Response testCreateGroupWithoutDescription (String groupName)
@@ -127,7 +104,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
         // list user group
-        JsonNode node = retrieveUserGroups(username);
+        JsonNode node = listUserGroups(username);
         assertEquals(1, node.size());
         node = node.get(0);
         assertEquals(node.get("name").asText(), "new-user-group");
@@ -153,7 +130,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         String description = "Description is updated.";
         Response response = createUserGroup(groupName, description, username);
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
-        JsonNode node = retrieveUserGroups(username);
+        JsonNode node = listUserGroups(username);
         assertEquals(1, node.size());
         assertEquals(description, node.get(0).get("description").asText());
     }
@@ -206,7 +183,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // check member
-        JsonNode node = retrieveUserGroups("pearl");
+        JsonNode node = listUserGroups("pearl");
         assertEquals(0, node.size());
     }
 
@@ -324,7 +301,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
             throws ProcessingException, KustvaktException {
         inviteMember(groupName, invitor, invitee);
         // list group
-        JsonNode node = listUserGroup(invitor);
+        JsonNode node = listUserGroups(invitor);
         node = node.get(0);
         assertEquals(2, node.get("members").size());
         assertEquals(node.at("/members/1/userId").asText(), invitee);
@@ -345,7 +322,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                 .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // check member
-        JsonNode node = retrieveUserGroups("marlin");
+        JsonNode node = listUserGroups("marlin");
         assertEquals(1, node.size());
         JsonNode group = node.get(0);
         assertEquals(GroupMemberStatus.PENDING.name(),
@@ -366,7 +343,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                 .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // check member
-        JsonNode node = retrieveUserGroups("pearl");
+        JsonNode node = listUserGroups("pearl");
         assertEquals(1, node.size());
         JsonNode group = node.get(0);
         assertEquals(GroupMemberStatus.PENDING.name(),
@@ -450,10 +427,10 @@ public class UserGroupControllerTest extends UserGroupTestBase {
     public void testSubscribePendingMember () throws KustvaktException {
         createDoryGroup();
         testInviteMember(doryGroupName, "dory", "marlin");
-        subscribe("@"+doryGroupName, "marlin");
+        subscribe(doryGroupName, "marlin");
         
         // retrieve marlin group
-        JsonNode node = retrieveUserGroups("marlin");
+        JsonNode node = listUserGroups("marlin");
         assertEquals(1, node.size());
         JsonNode group = node.get(0);
         assertEquals(group.at("/name").asText(), "dory-group");
@@ -562,7 +539,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .delete();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = retrieveUserGroups("marlin");
+        JsonNode node = listUserGroups("marlin");
         assertEquals(0, node.size());
     }
 
@@ -610,7 +587,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
     @Test
     public void testUnsubscribePendingMember ()
             throws ProcessingException, KustvaktException {
-        JsonNode node = retrieveUserGroups("marlin");
+        JsonNode node = listUserGroups("marlin");
         assertEquals(2, node.size());
         Response response = target().path(API_VERSION).path("group")
                 .path("@dory-group").path("unsubscribe").request()
@@ -619,7 +596,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .delete();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        node = retrieveUserGroups("marlin");
+        node = listUserGroups("marlin");
         assertEquals(1, node.size());
         // invite marlin to dory-group to set back the
         // GroupMemberStatus.PENDING
@@ -687,72 +664,5 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                 "Group new-user-group has been deleted.");
     }
 
-    @Test
-    public void testAddSameMemberRole ()
-            throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        form.param("roleId", "1");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@marlin-group").path("role").path("add").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        UserGroupMember member = memberDao.retrieveMemberById("dory", 1);
-        Set<Role> roles = member.getRoles();
-        assertEquals(2, roles.size());
-    }
 
-    @Test
-    public void testDeleteAddMemberRole ()
-            throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        form.param("roleId", "1");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@marlin-group").path("role").path("delete").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        UserGroupMember member = memberDao.retrieveMemberById("dory", 1);
-        Set<Role> roles = member.getRoles();
-        assertEquals(1, roles.size());
-        testAddSameMemberRole();
-    }
-
-    @Test
-    public void testEditMemberRoleEmpty ()
-            throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@marlin-group").path("role").path("edit").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        UserGroupMember member = memberDao.retrieveMemberById("dory", 1);
-        Set<Role> roles = member.getRoles();
-        assertEquals(0, roles.size());
-        testEditMemberRole();
-    }
-
-    private void testEditMemberRole ()
-            throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        form.param("roleId", "1");
-        form.param("roleId", "3");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@marlin-group").path("role").path("edit").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        UserGroupMember member = memberDao.retrieveMemberById("dory", 1);
-        Set<Role> roles = member.getRoles();
-        assertEquals(2, roles.size());
-    }
 }

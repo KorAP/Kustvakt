@@ -222,7 +222,8 @@ public class UserGroupController {
         }
     }
 
-    /**
+    /** DEPRECATED for simplicity and easier maintenance.
+     * 
      * Very similar to addMemberRoles web-service, but allows deletion
      * as well.
      * 
@@ -235,20 +236,21 @@ public class UserGroupController {
      *            a role id or multiple role ids
      * @return
      */
+    @Deprecated
     @POST
     @Path("@{groupName}/role/edit")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response editMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleId") List<PredefinedRole> roleIds) {
+            @FormParam("roles") List<PredefinedRole> roles) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.EDIT_USER_GROUP_MEMBER_ROLE);
             service.editMemberRoles(context.getUsername(), groupName,
-                    memberUsername, roleIds);
+                    memberUsername, roles);
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
@@ -275,7 +277,7 @@ public class UserGroupController {
     public Response addMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleId") List<PredefinedRole> roles) {
+            @FormParam("role") List<PredefinedRole> roles) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
@@ -310,14 +312,14 @@ public class UserGroupController {
     public Response deleteMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleId") List<Integer> roleIds) {
+            @FormParam("role") List<PredefinedRole> roles) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
             service.deleteMemberRoles(context.getUsername(), groupName,
-                    memberUsername, roleIds);
+                    memberUsername, roles);
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
