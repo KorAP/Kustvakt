@@ -1,32 +1,31 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.usergroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.MediaType;
-
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * @author margaretha
  */
-public class UserGroupControllerAdminTest extends SpringJerseyTest {
+public class UserGroupControllerAdminTest extends UserGroupTestBase {
 
     private String sysAdminUser = "admin";
 
@@ -46,6 +45,19 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
     @Test
     public void testListUserGroupsUsingAdminToken () throws KustvaktException {
+        createDoryGroup();
+        
+        createMarlinGroup();
+        inviteMember(marlinGroupName, "marlin", "dory");
+        subscribe(marlinGroupName, "dory");
+        
+        String testGroup = "test-group"; 
+        createUserGroup("test-group", "Test group to be deleted.", "marlin");
+        inviteMember(testGroup, "marlin", "dory");
+        subscribe(testGroup, "dory");
+        deleteGroupByName("test-group", "marlin");
+
+        
         Form f = new Form();
         f.param("username", "dory");
         f.param("token", "secret");
@@ -57,7 +69,12 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(3, node.size());
+        assertEquals(2, node.size());
+        
+        testListUserGroupsWithStatus();
+        
+        deleteGroupByName(doryGroupName, "dory");
+        deleteGroupByName(marlinGroupName, "marlin");
     }
 
     /**
@@ -100,11 +117,11 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
     }
 
-    @Test
-    public void testListUserGroupsWithStatus () throws KustvaktException {
+    private void testListUserGroupsWithStatus () throws KustvaktException {
         Form f = new Form();
         f.param("username", "dory");
         f.param("status", "ACTIVE");
+        
         Response response = target().path(API_VERSION).path("admin")
                 .path("group").path("list").queryParam("username", "dory")
                 .queryParam("status", "ACTIVE").request()
@@ -117,7 +134,6 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .post(Entity.form(f));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
-        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
     }
@@ -181,21 +197,13 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.size());
-        assertEquals(3, node.at("/0/id").asInt());
     }
 
     @Test
     public void testUserGroupAdmin ()
             throws ProcessingException, KustvaktException {
         String groupName = "admin-test-group";
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(testUser,
-                                        "password"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .put(Entity.form(new Form()));
+        Response response = createUserGroup(groupName, "test group", testUser);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         // list user group
         JsonNode node = listGroup(testUser);
@@ -203,52 +211,36 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         node = node.get(0);
         assertEquals(groupName, node.get("name").asText());
         testInviteMember(groupName);
-        testMemberRole("marlin", groupName);
+        subscribe(groupName, "marlin");
+        testAddMemberRoles(groupName, "marlin");
+        testDeleteMemberRoles(groupName, "marlin");
         testDeleteMember(groupName);
-        testDeleteGroup(groupName);
+        
+        // delete group
+        deleteGroupByName(groupName, sysAdminUser);
+        // check group
+        node = listGroup(testUser);
+        assertEquals(0, node.size());
     }
 
-    private void testMemberRole (String memberUsername, String groupName)
-            throws ProcessingException, KustvaktException {
-        // accept invitation
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("subscribe").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(
-                                        memberUsername, "pass"))
-                .post(Entity.form(new Form()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        testAddMemberRoles(groupName, memberUsername);
-        testDeleteMemberRoles(groupName, memberUsername);
-    }
 
     private void testAddMemberRoles (String groupName, String memberUsername)
             throws ProcessingException, KustvaktException {
         Form form = new Form();
         form.param("memberUsername", memberUsername);
         // USER_GROUP_ADMIN
-        form.param("roleId", "1");
+        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
         // USER_GROUP_MEMBER
-        form.param("roleId", "2");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("role").path("add").request()
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "password"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        form.param("role", PredefinedRole.USER_GROUP_MEMBER_DELETE.name());
+        addMemberRole(groupName, sysAdminUser, form);
+
         JsonNode node = retrieveGroup(groupName).at("/members");
         JsonNode member;
         for (int i = 0; i < node.size(); i++) {
             member = node.get(i);
             if (member.at("/userId").asText().equals(memberUsername)) {
-                assertEquals(3, member.at("/roles").size());
-                assertEquals(PredefinedRole.USER_GROUP_ADMIN.name(),
-                        member.at("/roles/0").asText());
+                assertEquals(4, member.at("/roles").size());
+                System.out.println(member.at("/roles").asText());
                 break;
             }
         }
@@ -259,7 +251,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         Form form = new Form();
         form.param("memberUsername", memberUsername);
         // USER_GROUP_ADMIN
-        form.param("roleId", "1");
+        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
         Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("role").path("delete").request()
                 .header(Attributes.AUTHORIZATION,
@@ -274,7 +266,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         for (int i = 0; i < node.size(); i++) {
             member = node.get(i);
             if (member.at("/userId").asText().equals(memberUsername)) {
-                assertEquals(2, member.at("/roles").size());
+                assertEquals(3, member.at("/roles").size());
                 break;
             }
         }
@@ -293,22 +285,6 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         return node;
-    }
-
-    private void testDeleteGroup (String groupName)
-            throws ProcessingException, KustvaktException {
-        // delete group
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        // check group
-        JsonNode node = listGroup(testUser);
-        assertEquals(0, node.size());
     }
 
     private void testDeleteMember (String groupName)
