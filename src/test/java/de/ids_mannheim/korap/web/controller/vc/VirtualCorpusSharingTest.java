@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -181,9 +181,9 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         assertEquals(memberName, node.at("/members/1/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/1/status").asText());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
+        assertEquals(PredefinedRole.QUERY_MEMBER_READ,
                 node.at("/members/1/roles/1").asText());
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
+        assertEquals(PredefinedRole.USER_GROUP_MEMBER_DELETE,
                 node.at("/members/1/roles/0").asText());
     }
 

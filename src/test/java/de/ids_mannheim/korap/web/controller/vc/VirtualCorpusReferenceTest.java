@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
