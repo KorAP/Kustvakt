@@ -8,6 +8,7 @@ import com.google.common.net.HttpHeaders;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import jakarta.ws.rs.ProcessingException;
@@ -55,7 +56,7 @@ public class UserGroupTestBase extends SpringJerseyTest {
         return node;
     }
 
-    protected void inviteMember (String groupName, String invitor,
+    protected Response inviteMember (String groupName, String invitor,
             String invitee) throws KustvaktException {
         Form form = new Form();
         form.param("members", invitee);
@@ -65,20 +66,47 @@ public class UserGroupTestBase extends SpringJerseyTest {
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(invitor, "pass"))
                 .post(Entity.form(form));
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        return response;
+    }
+    
+    protected void testInviteMember (String groupName, String invitor,
+            String invitee)
+            throws ProcessingException, KustvaktException {
+        Response response = inviteMember(groupName, invitor, invitee);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
+        // list group
+        JsonNode node = listUserGroups(invitor);
+        node = node.get(0);
+        assertEquals(2, node.get("members").size());
+        assertEquals(node.at("/members/1/userId").asText(), invitee);
+        assertEquals(GroupMemberStatus.PENDING.name(),
+                node.at("/members/1/status").asText());
+        assertEquals(0, node.at("/members/1/roles").size());
     }
 
-    protected void subscribe (String groupName, String username)
+    protected Response subscribe (String groupName, String username)
             throws KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@"+groupName).path("subscribe").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .post(Entity.form(new Form()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        return response;
     }
     
+    protected Response unsubscribe (String groupName, String username)
+            throws KustvaktException {
+        Response response = target().path(API_VERSION).path("group")
+                .path("@" + groupName).path("unsubscribe").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete();
+        return response;
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
     protected void addMemberRole (String groupName, String username,
             Form form) throws KustvaktException {
         Response response = target().path(API_VERSION).path("group")
@@ -89,6 +117,16 @@ public class UserGroupTestBase extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
+    protected void deleteMember (String groupName, String memberName,
+            String deletedBy) throws KustvaktException {
+        Response response = target().path(API_VERSION).path("group")
+                .path("@" + groupName).path("~"+memberName).request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(deletedBy, "pass"))
+                .delete();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+    
     protected JsonNode createDoryGroup ()
             throws ProcessingException, KustvaktException {
         Response response = createUserGroup(doryGroupName,
