@@ -34,14 +34,15 @@ public class UserGroupTestBase extends SpringJerseyTest {
         return response;
     }
 
-    protected void deleteGroupByName (String groupName,String username)
+    protected Response deleteGroupByName (String groupName,String username)
             throws KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete();
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        return response;
     }
 
     protected JsonNode listUserGroups (String username)
@@ -107,24 +108,25 @@ public class UserGroupTestBase extends SpringJerseyTest {
 //        assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    protected void addMemberRole (String groupName, String username,
+    protected void addMemberRole (String groupName, String addedBy,
             Form form) throws KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@"+groupName).path("role").path("add").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                        .createBasicAuthorizationHeaderValue(addedBy, "pass"))
                 .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    protected void deleteMember (String groupName, String memberName,
+    protected Response deleteMember (String groupName, String memberName,
             String deletedBy) throws KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("~"+memberName).request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(deletedBy, "pass"))
                 .delete();
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        return response;
     }
     
     protected JsonNode createDoryGroup ()

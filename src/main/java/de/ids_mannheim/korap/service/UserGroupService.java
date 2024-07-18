@@ -70,8 +70,6 @@ public class UserGroupService {
     @Autowired
     private RandomCodeGenerator random;
 
-    private static Set<Role> memberRoles;
-
     /**
      * Only users with {@link PredefinedRole#USER_GROUP_ADMIN}
      * are allowed to see the members of the group.
@@ -170,9 +168,7 @@ public class UserGroupService {
         return groupAdmins;
     }
 
-    private void setMemberRoles (UserGroup userGroup) {
-        if (memberRoles == null) {
-            
+    private Set<Role> prepareMemberRoles (UserGroup userGroup) {
             Role r1 = new Role(PredefinedRole.USER_GROUP_MEMBER_DELETE,
                     PrivilegeType.DELETE, userGroup);
             Role r2 = new Role(PredefinedRole.QUERY_MEMBER_READ,
@@ -180,10 +176,10 @@ public class UserGroupService {
             roleDao.addRole(r1);
             roleDao.addRole(r2);
             
-            memberRoles = new HashSet<Role>(2);
+            Set<Role>memberRoles = new HashSet<Role>(2);
             memberRoles.add(r1);
             memberRoles.add(r2);
-        }
+            return memberRoles;
     }
 
     /**
@@ -478,7 +474,7 @@ public class UserGroupService {
 
             if (expiration.isAfter(now)) {
                 member.setStatus(GroupMemberStatus.ACTIVE);
-                setMemberRoles(userGroup);
+                Set<Role> memberRoles = prepareMemberRoles(userGroup);
                 member.setRoles(memberRoles);
                 groupMemberDao.updateMember(member);
             }
@@ -570,6 +566,7 @@ public class UserGroupService {
         return groupDto;
     }
 
+    @Deprecated
     public void editMemberRoles (String username, String groupName,
             String memberUsername, List<PredefinedRole> roleList)
             throws KustvaktException {
@@ -638,7 +635,12 @@ public class UserGroupService {
 
             Set<Role> roles = member.getRoles();
             for (PredefinedRole role : roleNames) {
-                roles.add(roleDao.retrieveRoleByName(role));
+                String[] roleArray = role.name().split("_");
+                String privilege = roleArray[roleArray.length-1];
+                Role r = new Role(role,
+                        Enum.valueOf(PrivilegeType.class, privilege), userGroup);
+                roleDao.addRole(r);
+                roles.add(r);
             }
             member.setRoles(roles);
             groupMemberDao.updateMember(member);
