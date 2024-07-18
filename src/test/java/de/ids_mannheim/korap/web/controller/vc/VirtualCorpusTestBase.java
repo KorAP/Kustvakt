@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
@@ -26,6 +26,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
 
 public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
 
