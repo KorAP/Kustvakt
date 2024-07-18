@@ -2,10 +2,7 @@ package de.ids_mannheim.korap.web.controller.usergroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Set;
-
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -14,9 +11,6 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
-import de.ids_mannheim.korap.dao.UserGroupMemberDao;
-import de.ids_mannheim.korap.entity.Role;
-import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -118,9 +112,12 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
         testUpdateUserGroup(groupName);
         testInviteMember(groupName, username, "darla");
-        testDeleteMemberUnauthorized(groupName);
-        testDeleteMember(groupName);
-        testDeleteGroup(groupName);
+        
+        testDeleteMemberUnauthorizedByNonMember(groupName,"darla");
+        testDeleteMemberUnauthorizedByMember(groupName, "darla");
+
+        testDeleteMember(groupName, username);
+        testDeleteGroup(groupName,username);
 //        testSubscribeToDeletedGroup(groupName);
 //        testUnsubscribeToDeletedGroup(groupName);
     }
@@ -135,35 +132,36 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         assertEquals(description, node.get(0).get("description").asText());
     }
 
-    private void testDeleteMember (String groupName)
+    private void testDeleteMember (String groupName, String username)
             throws ProcessingException, KustvaktException {
         // delete darla from group
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("~darla").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
+        deleteMember(groupName, "darla", username);
         // check group member
-        response = target().path(API_VERSION).path("group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
+        JsonNode node = listUserGroups(username);
         node = node.get(0);
         assertEquals(1, node.get("members").size());
     }
 
-    private void testDeleteMemberUnauthorized (String groupName)
-            throws ProcessingException, KustvaktException {
-        // nemo is a group member
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("~darla").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("nemo", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
+    private void testDeleteMemberUnauthorizedByNonMember (String groupName,
+            String memberName) throws ProcessingException, KustvaktException {
+
+        Response response = deleteMember(groupName, memberName, "nemo");
         String entity = response.readEntity(String.class);
-        // System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Unauthorized operation for user: nemo");
+    }
+    
+    private void testDeleteMemberUnauthorizedByMember (String groupName,
+            String memberName) throws ProcessingException, KustvaktException {
+        inviteMember(groupName, "dory", "nemo");
+        subscribe(groupName, "nemo");
+        // nemo is a group member
+        Response response = deleteMember(groupName, memberName, "nemo");
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
@@ -172,31 +170,31 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                 "Unauthorized operation for user: nemo");
     }
 
-    // EM: same as cancel invitation
-    private void testDeletePendingMember ()
+    @Test
+    public void testDeletePendingMember ()
             throws ProcessingException, KustvaktException {
+        createDoryGroup();
+        inviteMember(doryGroupName, "dory", "pearl");
         // dory delete pearl
-        Response response = target().path(API_VERSION).path("group")
-                .path("@dory-group").path("~pearl").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("dory", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
+        Response response = deleteMember(doryGroupName, "pearl", "dory");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // check member
         JsonNode node = listUserGroups("pearl");
         assertEquals(0, node.size());
+        
+        deleteGroupByName(doryGroupName, "dory");
     }
 
     @Test
     public void testDeleteDeletedMember ()
             throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@dory-group").path("~pearl").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("dory", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
+        createDoryGroup();
+        inviteMember(doryGroupName, "dory", "pearl");
+        subscribe(doryGroupName, "pearl");
+        deleteMember(doryGroupName, "pearl", "pearl");
+        
+        Response response = deleteMember(doryGroupName, "pearl", "pearl");
         String entity = response.readEntity(String.class);
-        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
@@ -204,24 +202,20 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         assertEquals(node.at("/errors/0/1").asText(),
                 "pearl has already been deleted from the group dory-group");
         assertEquals(node.at("/errors/0/2").asText(), "[pearl, dory-group]");
+        
+        deleteGroupByName(doryGroupName, "dory");
     }
 
-    private void testDeleteGroup (String groupName)
+    private void testDeleteGroup (String groupName, String username)
             throws ProcessingException, KustvaktException {
-        // delete group
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        deleteGroupByName(groupName, username);
         Form f = new Form();
         f.param("username", username);
         f.param("status", "DELETED");
         // EM: this is so complicated because the group retrieval are not allowed
         // for delete groups
         // check group
-        response = target().path(API_VERSION).path("admin").path("group")
+        Response response = target().path(API_VERSION).path("admin").path("group")
                 .path("list").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
@@ -244,6 +238,16 @@ public class UserGroupControllerTest extends UserGroupTestBase {
     @Test
     public void testDeleteGroupUnauthorized ()
             throws ProcessingException, KustvaktException {
+        createMarlinGroup();
+        inviteMember(marlinGroupName, "marlin", "dory");
+        subscribe(marlinGroupName, "dory");
+        
+        Form form = new Form();
+        form.param("memberUsername", "dory");
+        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
+        form.param("role", PredefinedRole.USER_GROUP_ADMIN_WRITE.name());
+        addMemberRole(marlinGroupName, "marlin", form);
+        
         // dory is a group admin in marlin-group
         Response response = target().path(API_VERSION).path("group")
                 .path("@marlin-group").request()
@@ -258,23 +262,17 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                 node.at("/errors/0/0").asInt());
         assertEquals(node.at("/errors/0/1").asText(),
                 "Unauthorized operation for user: dory");
+        
+        deleteGroupByName(marlinGroupName, "marlin");
     }
 
     @Test
     public void testDeleteDeletedGroup ()
             throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@deleted-group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("dory", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.GROUP_DELETED, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Group deleted-group has been deleted.");
-        assertEquals(node.at("/errors/0/2").asText(), "deleted-group");
+        createMarlinGroup();
+        deleteGroupByName(marlinGroupName, "marlin");
+        Response response = deleteGroupByName(marlinGroupName, "marlin");
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 
     @Test

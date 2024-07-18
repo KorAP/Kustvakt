@@ -2,14 +2,22 @@ package de.ids_mannheim.korap.web.controller.usergroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 
+import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.dao.UserGroupMemberDao;
+import de.ids_mannheim.korap.entity.Role;
+import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -65,5 +73,4 @@ public class UserGroupListTest extends UserGroupTestBase{
         assertEquals(node.at("/errors/0/1").asText(),
                 "Unauthorized operation for user: guest");
     }
-
 }
