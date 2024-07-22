@@ -9,12 +9,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.apache.http.entity.ContentType;
 import org.glassfish.jersey.server.ContainerRequest;
 
@@ -26,9 +20,14 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
+import de.ids_mannheim.korap.web.controller.usergroup.UserGroupTestBase;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
-public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
+public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
 
     protected JsonNode retrieveVCInfo (String username, String vcCreator,
             String vcName) throws ProcessingException, KustvaktException {
@@ -122,6 +121,16 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
                 .path(vcName).path("share").path("@" + groupName).request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(vcCreator, "pass"))
+                .post(Entity.form(new Form()));
+    }
+    
+    protected Response shareVC (String vcCreator, String vcName,
+            String groupName, String username) throws ProcessingException, KustvaktException {
+
+        return target().path(API_VERSION).path("vc").path("~" + vcCreator)
+                .path(vcName).path("share").path("@" + groupName).request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .post(Entity.form(new Form()));
     }
 

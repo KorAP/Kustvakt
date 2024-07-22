@@ -47,9 +47,8 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testShareVC_notOwner ()
+    public void testShareVC_Unauthorized ()
             throws ProcessingException, KustvaktException {
-        // dory is VCA in marlin group
         Response response = target().path(API_VERSION).path("vc")
                 .path("~marlin").path("marlin-vc").path("share")
                 .path("@marlin group").request()
@@ -62,13 +61,29 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
     @Test
     public void testShareVC_byMember ()
             throws ProcessingException, KustvaktException {
-        // nemo is not VCA in marlin group
-        Response response = target().path(API_VERSION).path("vc").path("~nemo")
-                .path("nemo-vc").path("share").path("@marlin-group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("nemo", "pass"))
-                .post(Entity.form(new Form()));
+        createMarlinGroup();
+        inviteMember(marlinGroupName, "marlin", "nemo");
+        subscribe(marlinGroupName, "nemo");
+        
+        JsonNode node = listAccessByGroup("marlin", marlinGroupName);
+        assertEquals(0, node.size());
+        
+        Response response = testShareVCByCreator("nemo", "nemo-vc",
+                marlinGroupName);
         testResponseUnauthorized(response, "nemo");
+        
+        
+        Form form = new Form();
+        form.param("memberUsername", "nemo");
+        form.param("role", PredefinedRole.GROUP_ADMIN.name());
+        addMemberRole(marlinGroupName, "marlin", form);
+
+        response = testShareVCByCreator("nemo", "nemo-vc", marlinGroupName);
+        
+        node = listAccessByGroup("marlin", marlinGroupName);
+        assertEquals(1, node.size());
+        System.out.println(node.toPrettyString());
+        deleteGroupByName(marlinGroupName, "marlin");
     }
 
     @Test
@@ -93,15 +108,19 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         // create user group
         String groupName = "owidGroup";
         String memberName = "darla";
-        response = createUserGroup(testUser, groupName, "Owid users");
+        response = createUserGroup(groupName, "Owid users", testUser);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         listUserGroup(testUser, groupName);
-        testInviteMember(testUser, groupName, "darla");
+        testInviteMember(groupName, testUser, "darla");
         subscribeToGroup(memberName, groupName);
         checkMemberInGroup(memberName, testUser, groupName);
         // share vc to group
         testShareVCByCreator(testUser, vcName, groupName);
+        
+        // check member roles
         node = listAccessByGroup(testUser, groupName);
+        assertEquals(1, node.size());
+        
         // search by member
         response = searchWithVCRef(memberName, testUser, vcName);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -120,18 +139,6 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
                 node.at("/errors/0/0").asInt());
     }
 
-    private Response createUserGroup (String username, String groupName,
-            String description) throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("description", description);
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .put(Entity.form(form));
-        return response;
-    }
-
     private JsonNode listUserGroup (String username, String groupName)
             throws KustvaktException {
         Response response = target().path(API_VERSION).path("group").request()
@@ -142,26 +149,6 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         return node;
-    }
-
-    private void testInviteMember (String username, String groupName,
-            String memberName) throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("members", memberName);
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("invite").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        // list group
-        JsonNode node = listUserGroup(username, groupName);
-        node = node.get(0);
-        assertEquals(2, node.get("members").size());
-        assertEquals(memberName, node.at("/members/1/userId").asText());
-        assertEquals(GroupMemberStatus.PENDING.name(),
-                node.at("/members/1/status").asText());
-        assertEquals(0, node.at("/members/1/roles").size());
     }
 
     private void subscribeToGroup (String username, String groupName)
@@ -181,9 +168,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         assertEquals(memberName, node.at("/members/1/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/1/status").asText());
-        assertEquals(PredefinedRole.QUERY_ACCESS,
-                node.at("/members/1/roles/1").asText());
-        assertEquals(PredefinedRole.GROUP_MEMBER,
+        assertEquals(PredefinedRole.GROUP_MEMBER.name(),
                 node.at("/members/1/roles/0").asText());
     }
 

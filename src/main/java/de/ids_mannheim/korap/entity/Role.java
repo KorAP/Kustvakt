@@ -56,7 +56,7 @@ public class Role implements Comparable<Role> {
 //    )
 //    private Set<UserRole> user_roles;
     
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     private List<UserGroupMember> userGroupMembers;
 //
 //    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
@@ -69,9 +69,19 @@ public class Role implements Comparable<Role> {
         setPrivilege(privilege);
         setUserGroup(group);
     }
+    
+    public Role (PredefinedRole name, PrivilegeType privilege, UserGroup group,
+                 QueryDO query) {
+        setName(name);
+        setPrivilege(privilege);
+        setUserGroup(group);
+        setQuery(query);
+    }
 
     public String toString () {
-        return "id=" + id + ", name=" + name;
+        return "id=" + id + ", name=" + name + ", privilege=" + privilege
+                + ", usergroup=" + userGroup.getId() + ", members=" + userGroupMembers + ", query="
+                + ((query!=null) ? query.getId() : query);
     }
 
     @Override
