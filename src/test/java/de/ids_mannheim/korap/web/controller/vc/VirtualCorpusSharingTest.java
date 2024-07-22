@@ -181,9 +181,9 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         assertEquals(memberName, node.at("/members/1/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/1/status").asText());
-        assertEquals(PredefinedRole.QUERY_MEMBER_READ,
+        assertEquals(PredefinedRole.QUERY_ACCESS,
                 node.at("/members/1/roles/1").asText());
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER_DELETE,
+        assertEquals(PredefinedRole.GROUP_MEMBER,
                 node.at("/members/1/roles/0").asText());
     }
 

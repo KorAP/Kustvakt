@@ -88,7 +88,8 @@ public class Role implements Comparable<Role> {
     @Override
     public boolean equals (Object obj) {
         Role r = (Role) obj;
-        if (this.id == r.getId() && this.name.equals(r.getName())) {
+        if (this.id == r.getId() && this.name.equals(r.getName())
+                && this.privilege.equals(r.getPrivilege())) {
             return true;
         }
         return false;

@@ -78,7 +78,7 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 group.at("/userMemberStatus").asText());
         
-        assertEquals(2, group.at("/userRoles").size());
+        assertEquals(1, group.at("/userRoles").size());
         
         // unsubscribe marlin from dory-group
         testUnsubscribeActiveMember("dory-group");

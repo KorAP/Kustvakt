@@ -229,9 +229,9 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         Form form = new Form();
         form.param("memberUsername", memberUsername);
         // USER_GROUP_ADMIN
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
+        form.param("role", PredefinedRole.GROUP_ADMIN.name());
         // USER_GROUP_MEMBER
-        form.param("role", PredefinedRole.USER_GROUP_MEMBER_DELETE.name());
+        form.param("role", PredefinedRole.GROUP_MEMBER.name());
         addMemberRole(groupName, sysAdminUser, form);
 
         JsonNode node = retrieveGroup(groupName).at("/members");
@@ -239,8 +239,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         for (int i = 0; i < node.size(); i++) {
             member = node.get(i);
             if (member.at("/userId").asText().equals(memberUsername)) {
-                assertEquals(4, member.at("/roles").size());
-                System.out.println(member.at("/roles").asText());
+                assertEquals(6, member.at("/roles").size());
                 break;
             }
         }
@@ -251,14 +250,13 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         Form form = new Form();
         form.param("memberUsername", memberUsername);
         // USER_GROUP_ADMIN
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
+        form.param("role", PredefinedRole.GROUP_ADMIN.name());
         Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("role").path("delete").request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
                                         sysAdminUser, "password"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = retrieveGroup(groupName).at("/members");
@@ -266,7 +264,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         for (int i = 0; i < node.size(); i++) {
             member = node.get(i);
             if (member.at("/userId").asText().equals(memberUsername)) {
-                assertEquals(3, member.at("/roles").size());
+                assertEquals(1, member.at("/roles").size());
                 break;
             }
         }
