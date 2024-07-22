@@ -13,18 +13,24 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import de.ids_mannheim.korap.entity.UserGroup;
+import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroup_;
 import de.ids_mannheim.korap.entity.QueryAccess;
 import de.ids_mannheim.korap.entity.QueryAccess_;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.entity.QueryDO_;
+import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
@@ -43,6 +49,11 @@ public class QueryAccessDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+    
+    @Autowired
+    private RoleDao roleDao;
+    @Autowired
+    private UserGroupMemberDao memberDao;
 
     public QueryAccess retrieveAccessById (int accessId)
             throws KustvaktException {
@@ -231,14 +242,26 @@ public class QueryAccessDao {
         }
     }
 
-    public void createAccessToQuery (QueryDO query, UserGroup userGroup,
-            String createdBy, QueryAccessStatus status) {
-        QueryAccess queryAccess = new QueryAccess();
-        queryAccess.setQuery(query);
-        queryAccess.setUserGroup(userGroup);
-        queryAccess.setCreatedBy(createdBy);
-        queryAccess.setStatus(status);
-        entityManager.persist(queryAccess);
+    public void createAccessToQuery (QueryDO query, UserGroup userGroup)
+            throws KustvaktException {
+    
+        List<UserGroupMember> members = memberDao
+                .retrieveMemberByGroupId(userGroup.getId());
+
+        Role r1 = new Role(PredefinedRole.QUERY_ACCESS,
+                PrivilegeType.READ_QUERY, userGroup, query);
+        roleDao.addRole(r1);
+        
+        for (UserGroupMember member : members) {
+            member.getRoles().add(r1);
+            memberDao.updateMember(member);
+        }
+//        QueryAccess queryAccess = new QueryAccess();
+//        queryAccess.setQuery(query);
+//        queryAccess.setUserGroup(userGroup);
+//        queryAccess.setCreatedBy(createdBy);
+//        queryAccess.setStatus(status);
+//        entityManager.persist(queryAccess);
     }
 
     public void deleteAccess (QueryAccess access, String deletedBy) {

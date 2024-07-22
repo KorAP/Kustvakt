@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,18 +19,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.QueryAccessStatus;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.QueryAccessDao;
 import de.ids_mannheim.korap.dao.QueryDao;
+import de.ids_mannheim.korap.dao.RoleDao;
 import de.ids_mannheim.korap.dto.QueryAccessDto;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.dto.converter.QueryAccessConverter;
 import de.ids_mannheim.korap.dto.converter.QueryConverter;
 import de.ids_mannheim.korap.entity.QueryAccess;
 import de.ids_mannheim.korap.entity.QueryDO;
+import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -73,6 +76,8 @@ public class QueryService {
 
     @Autowired
     private QueryDao queryDao;
+    @Autowired
+    private RoleDao roleDao;
     @Autowired
     private QueryAccessDao accessDao;
     @Autowired
@@ -254,8 +259,8 @@ public class QueryService {
             int groupId = userGroupService.createAutoHiddenGroup();
             UserGroup autoHidden = userGroupService
                     .retrieveUserGroupById(groupId);
-            accessDao.createAccessToQuery(query, autoHidden, "system",
-                    QueryAccessStatus.HIDDEN);
+            accessDao.createAccessToQuery(query, autoHidden);
+//                    , "system", QueryAccessStatus.HIDDEN);
         }
         else {
             // should not happened
@@ -476,15 +481,14 @@ public class QueryService {
         UserGroup userGroup = userGroupService
                 .retrieveUserGroupByName(groupName);
 
-        if (!isQueryAccessAdmin(userGroup, username)
+        if (!userGroupService.isUserGroupAdmin(username,userGroup)
                 && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
         else {
             try {
-                accessDao.createAccessToQuery(query, userGroup, username,
-                        QueryAccessStatus.ACTIVE);
+                accessDao.createAccessToQuery(query, userGroup);
             }
             catch (Exception e) {
                 Throwable cause = e;
@@ -505,6 +509,7 @@ public class QueryService {
         }
     }
 
+    @Deprecated
     private boolean isQueryAccessAdmin (UserGroup userGroup, String username)
             throws KustvaktException {
         List<UserGroupMember> accessAdmins = userGroupService
@@ -543,7 +548,7 @@ public class QueryService {
             List<UserGroup> groups = userGroupService
                     .retrieveUserGroup(username);
             for (UserGroup g : groups) {
-                if (isQueryAccessAdmin(g, username)) {
+                if (userGroupService.isUserGroupAdmin(username, g)) {
                     accessList.addAll(
                             accessDao.retrieveActiveAccessByGroup(g.getId()));
                 }
@@ -566,7 +571,7 @@ public class QueryService {
             List<QueryAccess> filteredAccessList = new ArrayList<>();
             for (QueryAccess access : accessList) {
                 UserGroup userGroup = access.getUserGroup();
-                if (isQueryAccessAdmin(userGroup, username)) {
+                if (userGroupService.isUserGroupAdmin(username, userGroup)) {
                     filteredAccessList.add(access);
                 }
             }
@@ -575,44 +580,23 @@ public class QueryService {
         return accessConverter.createQueryAccessDto(accessList);
     }
 
-    @Deprecated
-    public List<QueryAccessDto> listVCAccessByGroup (String username,
-            int groupId) throws KustvaktException {
-        UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
-
-        List<QueryAccess> accessList;
-        if (adminDao.isAdmin(username)) {
-            accessList = accessDao.retrieveAllAccessByGroup(groupId);
-        }
-        else if (isQueryAccessAdmin(userGroup, username)) {
-            accessList = accessDao.retrieveActiveAccessByGroup(groupId);
-        }
-        else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
-
-        return accessConverter.createQueryAccessDto(accessList);
-    }
-
     public List<QueryAccessDto> listQueryAccessByGroup (String username,
             String groupName) throws KustvaktException {
         UserGroup userGroup = userGroupService
                 .retrieveUserGroupByName(groupName);
 
-        List<QueryAccess> accessList;
-        if (adminDao.isAdmin(username)) {
-            accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
-        }
-        else if (isQueryAccessAdmin(userGroup, username)) {
-            accessList = accessDao
-                    .retrieveActiveAccessByGroup(userGroup.getId());
+        Set<Role> accessList;
+        if (adminDao.isAdmin(username)
+                || userGroupService.isUserGroupAdmin(username, userGroup)) {
+            //            accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
+            accessList = roleDao.retrieveRoleByGroupId(userGroup.getId(), false);
+
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
-        return accessConverter.createQueryAccessDto(accessList);
+        return accessConverter.createRoleDto(accessList);
     }
 
     public void deleteQueryAccess (int accessId, String username)
@@ -620,7 +604,7 @@ public class QueryService {
 
         QueryAccess access = accessDao.retrieveAccessById(accessId);
         UserGroup userGroup = access.getUserGroup();
-        if (isQueryAccessAdmin(userGroup, username)
+        if (userGroupService.isUserGroupAdmin(username, userGroup)
                 || adminDao.isAdmin(username)) {
             accessDao.deleteAccess(access, username);
         }
@@ -713,7 +697,7 @@ public class QueryService {
                 && !username.equals(query.getCreatedBy())) {
             if (type.equals(ResourceType.PRIVATE)
                     || (type.equals(ResourceType.PROJECT)
-                            && !hasAccess(username, query.getId()))) {
+                            && !hasReadAccess(username, query.getId()))) {
                 throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                         "Unauthorized operation for user: " + username,
                         username);
@@ -738,16 +722,13 @@ public class QueryService {
         }
     }
 
-    private boolean hasAccess (String username, int queryId)
+    private boolean hasReadAccess (String username, int queryId)
             throws KustvaktException {
-        UserGroup userGroup;
-        List<QueryAccess> accessList = accessDao
-                .retrieveActiveAccessByQuery(queryId);
-        for (QueryAccess access : accessList) {
-            userGroup = access.getUserGroup();
-            if (userGroupService.isMember(username, userGroup)) {
+        Set<Role> roles = roleDao.retrieveRoleByQueryIdAndUsername(queryId,
+                username);
+        for (Role r :roles) {
+            if (r.getPrivilege().equals(PrivilegeType.READ_QUERY))
                 return true;
-            }
         }
         return false;
     }

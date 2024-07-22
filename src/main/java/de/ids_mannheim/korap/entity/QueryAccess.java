@@ -25,6 +25,7 @@ import lombok.Setter;
  * @see QueryDO
  * @see UserGroup
  */
+@Deprecated
 @Setter
 @Getter
 @Entity
