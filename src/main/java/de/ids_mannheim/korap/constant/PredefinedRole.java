@@ -7,17 +7,11 @@ package de.ids_mannheim.korap.constant;
  *
  */
 public enum PredefinedRole {
-    USER_GROUP_ADMIN_READ, 
-    USER_GROUP_ADMIN_WRITE, 
-    USER_GROUP_ADMIN_DELETE, 
-    
-    USER_GROUP_MEMBER_DELETE, 
-    
-    QUERY_ADMIN_READ,
-    QUERY_ADMIN_WRITE,
-    QUERY_ADMIN_DELETE,
-    
-    QUERY_MEMBER_READ;
+    GROUP_ADMIN, 
+    GROUP_MEMBER, 
+    @Deprecated
+    QUERY_ACCESS_ADMIN,
+    QUERY_ACCESS;
 
 //    USER_GROUP_ADMIN(1), USER_GROUP_MEMBER(2), VC_ACCESS_ADMIN(
 //            3), VC_ACCESS_MEMBER(

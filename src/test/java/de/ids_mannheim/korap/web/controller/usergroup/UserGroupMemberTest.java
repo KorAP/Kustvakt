@@ -109,15 +109,14 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         
         Form form = new Form();
         form.param("memberUsername", "marlin");
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_WRITE.name());
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_DELETE.name());
+        form.param("role", PredefinedRole.GROUP_ADMIN.name());
+        form.param("role", PredefinedRole.QUERY_ACCESS_ADMIN.name());
         addMemberRole(doryGroupName, "dory", form);
         
         UserGroupMember member = memberDao.retrieveMemberById("marlin",
                 groupId);
         Set<Role> roles = member.getRoles();
-        assertEquals(5, roles.size());
+        assertEquals(6, roles.size());
         
         deleteGroupByName(doryGroupName, "dory");
     }
@@ -132,12 +131,12 @@ public class UserGroupMemberTest extends UserGroupTestBase {
 
         Form form = new Form();
         form.param("memberUsername", "dory");
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
+        form.param("role", PredefinedRole.GROUP_ADMIN.name());
         addMemberRole(marlinGroupName, "marlin", form);
 
         UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();
-        assertEquals(3, roles.size());
+        assertEquals(6, roles.size());
 
         testAddSameMemberRole(groupId);
         testDeleteMemberRole(groupId);
@@ -152,20 +151,20 @@ public class UserGroupMemberTest extends UserGroupTestBase {
             throws ProcessingException, KustvaktException {
         Form form = new Form();
         form.param("memberUsername", "dory");
-        form.param("role", PredefinedRole.USER_GROUP_MEMBER_DELETE.name());
+        form.param("role", PredefinedRole.GROUP_MEMBER.name());
 
         addMemberRole(marlinGroupName, "marlin", form);
 
         UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();
-        assertEquals(4, roles.size());
+        assertEquals(6, roles.size());
     }
 
     private void testDeleteMemberRole (int groupId)
             throws ProcessingException, KustvaktException {
         Form form = new Form();
         form.param("memberUsername", "dory");
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
+        form.param("role", PredefinedRole.GROUP_ADMIN.name());
         Response response = target().path(API_VERSION).path("group")
                 .path("@marlin-group").path("role").path("delete").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -174,7 +173,7 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();
-        assertEquals(3, roles.size());
+        assertEquals(1, roles.size());
     }
 
     @Deprecated

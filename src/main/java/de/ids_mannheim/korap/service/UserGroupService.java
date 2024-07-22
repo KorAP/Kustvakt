@@ -71,7 +71,7 @@ public class UserGroupService {
     private RandomCodeGenerator random;
 
     /**
-     * Only users with {@link PredefinedRole#USER_GROUP_ADMIN}
+     * Only users with {@link PredefinedRole#GROUP_ADMIN}
      * are allowed to see the members of the group.
      * 
      * @param username
@@ -114,7 +114,7 @@ public class UserGroupService {
     private List<UserGroupMember> retrieveMembers (int groupId, String username)
             throws KustvaktException {
         List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
-                groupId, PredefinedRole.USER_GROUP_ADMIN_DELETE);
+                groupId, PredefinedRole.GROUP_ADMIN);
 
         List<UserGroupMember> members = null;
         for (UserGroupMember admin : groupAdmins) {
@@ -164,21 +164,16 @@ public class UserGroupService {
     public List<UserGroupMember> retrieveQueryAccessAdmins (UserGroup userGroup)
             throws KustvaktException {
         List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
-                userGroup.getId(), PredefinedRole.QUERY_ADMIN_DELETE);
+                userGroup.getId(), PredefinedRole.QUERY_ACCESS_ADMIN);
         return groupAdmins;
     }
 
     private Set<Role> prepareMemberRoles (UserGroup userGroup) {
-            Role r1 = new Role(PredefinedRole.USER_GROUP_MEMBER_DELETE,
-                    PrivilegeType.DELETE, userGroup);
-            Role r2 = new Role(PredefinedRole.QUERY_MEMBER_READ,
-                    PrivilegeType.DELETE, userGroup);
+            Role r1 = new Role(PredefinedRole.GROUP_MEMBER,
+                    PrivilegeType.DELETE_MEMBER, userGroup);
             roleDao.addRole(r1);
-            roleDao.addRole(r2);
-            
-            Set<Role>memberRoles = new HashSet<Role>(2);
+            Set<Role>memberRoles = new HashSet<Role>(1);
             memberRoles.add(r1);
-            memberRoles.add(r2);
             return memberRoles;
     }
 
@@ -186,11 +181,11 @@ public class UserGroupService {
      * Group owner is automatically added when creating a group.
      * Do not include owners in group members.
      * 
-     * {@link PredefinedRole#USER_GROUP_MEMBER} and
+     * {@link PredefinedRole#GROUP_MEMBER} and
      * {@link PredefinedRole#VC_ACCESS_MEMBER} roles are
      * automatically assigned to each group member.
      * 
-     * {@link PredefinedRole#USER_GROUP_MEMBER} restrict users
+     * {@link PredefinedRole#GROUP_MEMBER} restrict users
      * to see other group members and allow users to remove
      * themselves from the groups.
      * 
@@ -405,12 +400,12 @@ public class UserGroupService {
         }
     }
 
-    private boolean isUserGroupAdmin (String username, UserGroup userGroup)
+    public boolean isUserGroupAdmin (String username, UserGroup userGroup)
             throws KustvaktException {
 
         List<UserGroupMember> userGroupAdmins = groupMemberDao
                 .retrieveMemberByRole(userGroup.getId(),
-                        PredefinedRole.USER_GROUP_ADMIN_DELETE);
+                        PredefinedRole.GROUP_ADMIN);
 
         for (UserGroupMember admin : userGroupAdmins) {
             if (username.equals(admin.getUserId())) {
@@ -420,6 +415,18 @@ public class UserGroupService {
         return false;
     }
 
+    public boolean isUserGroupAdmin (UserGroupMember member)
+            throws KustvaktException {
+
+        for (Role r : member.getRoles()) {
+            if (r.getName().equals(PredefinedRole.GROUP_ADMIN)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
     /**
      * Updates the {@link GroupMemberStatus} of a pending member
      * to {@link GroupMemberStatus#ACTIVE} and add default member
@@ -635,12 +642,27 @@ public class UserGroupService {
 
             Set<Role> roles = member.getRoles();
             for (PredefinedRole role : roleNames) {
-                String[] roleArray = role.name().split("_");
-                String privilege = roleArray[roleArray.length-1];
-                Role r = new Role(role,
-                        Enum.valueOf(PrivilegeType.class, privilege), userGroup);
-                roleDao.addRole(r);
-                roles.add(r);
+                if (role.equals(PredefinedRole.GROUP_ADMIN)) {
+                    Role r1 = new Role(role,PrivilegeType.READ_MEMBER, userGroup);
+                    roleDao.addRole(r1);
+                    roles.add(r1);
+                    
+                    Role r2 = new Role(role,PrivilegeType.DELETE_MEMBER, userGroup);
+                    roleDao.addRole(r2);
+                    roles.add(r2);
+
+                    Role r3 = new Role(role,PrivilegeType.WRITE_MEMBER, userGroup);
+                    roleDao.addRole(r3);
+                    roles.add(r3);
+                    
+                    Role r4 = new Role(role,PrivilegeType.SHARE_QUERY, userGroup);
+                    roleDao.addRole(r4);
+                    roles.add(r4);
+                    
+                    Role r5 = new Role(role,PrivilegeType.DELETE_QUERY, userGroup);
+                    roleDao.addRole(r5);
+                    roles.add(r5);
+                }
             }
             member.setRoles(roles);
             groupMemberDao.updateMember(member);

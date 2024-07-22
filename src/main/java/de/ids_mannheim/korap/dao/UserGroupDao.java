@@ -89,18 +89,16 @@ public class UserGroupDao {
     
     private Set<Role> createUserGroupAdminRoles (UserGroup group) {
         Set<Role> roles = new HashSet<Role>();
-        roles.add(new Role(PredefinedRole.USER_GROUP_ADMIN_DELETE,
-                PrivilegeType.DELETE, group));
-        roles.add(new Role(PredefinedRole.USER_GROUP_ADMIN_READ,
-                PrivilegeType.READ, group));
-        roles.add(new Role(PredefinedRole.USER_GROUP_ADMIN_WRITE,
-                PrivilegeType.WRITE, group));
-        roles.add(new Role(PredefinedRole.QUERY_ADMIN_DELETE,
-                PrivilegeType.DELETE, group));
-        roles.add(new Role(PredefinedRole.QUERY_ADMIN_READ,
-                PrivilegeType.READ, group));
-        roles.add(new Role(PredefinedRole.QUERY_ADMIN_WRITE,
-                PrivilegeType.WRITE, group));
+        roles.add(new Role(PredefinedRole.GROUP_ADMIN,
+                PrivilegeType.DELETE_MEMBER, group));
+        roles.add(new Role(PredefinedRole.GROUP_ADMIN, PrivilegeType.READ_MEMBER,
+                group));
+        roles.add(new Role(PredefinedRole.GROUP_ADMIN, PrivilegeType.WRITE_MEMBER,
+                group));
+        roles.add(new Role(PredefinedRole.GROUP_ADMIN, PrivilegeType.SHARE_QUERY,
+                group));
+        roles.add(new Role(PredefinedRole.GROUP_ADMIN, PrivilegeType.DELETE_QUERY,
+                group));
         return roles;
     }
 

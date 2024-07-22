@@ -40,7 +40,7 @@ public class UserGroupDaoTest extends DaoTestBase{
         
         // member roles
         Set<Role> roles = roleDao.retrieveRoleByGroupMemberId(m.getId());
-        assertEquals(6, roles.size());
+        assertEquals(2, roles.size());
     }
 
     @Test

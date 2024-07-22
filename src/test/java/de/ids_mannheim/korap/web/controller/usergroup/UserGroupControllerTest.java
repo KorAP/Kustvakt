@@ -108,7 +108,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         assertEquals(username, node.at("/members/0/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/0/status").asText());
-        assertEquals(6,  node.at("/members/0/roles").size());
+        assertEquals(5,  node.at("/members/0/roles").size());
 
         testUpdateUserGroup(groupName);
         testInviteMember(groupName, username, "darla");
@@ -244,8 +244,8 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         
         Form form = new Form();
         form.param("memberUsername", "dory");
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_READ.name());
-        form.param("role", PredefinedRole.USER_GROUP_ADMIN_WRITE.name());
+        form.param("role", PredefinedRole.GROUP_ADMIN.name());
+        form.param("role", PredefinedRole.QUERY_ACCESS_ADMIN.name());
         addMemberRole(marlinGroupName, "marlin", form);
         
         // dory is a group admin in marlin-group

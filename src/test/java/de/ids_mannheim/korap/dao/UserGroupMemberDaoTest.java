@@ -30,44 +30,41 @@ public class UserGroupMemberDaoTest extends DaoTestBase {
     @Autowired
     private RoleDao roleDao;
     
-    private static UserGroup group;
-
-    @BeforeEach
-    public void setUp() throws KustvaktException {
-        group = createDoryGroup();
-    }
-
-    @AfterEach
-    public void tearDown() throws KustvaktException {
-        deleteUserGroup(group.getId(), "dory");
-    }
-    
     @Test
     public void testRetrieveMemberByRole () throws KustvaktException {
+        UserGroup group = createDoryGroup();
+        
         // dory group
         List<UserGroupMember> vcaAdmins = dao.retrieveMemberByRole(group.getId(),
-                PredefinedRole.QUERY_ADMIN_DELETE);
+                PredefinedRole.QUERY_ACCESS_ADMIN);
         // System.out.println(vcaAdmins);
         assertEquals(1, vcaAdmins.size());
         assertEquals(vcaAdmins.get(0).getUserId(), "dory");
+        
+        deleteUserGroup(group.getId(), "dory");
     }
 
     // EM: now it is possible to add duplicate member role !
     @Test
     public void testAddSameMemberRole () throws KustvaktException {
+        UserGroup group = createDoryGroup();
         int groupId = group.getId();
         
-        Role newRole = new Role(PredefinedRole.USER_GROUP_ADMIN_DELETE,
-                PrivilegeType.DELETE, group);
+        Role newRole = new Role(PredefinedRole.GROUP_ADMIN,
+                PrivilegeType.DELETE_MEMBER, group);
         roleDao.addRole(newRole);
         
         UserGroupMember member = dao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();
+        assertEquals(6, roles.size());
+        
         roles.add(newRole);
         member.setRoles(roles);
         dao.updateMember(member);
         member = dao.retrieveMemberById("dory", groupId);
         member.getRoles();
         assertEquals(7, roles.size());
+        
+        deleteUserGroup(group.getId(), "dory");
     }
 }
