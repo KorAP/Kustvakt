@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
@@ -26,6 +27,7 @@ import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.QueryAccessDao;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.dao.RoleDao;
+import de.ids_mannheim.korap.dao.UserGroupMemberDao;
 import de.ids_mannheim.korap.dto.QueryAccessDto;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.dto.converter.QueryAccessConverter;
@@ -78,6 +80,9 @@ public class QueryService {
     private QueryDao queryDao;
     @Autowired
     private RoleDao roleDao;
+    @Autowired
+    private UserGroupMemberDao memberDao;
+
     @Autowired
     private QueryAccessDao accessDao;
     @Autowired
@@ -488,7 +493,7 @@ public class QueryService {
         }
         else {
             try {
-                accessDao.createAccessToQuery(query, userGroup);
+                createAccessToQuery(query, userGroup);
             }
             catch (Exception e) {
                 Throwable cause = e;
@@ -501,42 +506,29 @@ public class QueryService {
                     lastCause = cause;
                 }
                 throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
-                        cause.getMessage());
+                        e.getMessage());
             }
 
             queryDao.editQuery(query, null, ResourceType.PROJECT, null, null,
                     null, null, null, query.isCached(), null, null);
         }
     }
-
-    @Deprecated
-    private boolean isQueryAccessAdmin (UserGroup userGroup, String username)
+    
+    public void createAccessToQuery (QueryDO query, UserGroup userGroup)
             throws KustvaktException {
-        List<UserGroupMember> accessAdmins = userGroupService
-                .retrieveQueryAccessAdmins(userGroup);
-        for (UserGroupMember m : accessAdmins) {
-            if (username.equals(m.getUserId())) {
-                return true;
-            }
-        }
-        return false;
-    }
+    
+        List<UserGroupMember> members = memberDao
+                .retrieveMemberByGroupId(userGroup.getId());
 
-    // public void editVCAccess (VirtualCorpusAccess access, String
-    // username)
-    // throws KustvaktException {
-    //
-    // // get all the VCA admins
-    // UserGroup userGroup = access.getUserGroup();
-    // List<UserGroupMember> accessAdmins =
-    // userGroupService.retrieveVCAccessAdmins(userGroup);
-    //
-    // User user = authManager.getUser(username);
-    // if (!user.isSystemAdmin()) {
-    // throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-    // "Unauthorized operation for user: " + username, username);
-    // }
-    // }
+        Role r1 = new Role(PredefinedRole.QUERY_ACCESS,
+                PrivilegeType.READ_QUERY, userGroup, query);
+        roleDao.addRole(r1);
+        
+        for (UserGroupMember member : members) {
+            member.getRoles().add(r1);
+            memberDao.updateMember(member);
+        }
+    }
 
     public List<QueryAccessDto> listQueryAccessByUsername (String username)
             throws KustvaktException {
@@ -599,14 +591,14 @@ public class QueryService {
         return accessConverter.createRoleDto(accessList);
     }
 
-    public void deleteQueryAccess (int accessId, String username)
+    public void deleteQueryAccess (int roleId, String username)
             throws KustvaktException {
 
-        QueryAccess access = accessDao.retrieveAccessById(accessId);
-        UserGroup userGroup = access.getUserGroup();
+        Role role = roleDao.retrieveRoleById(roleId);
+        UserGroup userGroup = role.getUserGroup();
         if (userGroupService.isUserGroupAdmin(username, userGroup)
                 || adminDao.isAdmin(username)) {
-            accessDao.deleteAccess(access, username);
+            roleDao.deleteRole(roleId);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,

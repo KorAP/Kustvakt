@@ -187,4 +187,26 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
             }
         }
     }
+    
+    protected void createAccess (String vcCreator, String vcName,
+            String groupName, String username)
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~" + vcCreator).path(vcName).path("share")
+                .path("@" + groupName).request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .post(Entity.form(new Form()));
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+    
+    protected Response deleteAccess (String username, String accessId)
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").path("access")
+                .path(accessId).request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete();
+        return response;
+    }
 }
