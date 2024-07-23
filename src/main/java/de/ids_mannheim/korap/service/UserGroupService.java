@@ -172,8 +172,14 @@ public class UserGroupService {
             Role r1 = new Role(PredefinedRole.GROUP_MEMBER,
                     PrivilegeType.DELETE_MEMBER, userGroup);
             roleDao.addRole(r1);
-            Set<Role>memberRoles = new HashSet<Role>(1);
+            Set<Role>memberRoles = new HashSet<Role>();
             memberRoles.add(r1);
+            
+            Set<Role> roles = 
+                    roleDao.retrieveRolesByGroupIdWithUniqueQuery(userGroup.getId());
+            for(Role r :roles) {
+                memberRoles.add(r);
+            }
             return memberRoles;
     }
 

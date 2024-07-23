@@ -161,34 +161,31 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     // 
     // return node.at("/accessId").asText();
     // }
-    private JsonNode testlistAccessByGroup (String groupName)
-            throws KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("access")
-                .queryParam("groupName", groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .get();
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(2, node.size());
-        return node.get(node.size() - 1);
-    }
 
     @Test
-    public void testVCSharing () throws ProcessingException, KustvaktException {
+    public void testShareVC () throws ProcessingException, KustvaktException {
+        createMarlinGroup();
+        
         String vcCreator = "marlin";
         String vcName = "marlin-vc";
         String groupName = "marlin-group";
         JsonNode node2 = testAdminListVC_UsingAdminToken(vcCreator,
                 ResourceType.PROJECT);
         assertEquals(0, node2.size());
-        testCreateVCAccess(vcCreator, vcName, groupName);
-        JsonNode node = testlistAccessByGroup(groupName);
-        String accessId = node.at("/accessId").asText();
-        testDeleteVCAccess(accessId);
+        createAccess(vcCreator, vcName, groupName, admin);
+        
+        JsonNode node = listAccessByGroup("admin",groupName);
+        assertEquals(1, node.size());
+        String roleId = node.at("/0/roleId").asText();
         node2 = testAdminListVC_UsingAdminToken(vcCreator,
                 ResourceType.PROJECT);
         assertEquals(1, node2.size());
+        
+        Response response = deleteAccess("admin",roleId);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        node = listAccessByGroup("admin",groupName);
+        assertEquals(0, node.size());
+        
         String json = "{\"type\": \"" + ResourceType.PRIVATE + "\"}";
         editVC(admin, vcCreator, vcName, json);
         node = retrieveVCInfo(admin, vcCreator, vcName);
@@ -197,27 +194,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         node2 = testAdminListVC_UsingAdminToken(vcCreator,
                 ResourceType.PROJECT);
         assertEquals(0, node2.size());
-    }
-
-    private void testCreateVCAccess (String vcCreator, String vcName,
-            String groupName) throws ProcessingException, KustvaktException {
-        Response response;
-        // share VC
-        response = target().path(API_VERSION).path("vc").path("~" + vcCreator)
-                .path(vcName).path("share").path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .post(Entity.form(new Form()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    }
-
-    private void testDeleteVCAccess (String accessId)
-            throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("access")
-                .path(accessId).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .delete();
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        deleteGroupByName(marlinGroupName, "marlin");
     }
 }
