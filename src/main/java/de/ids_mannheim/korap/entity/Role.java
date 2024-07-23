@@ -80,8 +80,10 @@ public class Role implements Comparable<Role> {
 
     public String toString () {
         return "id=" + id + ", name=" + name + ", privilege=" + privilege
-                + ", usergroup=" + userGroup.getId() + ", members=" + userGroupMembers + ", query="
-                + ((query!=null) ? query.getId() : query);
+                + ", usergroup=" + userGroup.getId() 
+//                + ", members=" + userGroupMembers 
+                + ", query=" + ((query!=null) ? query.getId() : query)
+                ;
     }
 
     @Override

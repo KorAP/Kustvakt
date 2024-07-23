@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.PredefinedRole;
-import de.ids_mannheim.korap.entity.QueryAccess;
 import de.ids_mannheim.korap.entity.QueryDO_;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.Role_;
@@ -24,6 +23,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.ListJoin;
@@ -112,16 +112,39 @@ public class RoleDao {
 
         Root<Role> role = query.from(Role.class);
         role.fetch("userGroup", JoinType.INNER);
-        role.fetch("query", JoinType.INNER);
         
         query.select(role);
         if (hasQuery) {
+            role.fetch("query", JoinType.INNER);
             query.where(cb.equal(role.get("userGroup").get("id"), groupId),
                     cb.isNotNull(role.get("query").get("id")));
         }
         else {
             query.where(cb.equal(role.get("userGroup").get("id"), groupId));
         }
+
+        TypedQuery<Role> q = entityManager.createQuery(query);
+        List<Role> resultList = q.getResultList();
+        return new HashSet<Role>(resultList);
+    }
+    
+    public Set<Role> retrieveRolesByGroupIdWithUniqueQuery (int groupId) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Role> query = cb.createQuery(Role.class);
+
+        Root<Role> role = query.from(Role.class);
+        role.fetch("userGroup", JoinType.INNER);
+        role.fetch("query", JoinType.INNER);
+//        role.fetch("userGroupMembers", JoinType.INNER);
+        
+        Expression<?> queryId = role.get("query").get("id");
+        
+        query.select(role);
+        query.where(
+                cb.equal(role.get("userGroup").get("id"), groupId)
+        );
+        query.groupBy(queryId);
+        query.having(cb.equal(cb.count(queryId), 1));
 
         TypedQuery<Role> q = entityManager.createQuery(query);
         List<Role> resultList = q.getResultList();

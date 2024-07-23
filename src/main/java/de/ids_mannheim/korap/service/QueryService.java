@@ -581,7 +581,7 @@ public class QueryService {
         if (adminDao.isAdmin(username)
                 || userGroupService.isUserGroupAdmin(username, userGroup)) {
             //            accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
-            accessList = roleDao.retrieveRoleByGroupId(userGroup.getId(), false);
+            accessList = roleDao.retrieveRoleByGroupId(userGroup.getId(), true);
 
         }
         else {

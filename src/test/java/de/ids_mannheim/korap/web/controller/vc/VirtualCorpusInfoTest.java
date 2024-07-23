@@ -71,10 +71,26 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     @Test
     public void testRetrieveProjectVC ()
             throws ProcessingException, KustvaktException {
+        createDoryGroup();
+        inviteMember(doryGroupName, "dory", "nemo");
+        subscribe(doryGroupName, "nemo");
+        
+        createAccess("dory", "group-vc", doryGroupName, "dory");
+        
         JsonNode node = retrieveVCInfo("nemo", "dory", "group-vc");
         assertEquals(node.at("/name").asText(), "group-vc");
         assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
+        
+        inviteMember(doryGroupName, "dory", "pearl");
+        subscribe(doryGroupName, "pearl");
+        
+        node = retrieveVCInfo("pearl", "dory", "group-vc");
+        assertEquals(node.at("/name").asText(), "group-vc");
+        assertEquals(ResourceType.PROJECT.displayName(),
+                node.at("/type").asText());
+        
+        deleteGroupByName(doryGroupName, "dory");
     }
 
     @Test
