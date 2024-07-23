@@ -43,6 +43,7 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
  * @see QueryAccess
  * @see Query
  */
+@Deprecated
 @Transactional
 @Repository
 public class QueryAccessDao {
