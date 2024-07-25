@@ -8,10 +8,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     
@@ -31,24 +34,18 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         assertEquals(UserGroupStatus.HIDDEN.name(), 
                 node.at("/status").asText());
         
-        testAccessPublishedVC("gill", testUser, vcName);
+        testRetrievePublishedVC("gill", testUser, vcName);
         
-        deleteVC(vcName, testUser, testUser);
-        
-        // EM: check if the hidden groups are deleted as well
-        node = getHiddenGroup(vcName);
-        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
-                node.at("/errors/0/0").asInt());
-        assertEquals("No hidden group for query " + vcName + " is found",
-                node.at("/errors/0/1").asText());
+        String groupName = node.at("/name").asText();
+        testDeletePublishedVCUnauthorized(testUser, vcName, "gill");
+        testDeletePublishedVC(testUser, vcName, testUser, groupName);
     }
     
-    private void testAccessPublishedVC (String username, String vcCreator,
+    private void testRetrievePublishedVC (String username, String vcCreator,
             String vcName) throws ProcessingException, KustvaktException {
         retrieveVCInfo(username, vcCreator, vcName);
         
         JsonNode node = getHiddenGroup(vcName);
-        System.out.println(node.toPrettyString());
         assertEquals("system", node.at("/owner").asText());
         assertEquals(UserGroupStatus.HIDDEN.name(), 
                 node.at("/status").asText());
@@ -67,6 +64,38 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         assertEquals(1, node.at("/0/members").size());
     }
     
+    private void testDeletePublishedVC (String vcCreator, String vcName,
+            String deletedBy, String hiddenGroupName) throws KustvaktException {
+        deleteVC(vcName, vcCreator, deletedBy);
+
+        // EM: check if the hidden groups are deleted as well
+        JsonNode node = getHiddenGroup(vcName);
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("No hidden group for query " + vcName + " is found",
+                node.at("/errors/0/1").asText());
+        
+        testHiddenGroupNotFound(hiddenGroupName);
+    }
+    
+    private void testHiddenGroupNotFound (String hiddenGroupName)
+            throws KustvaktException {
+        JsonNode node = listAccessByGroup("admin", hiddenGroupName);
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Group " + hiddenGroupName + " is not found",
+                node.at("/errors/0/1").asText());
+
+    }
+
+    private void testDeletePublishedVCUnauthorized (String vcCreator,
+            String vcName, String deletedBy)
+            throws KustvaktException {
+        Response response = deleteVC(vcName, vcCreator, deletedBy);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        testResponseUnauthorized(response, deletedBy);
+    }
+    
     @Test
     public void testMarlinPublishedVC () throws KustvaktException {
         
@@ -83,9 +112,15 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         node = listVC("marlin");
         assertEquals(4, node.size());
         
-        testSharePublishedVC(vcName);
+        String groupName = testSharePublishedVC(vcName);
         
-        deleteVC(vcName, "marlin", "marlin");
+        // dory is a member
+        testDeletePublishedVCUnauthorized("marlin", vcName, "dory");
+        // add dory as group admin
+        addAdminRole(marlinGroupName, "dory", "marlin");
+        testDeletePublishedVCUnauthorized("marlin", vcName, "dory");
+        
+        testDeletePublishedVC("marlin",vcName,"marlin", groupName);
         
         node = listAccessByGroup("admin", marlinGroupName);
         assertEquals(0, node.size());
@@ -93,7 +128,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         deleteGroupByName(marlinGroupName, "marlin");
     }
     
-    private void testSharePublishedVC (String vcName) throws KustvaktException {
+    private String testSharePublishedVC (String vcName) throws KustvaktException {
         createMarlinGroup();
         inviteMember(marlinGroupName, "marlin", "dory");
         subscribe(marlinGroupName, "dory");
@@ -102,6 +137,11 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         assertEquals(3, node.size());
 
         shareVC("marlin", vcName, marlinGroupName, "marlin");
+        
+        node = listVC("dory");
+        assertEquals(4, node.size());
+        node = listVC("marlin");
+        assertEquals(4, node.size());
         
         // check marlin-group access
         node = listAccessByGroup("admin", marlinGroupName);
@@ -116,7 +156,62 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         node = listAccessByGroup("admin", hiddenGroupName);
         assertEquals(0, node.at("/0/members").size());
         
-//        testAccessPublishedVC("dory", "marlin", vcName);
+        testAddMemberAfterSharingPublishedVC(hiddenGroupName);
+        testRetrievePublishedVC("dory", "marlin", vcName);
+        return hiddenGroupName;
     }
     
+    private void testAddMemberAfterSharingPublishedVC (String hiddenGroupName)
+            throws KustvaktException {
+        JsonNode node = listVC("nemo");
+        assertEquals(2, node.size());
+
+        inviteMember(marlinGroupName, "marlin", "nemo");
+        subscribe(marlinGroupName, "nemo");
+
+        node = listVC("nemo");
+        assertEquals(3, node.size());
+
+        node = listAccessByGroup("admin", marlinGroupName);
+        assertEquals(3, node.at("/0/members").size());
+
+        node = listAccessByGroup("admin", hiddenGroupName);
+        assertEquals(0, node.at("/0/members").size());
+    }
+    
+    @Test
+    public void testPublishProjectVC () throws KustvaktException {
+        String vcName = "group-vc";
+        JsonNode node = retrieveVCInfo("dory", "dory", vcName);
+        assertEquals(ResourceType.PROJECT.displayName(),
+                node.get("type").asText());
+        
+        // edit PROJECT to PUBLISHED vc
+        String json = "{\"type\": \"PUBLISHED\"}";
+        editVC("dory", "dory", vcName, json);
+        
+        // check VC type
+        node = testListOwnerVC("dory");
+        JsonNode n = node.get(1);
+        assertEquals(ResourceType.PUBLISHED.displayName(),
+                n.get("type").asText());
+        
+        // check hidden group and roles
+        node = getHiddenGroup(vcName);
+        String hiddenGroupName = node.at("/name").asText();
+        node = listAccessByGroup("admin", hiddenGroupName);
+        assertEquals(1, node.size());
+        node = node.get(0);
+        assertEquals(vcName, node.at("/queryName").asText());
+        assertEquals(hiddenGroupName, node.at("/userGroupName").asText());
+        
+        // change PUBLISHED to PROJECT
+        json = "{\"type\": \"PROJECT\"}";
+        editVC("dory", "dory", vcName, json);
+        node = testListOwnerVC("dory");
+        assertEquals(ResourceType.PROJECT.displayName(),
+                node.get(1).get("type").asText());
+        
+        testHiddenGroupNotFound(hiddenGroupName);
+    }
 }

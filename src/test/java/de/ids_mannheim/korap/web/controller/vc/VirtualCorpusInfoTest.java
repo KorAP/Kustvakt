@@ -3,21 +3,18 @@ package de.ids_mannheim.korap.web.controller.vc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
+
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
@@ -113,31 +110,6 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .get();
         testResponseUnauthorized(response, "marlin");
-    }
-
-    @Test
-    public void testRetrievePublishedVC ()
-            throws ProcessingException, KustvaktException {
-        JsonNode node = retrieveVCInfo("gill", "marlin", "published-vc");
-        assertEquals(node.at("/name").asText(), "published-vc");
-        assertEquals(ResourceType.PUBLISHED.displayName(),
-                node.at("/type").asText());
-        Form f = new Form();
-        f.param("status", "HIDDEN");
-        // check gill in the hidden group of the vc
-        Response response = target().path(API_VERSION).path("admin")
-                .path("group").path("list").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        MediaType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(f));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        node = JsonUtils.readTree(entity);
-        assertEquals(3, node.at("/0/id").asInt());
-        String members = node.at("/0/members").toString();
-        assertTrue(members.contains("\"userId\":\"gill\""));
     }
 
     @Test

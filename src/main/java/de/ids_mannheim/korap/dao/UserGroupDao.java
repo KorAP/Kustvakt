@@ -375,24 +375,6 @@ public class UserGroupDao {
 
     }
 
-    public void addQueryToGroup (QueryDO query, String createdBy,
-            QueryAccessStatus status, UserGroup group) {
-        QueryAccess accessGroup = new QueryAccess();
-        accessGroup.setCreatedBy(createdBy);
-        accessGroup.setStatus(status);
-        accessGroup.setUserGroup(group);
-        accessGroup.setQuery(query);;
-        entityManager.persist(accessGroup);
-    }
-
-    public void addQueryToGroup (List<QueryDO> queries, String createdBy,
-            UserGroup group, QueryAccessStatus status) {
-
-        for (QueryDO q : queries) {
-            addQueryToGroup(q, createdBy, status, group);
-        }
-    }
-
     public void deleteQueryFromGroup (int queryId, int groupId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(queryId, "queryId");

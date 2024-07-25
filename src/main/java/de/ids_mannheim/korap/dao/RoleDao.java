@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.Role_;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
+import de.ids_mannheim.korap.entity.UserGroup_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import jakarta.persistence.EntityManager;
@@ -43,17 +44,6 @@ public class RoleDao {
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    //    public void deleteRole (Role role) {
-    //        entityManager.remove(role);
-    //        entityManager.flush();
-    //    }
-    //
-    //    public void editRoleName (int roleId, PredefinedRole name) {
-    //        Role r = retrieveRoleById(roleId);
-    //        r.setName(name);
-    //        entityManager.persist(r);
-    //    }
 
     public void addRole (Role newRole) {
         entityManager.persist(newRole);
@@ -191,19 +181,20 @@ public class RoleDao {
         
     }
 
-    public Role retrieveRoleByPrivilegeAndQuery (PrivilegeType p,
-            int queryId) throws KustvaktException {
+    public Role retrieveRoleByGroupIdQueryIdPrivilege (int groupId, int queryId,
+            PrivilegeType p) throws KustvaktException {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Role> query = cb.createQuery(Role.class);
 
         Root<Role> role = query.from(Role.class);
+        role.fetch("userGroup", JoinType.INNER);
         role.fetch(Role_.query, JoinType.INNER);
 
         query.select(role);
-        query.where(
-                cb.equal(role.get(Role_.query).get(QueryDO_.id), queryId),
-                cb.equal(role.get(Role_.privilege), p));
+        query.where(cb.equal(role.get(Role_.query).get(QueryDO_.id), queryId),
+                cb.equal(role.get(Role_.privilege), p), cb.equal(
+                        role.get(Role_.userGroup).get(UserGroup_.id), groupId));
 
         TypedQuery<Role> q = entityManager.createQuery(query);
         return (Role) q.getSingleResult();
