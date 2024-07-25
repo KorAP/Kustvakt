@@ -209,4 +209,15 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
                 .delete();
         return response;
     }
+    
+    protected void createPublishedVC (String username, String vcName)
+            throws KustvaktException {
+        String json = "{\"type\": \"PUBLISHED\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
+
+        String authHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue(username, "pass");
+        createVC(authHeader, username, vcName, json);
+    }
 }

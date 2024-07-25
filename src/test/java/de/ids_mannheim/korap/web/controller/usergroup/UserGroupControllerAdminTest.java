@@ -178,24 +178,9 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
     }
 
     @Test
-    public void testListByStatusHidden ()
+    public void testListHiddenGroups ()
             throws ProcessingException, KustvaktException {
-        Form f = new Form();
-        f.param("status", "HIDDEN");
-        Response response = target().path(API_VERSION).path("admin")
-                .path("group").path("list").queryParam("status", "HIDDEN")
-                .request()
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        MediaType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(f));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
+        JsonNode node = listHiddenGroup();
         assertEquals(1, node.size());
     }
 

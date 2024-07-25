@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.entity.QueryDO_;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.Role_;
@@ -188,6 +189,24 @@ public class RoleDao {
                     "Role is not found", String.valueOf(roleId));
         }
         
+    }
+
+    public Role retrieveRoleByPrivilegeAndQuery (PrivilegeType p,
+            int queryId) throws KustvaktException {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Role> query = cb.createQuery(Role.class);
+
+        Root<Role> role = query.from(Role.class);
+        role.fetch(Role_.query, JoinType.INNER);
+
+        query.select(role);
+        query.where(
+                cb.equal(role.get(Role_.query).get(QueryDO_.id), queryId),
+                cb.equal(role.get(Role_.privilege), p));
+
+        TypedQuery<Role> q = entityManager.createQuery(query);
+        return (Role) q.getSingleResult();
     }
 
 }

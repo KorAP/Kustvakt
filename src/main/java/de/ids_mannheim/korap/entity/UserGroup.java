@@ -57,8 +57,9 @@ public class UserGroup implements Comparable<UserGroup> {
             cascade = CascadeType.REMOVE)
     private List<UserGroupMember> members;
 
-    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<QueryAccess> queryAccess;
+    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY, 
+            cascade = CascadeType.REMOVE)
+    private List<Role> roles;
 
     @Override
     public String toString () {

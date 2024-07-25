@@ -82,7 +82,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         
         node = listAccessByGroup("marlin", marlinGroupName);
         assertEquals(1, node.size());
-        System.out.println(node.toPrettyString());
+//        System.out.println(node.toPrettyString());
         deleteGroupByName(marlinGroupName, "marlin");
     }
 
@@ -120,6 +120,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         // check member roles
         node = listAccessByGroup(testUser, groupName);
         assertEquals(1, node.size());
+//        System.out.println(node.toPrettyString());
         
         // search by member
         response = searchWithVCRef(memberName, testUser, vcName);
