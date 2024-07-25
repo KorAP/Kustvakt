@@ -8,15 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
@@ -24,6 +21,10 @@ import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * @author margaretha
@@ -54,48 +55,6 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         // list VC
         node = listVC(testUser);
         assertEquals(1, node.size());
-    }
-
-    @Test
-    public void testCreatePublishedVC () throws KustvaktException {
-        String json = "{\"type\": \"PUBLISHED\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
-        String vcName = "new-published-vc";
-        createVC(authHeader, testUser, vcName, json);
-        // test list owner vc
-        JsonNode node = retrieveVCInfo(testUser, testUser, vcName);
-        assertEquals(vcName, node.get("name").asText());
-        // EM: check hidden access
-        node = listAccessByGroup("admin", "");
-        node = node.get(node.size() - 1);
-        assertEquals(node.at("/createdBy").asText(), "system");
-        assertEquals(vcName, node.at("/queryName").asText());
-        assertTrue(node.at("/userGroupName").asText().startsWith("auto"));
-        assertEquals(vcName, node.at("/queryName").asText());
-        String groupName = node.at("/userGroupName").asText();
-        // EM: check if hidden group has been created
-        node = testCheckHiddenGroup(groupName);
-        assertEquals(node.at("/status").asText(), "HIDDEN");
-        // EM: delete vc
-        deleteVC(vcName, testUser, testUser);
-        // EM: check if the hidden groups are deleted as well
-        node = testCheckHiddenGroup(groupName);
-        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Group " + groupName + " is not found",
-                node.at("/errors/0/1").asText());
-    }
-
-    private JsonNode testCheckHiddenGroup (String groupName)
-            throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("admin")
-                .path("group").path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").post(null);
-        String entity = response.readEntity(String.class);
-        return JsonUtils.readTree(entity);
     }
 
     @Test

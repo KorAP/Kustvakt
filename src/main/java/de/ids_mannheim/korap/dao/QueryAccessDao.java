@@ -243,6 +243,7 @@ public class QueryAccessDao {
         }
     }
 
+    @Deprecated
     public void createAccessToQuery (QueryDO query, UserGroup userGroup)
             throws KustvaktException {
     

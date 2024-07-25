@@ -26,7 +26,7 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
         node = listSystemVC("nemo");
         assertEquals(1, node.size());
         node = listVC("nemo");
-        assertEquals(3, node.size());
+        assertEquals(2, node.size());
     }
 
     @Test
@@ -35,16 +35,26 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
         JsonNode node = testListOwnerVC("pearl");
         assertEquals(0, node.size());
         node = listVC("pearl");
-        assertEquals(2, node.size());
+        assertEquals(1, node.size());
     }
 
+    @Test
+    public void testListVCMarlin ()
+            throws ProcessingException, KustvaktException {
+        JsonNode node = testListOwnerVC("marlin");
+        assertEquals(2, node.size());
+        node = listVC("marlin");
+        assertEquals(3, node.size());
+    }
+
+    
     @Test
     public void testListVCDory ()
             throws ProcessingException, KustvaktException {
         JsonNode node = testListOwnerVC("dory");
         assertEquals(2, node.size());
         node = listVC("dory");
-        assertEquals(4, node.size());
+        assertEquals(3, node.size());
     }
 
     @Test

@@ -360,7 +360,7 @@ public class VirtualCorpusController {
      */
     @DELETE
     @Path("access/{accessId}")
-    public Response deleteVCAccessById (
+    public Response deleteAccessById (
             @Context SecurityContext securityContext,
             @PathParam("accessId") int accessId) {
         TokenContext context = (TokenContext) securityContext
@@ -386,7 +386,7 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("access")
-    public List<QueryAccessDto> listVCAccesses (
+    public List<QueryAccessDto> listAccess (
             @Context SecurityContext securityContext,
             @QueryParam("groupName") String groupName) {
         TokenContext context = (TokenContext) securityContext

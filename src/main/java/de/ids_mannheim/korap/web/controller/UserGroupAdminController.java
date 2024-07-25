@@ -59,6 +59,21 @@ public class UserGroupAdminController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
+    
+    @POST
+    @Path("hidden")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public UserGroupDto getHiddenUserGroupForQuery (
+            @FormParam("queryName") String queryName) {
+        try {
+            return service.retrieveHiddenUserGroupByQueryName(queryName);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
+    
+    
 
     /**
      * Retrieves a specific user-group. Only system admins are

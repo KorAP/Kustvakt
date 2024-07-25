@@ -45,6 +45,7 @@ public class UserGroupMemberDao {
     public void addMember (UserGroupMember member) throws KustvaktException {
         ParameterChecker.checkObjectValue(member, "userGroupMember");
         entityManager.persist(member);
+        entityManager.flush();
     }
 
     public void updateMember (UserGroupMember member) throws KustvaktException {

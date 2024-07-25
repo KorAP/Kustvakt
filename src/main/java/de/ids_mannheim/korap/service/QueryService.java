@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.service;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +28,7 @@ import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.QueryAccessDao;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.dao.RoleDao;
+import de.ids_mannheim.korap.dao.UserGroupDao;
 import de.ids_mannheim.korap.dao.UserGroupMemberDao;
 import de.ids_mannheim.korap.dto.QueryAccessDto;
 import de.ids_mannheim.korap.dto.QueryDto;
@@ -48,6 +50,7 @@ import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.controller.QueryReferenceController;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import de.ids_mannheim.korap.web.input.QueryJson;
+import jakarta.persistence.NoResultException;
 import jakarta.ws.rs.core.Response.Status;
 
 /**
@@ -80,6 +83,8 @@ public class QueryService {
     private QueryDao queryDao;
     @Autowired
     private RoleDao roleDao;
+    @Autowired
+    private UserGroupDao userGroupDao;
     @Autowired
     private UserGroupMemberDao memberDao;
 
@@ -155,7 +160,7 @@ public class QueryService {
         return dtos;
     }
 
-    public void deleteQueryByName (String username, String queryName,
+    public void deleteQueryByName (String deletedBy, String queryName,
             String createdBy, QueryType type) throws KustvaktException {
 
         QueryDO query = queryDao.retrieveQueryByName(queryName, createdBy);
@@ -165,15 +170,13 @@ public class QueryService {
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
                     "Query " + code + " is not found.", String.valueOf(code));
         }
-        else if (query.getCreatedBy().equals(username)
-                || adminDao.isAdmin(username)) {
+        else if (query.getCreatedBy().equals(deletedBy)
+                || adminDao.isAdmin(deletedBy)) {
 
             if (query.getType().equals(ResourceType.PUBLISHED)) {
-                QueryAccess access = accessDao
-                        .retrieveHiddenAccess(query.getId());
-                accessDao.deleteAccess(access, "system");
-                userGroupService.deleteAutoHiddenGroup(
-                        access.getUserGroup().getId(), "system");
+                UserGroup group = userGroupDao
+                        .retrieveHiddenGroupByQueryName(queryName);
+                userGroupDao.deleteGroup(group.getId(), deletedBy, false);
             }
             if (type.equals(QueryType.VIRTUAL_CORPUS)
                     && VirtualCorpusCache.contains(queryName)) {
@@ -183,7 +186,7 @@ public class QueryService {
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
+                    "Unauthorized operation for user: " + deletedBy, deletedBy);
         }
     }
 
@@ -232,11 +235,10 @@ public class QueryService {
             if (existingQuery.getType().equals(ResourceType.PUBLISHED)) {
                 // withdraw from publication
                 if (!type.equals(ResourceType.PUBLISHED)) {
-                    QueryAccess hiddenAccess = accessDao
-                            .retrieveHiddenAccess(existingQuery.getId());
-                    deleteQueryAccess(hiddenAccess.getId(), "system");
-                    int groupId = hiddenAccess.getUserGroup().getId();
-                    userGroupService.deleteAutoHiddenGroup(groupId, "system");
+                    UserGroup group = userGroupDao
+                            .retrieveHiddenGroupByQueryName(queryName);
+                    int groupId = group.getId();
+                    userGroupDao.deleteGroup(groupId, username, false);
                     // EM: should the users within the hidden group
                     // receive
                     // notifications?
@@ -256,22 +258,22 @@ public class QueryService {
 
     private void publishQuery (int queryId) throws KustvaktException {
 
-        QueryAccess access = accessDao.retrieveHiddenAccess(queryId);
+//        QueryAccess access = accessDao.retrieveHiddenAccess(queryId);
         // check if hidden access exists
-        if (access == null) {
+//        if (access == null) {
             QueryDO query = queryDao.retrieveQueryById(queryId);
             // create and assign a new hidden group
             int groupId = userGroupService.createAutoHiddenGroup();
             UserGroup autoHidden = userGroupService
                     .retrieveUserGroupById(groupId);
-            accessDao.createAccessToQuery(query, autoHidden);
-//                    , "system", QueryAccessStatus.HIDDEN);
-        }
-        else {
-            // should not happened
-            jlog.error("Cannot publish query with id: " + queryId
-                    + ". Hidden access exists! Access id: " + access.getId());
-        }
+//            accessDao.createAccessToQuery(query, autoHidden);
+            addRoleToQuery(query, autoHidden);
+//        }
+//        else {
+//            // should not happened
+//            jlog.error("Cannot publish query with id: " + queryId
+//                    + ". Hidden access exists! Access id: " + access.getId());
+//        }
     }
 
     public void storeQuery (QueryJson query, String queryName,
@@ -493,7 +495,7 @@ public class QueryService {
         }
         else {
             try {
-                createAccessToQuery(query, userGroup);
+                addRoleToQuery(query, userGroup);
             }
             catch (Exception e) {
                 Throwable cause = e;
@@ -514,7 +516,7 @@ public class QueryService {
         }
     }
     
-    public void createAccessToQuery (QueryDO query, UserGroup userGroup)
+    public void addRoleToQuery (QueryDO query, UserGroup userGroup)
             throws KustvaktException {
     
         List<UserGroupMember> members = memberDao
@@ -577,18 +579,18 @@ public class QueryService {
         UserGroup userGroup = userGroupService
                 .retrieveUserGroupByName(groupName);
 
-        Set<Role> accessList;
+        Set<Role> roles;
         if (adminDao.isAdmin(username)
                 || userGroupService.isUserGroupAdmin(username, userGroup)) {
             //            accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
-            accessList = roleDao.retrieveRoleByGroupId(userGroup.getId(), true);
+            roles = roleDao.retrieveRoleByGroupId(userGroup.getId(), true);
 
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
-        return accessConverter.createRoleDto(accessList);
+        return accessConverter.createRoleDto(roles);
     }
 
     public void deleteQueryAccess (int roleId, String username)
@@ -699,11 +701,27 @@ public class QueryService {
                     && !username.equals("guest")) {
                 // add user in the query's auto group
                 UserGroup userGroup = userGroupService
-                        .retrieveHiddenUserGroupByQuery(query.getId());
+                        .retrieveHiddenUserGroupByQueryId(query.getId());
                 try {
+                    
+                    Role r1= roleDao.retrieveRoleByPrivilegeAndQuery(
+                            PrivilegeType.READ_QUERY, query.getId());
+                    Set<Role> memberRoles = new HashSet<Role>();
+                    memberRoles.add(r1);
+                    
                     userGroupService.addGroupMember(username, userGroup,
-                            "system", GroupMemberStatus.ACTIVE);
+                            "system", GroupMemberStatus.ACTIVE, memberRoles);    
                     // member roles are not set (not necessary)
+                }
+                catch (NoResultException ne) {
+                    Role r1 = new Role(PredefinedRole.QUERY_ACCESS,
+                            PrivilegeType.READ_QUERY, userGroup);
+                    roleDao.addRole(r1);
+                    Set<Role> memberRoles = new HashSet<Role>();
+                    memberRoles.add(r1);
+                    
+                    userGroupService.addGroupMember(username, userGroup,
+                            "system", GroupMemberStatus.ACTIVE, memberRoles);                
                 }
                 catch (KustvaktException e) {
                     // member exists

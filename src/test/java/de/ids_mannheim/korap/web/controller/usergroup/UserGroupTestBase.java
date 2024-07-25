@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -139,11 +140,47 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
         return node;
     }
 
-    protected JsonNode createMarlinGroup ()
-            throws ProcessingException, KustvaktException {
+    protected JsonNode createMarlinGroup () throws KustvaktException {
         Response response = createUserGroup(marlinGroupName,
                 "This is marlin-group.", "marlin");
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        return node;
+    }
+    
+    protected JsonNode getHiddenGroup (String queryName)
+            throws KustvaktException {
+        Form f = new Form();
+        f.param("queryName", queryName);
+        Response response = target().path(API_VERSION).path("admin")
+                .path("group").path("hidden").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("admin", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE,
+                        MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        return node;
+    }
+    
+    protected JsonNode listHiddenGroup () throws KustvaktException {
+        Form f = new Form();
+        f.param("status", "HIDDEN");
+        Response response = target().path(API_VERSION).path("admin")
+                .path("group").path("list")
+                .request()
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "admin", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         return node;

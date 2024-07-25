@@ -5,6 +5,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
+import de.ids_mannheim.korap.constant.QueryAccessStatus;
+import de.ids_mannheim.korap.constant.UserGroupStatus;
+import de.ids_mannheim.korap.entity.QueryAccess;
+import de.ids_mannheim.korap.entity.QueryAccess_;
+import de.ids_mannheim.korap.entity.QueryDO;
+import de.ids_mannheim.korap.entity.QueryDO_;
+import de.ids_mannheim.korap.entity.Role;
+import de.ids_mannheim.korap.entity.Role_;
+import de.ids_mannheim.korap.entity.UserGroup;
+import de.ids_mannheim.korap.entity.UserGroupMember;
+import de.ids_mannheim.korap.entity.UserGroupMember_;
+import de.ids_mannheim.korap.entity.UserGroup_;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -15,28 +36,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.ListJoin;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.PredefinedRole;
-import de.ids_mannheim.korap.constant.PrivilegeType;
-import de.ids_mannheim.korap.constant.UserGroupStatus;
-import de.ids_mannheim.korap.constant.QueryAccessStatus;
-import de.ids_mannheim.korap.entity.Role;
-import de.ids_mannheim.korap.entity.UserGroup;
-import de.ids_mannheim.korap.entity.UserGroupMember;
-import de.ids_mannheim.korap.entity.UserGroupMember_;
-import de.ids_mannheim.korap.entity.UserGroup_;
-import de.ids_mannheim.korap.entity.QueryDO;
-import de.ids_mannheim.korap.entity.QueryAccess;
-import de.ids_mannheim.korap.entity.QueryAccess_;
-import de.ids_mannheim.korap.entity.QueryDO_;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
  * Manages database queries and transactions regarding
@@ -69,20 +68,22 @@ public class UserGroupDao {
         entityManager.persist(group);
         entityManager.flush();
         
-        Set<Role> roles = createUserGroupAdminRoles(group);
-        for (Role role : roles) {
-            entityManager.persist(role);
-        }
-        entityManager.flush();
+        if (createdBy != "system") {
+            Set<Role> roles = createUserGroupAdminRoles(group);
+            for (Role role : roles) {
+                entityManager.persist(role);
+            }
+            entityManager.flush();
         
-        UserGroupMember owner = new UserGroupMember();
-        owner.setUserId(createdBy);
-        owner.setCreatedBy(createdBy);
-        owner.setStatus(GroupMemberStatus.ACTIVE);
-        owner.setGroup(group);
-        owner.setRoles(roles);
-        entityManager.persist(owner);
-        entityManager.flush();
+            UserGroupMember owner = new UserGroupMember();
+            owner.setUserId(createdBy);
+            owner.setCreatedBy(createdBy);
+            owner.setStatus(GroupMemberStatus.ACTIVE);
+            owner.setGroup(group);
+            owner.setRoles(roles);
+            entityManager.persist(owner);
+            entityManager.flush();
+        };
         
         return group.getId();
     }
@@ -249,23 +250,24 @@ public class UserGroupDao {
                     "Group " + groupName + " is not found", groupName, e);
         }
     }
-
-    public UserGroup retrieveHiddenGroupByQuery (int queryId)
+    
+    public UserGroup retrieveHiddenGroupByQueryName (String queryName)
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(queryId, "queryId");
+        ParameterChecker.checkNameValue(queryName, "queryName");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroup> criteriaQuery = criteriaBuilder
                 .createQuery(UserGroup.class);
 
         Root<UserGroup> root = criteriaQuery.from(UserGroup.class);
-        Join<UserGroup, QueryAccess> access = root.join(UserGroup_.queryAccess);
-        Join<QueryAccess, QueryDO> query = access.join(QueryAccess_.query);
+        Join<UserGroup, Role> group_role = root.join(UserGroup_.roles);
+        Join<Role, QueryDO> query_role = group_role.join(Role_.query);
 
         Predicate p = criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(UserGroup_.status),
                         UserGroupStatus.HIDDEN),
-                criteriaBuilder.equal(query.get(QueryDO_.id), queryId));
+                criteriaBuilder.equal(query_role.get(QueryDO_.name), queryName)
+        );
 
         criteriaQuery.select(root);
         criteriaQuery.where(p);
@@ -275,7 +277,40 @@ public class UserGroupDao {
             return (UserGroup) q.getSingleResult();
         }
         catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                    "No hidden group for query " + queryName
+                            + " is found",
+                    String.valueOf(queryName), e);
+        }
+
+    }
+
+    public UserGroup retrieveHiddenGroupByQueryId (int queryId)
+            throws KustvaktException {
+        ParameterChecker.checkIntegerValue(queryId, "queryId");
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserGroup> criteriaQuery = criteriaBuilder
+                .createQuery(UserGroup.class);
+
+        Root<UserGroup> root = criteriaQuery.from(UserGroup.class);
+        Join<UserGroup, Role> group_role = root.join(UserGroup_.roles);
+        Join<Role, QueryDO> query_role = group_role.join(Role_.query);
+
+        Predicate p = criteriaBuilder.and(
+                criteriaBuilder.equal(root.get(UserGroup_.status),
+                        UserGroupStatus.HIDDEN),
+                criteriaBuilder.equal(query_role.get(QueryDO_.id), queryId));
+
+        criteriaQuery.select(root);
+        criteriaQuery.where(p);
+        Query q = entityManager.createQuery(criteriaQuery);
+
+        try {
+            return (UserGroup) q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
                     "No hidden group for query with id " + queryId
                             + " is found",
                     String.valueOf(queryId), e);

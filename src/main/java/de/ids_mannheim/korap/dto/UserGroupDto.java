@@ -30,6 +30,8 @@ public class UserGroupDto {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<UserGroupMemberDto> members;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private GroupMemberStatus userMemberStatus;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<PredefinedRole> userRoles;
 }
