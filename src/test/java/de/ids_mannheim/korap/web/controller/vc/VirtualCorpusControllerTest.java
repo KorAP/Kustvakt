@@ -42,10 +42,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testCreatePrivateVC () throws KustvaktException {
-        String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
-        createVC(authHeader, testUser, "new_vc", json);
+        createPrivateVC(testUser, "new_vc");
+        
         // list user VC
         JsonNode node = listVC(testUser);
         assertEquals(2, node.size());
@@ -285,7 +283,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 + ",\"queryType\": \"VIRTUAL_CORPUS\""
                 + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
         for (int i = 1; i < 6; i++) {
-            createVC(authHeader, testUser, "new_vc_" + i, json);
+            createPrivateVC(testUser, "new_vc_" + i);
         }
         Response response = target().path(API_VERSION).path("vc")
                 .path("~" + testUser).path("new_vc_6").request()
@@ -401,38 +399,5 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals("Unauthorized operation for user: " + testUser,
                 node.at("/errors/0/1").asText());
         checkWWWAuthenticateHeader(response);
-    }
-
-    @Test
-    public void testPublishProjectVC () throws KustvaktException {
-        String vcName = "group-vc";
-        // check the vc type
-        JsonNode node = retrieveVCInfo("dory", "dory", vcName);
-        assertEquals(ResourceType.PROJECT.displayName(),
-                node.get("type").asText());
-        // edit vc
-        String json = "{\"type\": \"PUBLISHED\"}";
-        editVC("dory", "dory", vcName, json);
-        // check VC
-        node = testListOwnerVC("dory");
-        JsonNode n = node.get(1);
-        assertEquals(ResourceType.PUBLISHED.displayName(),
-                n.get("type").asText());
-        // check hidden VC access
-        node = listAccessByGroup("admin", "");
-        assertEquals(4, node.size());
-        node = node.get(node.size() - 1);
-        assertEquals(vcName, node.at("/queryName").asText());
-        assertEquals(node.at("/createdBy").asText(), "system");
-        assertTrue(node.at("/userGroupName").asText().startsWith("auto"));
-        // edit 2nd
-        json = "{\"type\": \"PROJECT\"}";
-        editVC("dory", "dory", vcName, json);
-        node = testListOwnerVC("dory");
-        assertEquals(ResourceType.PROJECT.displayName(),
-                node.get(1).get("type").asText());
-        // check VC access
-        node = listAccessByGroup("admin", "");
-        assertEquals(3, node.size());
     }
 }

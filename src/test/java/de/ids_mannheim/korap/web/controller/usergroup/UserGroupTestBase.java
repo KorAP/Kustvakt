@@ -8,6 +8,7 @@ import com.google.common.net.HttpHeaders;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
@@ -109,6 +110,14 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
 //        assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
+    protected void addAdminRole (String groupName, String memberName,
+            String addedBy) throws KustvaktException {
+        Form form = new Form();
+        form.param("memberUsername", memberName);
+        form.param("role", PredefinedRole.GROUP_ADMIN.name());
+        addMemberRole(groupName, addedBy, form);
+    }
+    
     protected void addMemberRole (String groupName, String addedBy,
             Form form) throws KustvaktException {
         Response response = target().path(API_VERSION).path("group")

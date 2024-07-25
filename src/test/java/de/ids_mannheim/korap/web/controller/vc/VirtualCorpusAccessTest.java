@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -53,35 +52,25 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
     // node.at("/errors/0/0").asInt());
     // assertEquals("vcId", node.at("/errors/0/1").asText());
     // }
-    private void testlistAccessByGroup (JsonNode node, String vcName,
-            String groupName) throws KustvaktException {
-        //        System.out.println(node.toPrettyString());
-        //        assertEquals(1, node.at("/0/accessId").asInt());
-        //        assertEquals(2, node.at("/0/queryId").asInt());
-        assertEquals(node.at("/0/queryName").asText(), vcName);
-        //        assertEquals(2, node.at("/0/userGroupId").asInt());
-        assertEquals(node.at("/0/userGroupName").asText(), groupName);
-    }
 
     @Test
     public void testDeleteSharedVC () throws KustvaktException {
         createDoryGroup();
 
-        String json = "{\"type\": \"PROJECT\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
         String vcName = "new_project_vc";
         String username = "dory";
-        String authHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue(username, "pass");
-        createVC(authHeader, username, vcName, json);
+        createProjectVC(username, vcName);
 
         String groupName = "dory-group";
-        testShareVCByCreator(username, vcName, groupName);
+        shareVCByCreator(username, vcName, groupName);
 
         JsonNode node = listAccessByGroup(username, groupName);
         assertEquals(1, node.size());
-        testlistAccessByGroup(node, vcName, groupName);
+//      System.out.println(node.toPrettyString());
+      //        assertEquals(2, node.at("/0/queryId").asInt());
+      assertEquals(node.at("/0/queryName").asText(), vcName);
+      //        assertEquals(2, node.at("/0/userGroupId").asInt());
+      assertEquals(node.at("/0/userGroupName").asText(), groupName);
 
         // delete project VC
         deleteVC(vcName, username, username);
@@ -103,7 +92,7 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
         assertEquals(vcName, node.at("/name").asText());
         assertEquals(node.at("/type").asText(), "private");
         // share vc to group
-        Response response = testShareVCByCreator("marlin", vcName, groupName);
+        Response response = shareVCByCreator("marlin", vcName, groupName);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // check the vc type
         node = retrieveVCInfo("marlin", "marlin", vcName);
@@ -159,7 +148,7 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
 
     private void testShareVC_nonUniqueAccess (String vcCreator, String vcName,
             String groupName) throws ProcessingException, KustvaktException {
-        Response response = testShareVCByCreator(vcCreator, vcName, groupName);
+        Response response = shareVCByCreator(vcCreator, vcName, groupName);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
         assertEquals(StatusCodes.DB_INSERT_FAILED,

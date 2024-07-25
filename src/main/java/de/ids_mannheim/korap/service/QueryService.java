@@ -246,7 +246,7 @@ public class QueryService {
                 // else remains the same
             }
             else if (type.equals(ResourceType.PUBLISHED)) {
-                publishQuery(existingQuery.getId());
+                publishQuery(existingQuery.getId(), username, queryName);
             }
         }
 
@@ -256,14 +256,16 @@ public class QueryService {
                 queryLanguage);
     }
 
-    private void publishQuery (int queryId) throws KustvaktException {
+    private void publishQuery (int queryId, String queryCreator,
+            String queryName) throws KustvaktException {
 
 //        QueryAccess access = accessDao.retrieveHiddenAccess(queryId);
         // check if hidden access exists
 //        if (access == null) {
             QueryDO query = queryDao.retrieveQueryById(queryId);
             // create and assign a new hidden group
-            int groupId = userGroupService.createAutoHiddenGroup();
+            int groupId = userGroupService.createAutoHiddenGroup(queryCreator,
+                    queryName);
             UserGroup autoHidden = userGroupService
                     .retrieveUserGroupById(groupId);
 //            accessDao.createAccessToQuery(query, autoHidden);
@@ -396,7 +398,7 @@ public class QueryService {
                     cause.getMessage());
         }
         if (type.equals(ResourceType.PUBLISHED)) {
-            publishQuery(queryId);
+            publishQuery(queryId, queryCreator, queryName);
         }
     }
 
@@ -511,7 +513,12 @@ public class QueryService {
                         e.getMessage());
             }
 
-            queryDao.editQuery(query, null, ResourceType.PROJECT, null, null,
+            ResourceType queryType = query.getType();
+            if(queryType.equals(ResourceType.PRIVATE)) {
+                queryType = ResourceType.PROJECT;
+            }
+                
+            queryDao.editQuery(query, null, queryType, null, null,
                     null, null, null, query.isCached(), null, null);
         }
     }
@@ -704,8 +711,9 @@ public class QueryService {
                         .retrieveHiddenUserGroupByQueryId(query.getId());
                 try {
                     
-                    Role r1= roleDao.retrieveRoleByPrivilegeAndQuery(
-                            PrivilegeType.READ_QUERY, query.getId());
+                    Role r1= roleDao.retrieveRoleByGroupIdQueryIdPrivilege(
+                            userGroup.getId(),query.getId(),
+                            PrivilegeType.READ_QUERY);
                     Set<Role> memberRoles = new HashSet<Role>();
                     memberRoles.add(r1);
                     

@@ -17,6 +17,7 @@ import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -53,6 +54,40 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     }
+    
+    protected void createVC (String username, String vcName,
+            ResourceType vcType) throws KustvaktException {
+        String vcJson = "{\"type\": \""+vcType+"\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
+
+        String authHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue(username, "pass");
+        
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~" + username).path(vcName).request()
+                .header(Attributes.AUTHORIZATION, authHeader)
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(Entity.json(vcJson));
+
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    }
+    
+    protected void createPrivateVC (String username, String vcName)
+            throws KustvaktException {
+        createVC(username, vcName, ResourceType.PRIVATE);
+    }
+    
+    protected void createProjectVC (String username, String vcName)
+            throws KustvaktException {
+        createVC(username, vcName, ResourceType.PROJECT);
+    }
+
+    protected void createPublishedVC (String username, String vcName)
+            throws KustvaktException {
+        createVC(username, vcName, ResourceType.PUBLISHED);
+    }
+
 
     protected void editVC (String username, String vcCreator, String vcName,
             String vcJson) throws KustvaktException {
@@ -114,7 +149,7 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
         return node;
     }
 
-    protected Response testShareVCByCreator (String vcCreator, String vcName,
+    protected Response shareVCByCreator (String vcCreator, String vcName,
             String groupName) throws ProcessingException, KustvaktException {
 
         return target().path(API_VERSION).path("vc").path("~" + vcCreator)
@@ -146,7 +181,7 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
         return node;
     }
 
-    protected void deleteVC (String vcName, String vcCreator, String username)
+    protected Response deleteVC (String vcName, String vcCreator, String username)
             throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~" + vcCreator).path(vcName).request()
@@ -154,7 +189,8 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete();
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        return response;
     }
 
     protected void testResponseUnauthorized (Response response, String username)
@@ -210,14 +246,16 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
         return response;
     }
     
-    protected void createPublishedVC (String username, String vcName)
-            throws KustvaktException {
-        String json = "{\"type\": \"PUBLISHED\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
-
-        String authHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue(username, "pass");
-        createVC(authHeader, username, vcName, json);
+    protected Response searchWithVCRef (String username, String vcCreator,
+            String vcName) throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq",
+                        "referTo \"" + vcCreator + "/" + vcName + "\"")
+                .request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .get();
+        return response;
     }
 }

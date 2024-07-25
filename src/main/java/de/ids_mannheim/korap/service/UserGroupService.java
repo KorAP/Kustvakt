@@ -289,10 +289,12 @@ public class UserGroupService {
         }
     }
 
-    public int createAutoHiddenGroup () throws KustvaktException {
+    public int createAutoHiddenGroup (String queryCreator, String queryName) 
+            throws KustvaktException {
         String code = random.createRandomCode();
         String groupName = "auto-" + code;
-        int groupId = userGroupDao.createGroup(groupName, "auto-hidden-group",
+        int groupId = userGroupDao.createGroup(groupName, "auto-hidden-group for "
+                + "~"+queryCreator+"/"+queryName,
                 "system", UserGroupStatus.HIDDEN);
 
         return groupId;
