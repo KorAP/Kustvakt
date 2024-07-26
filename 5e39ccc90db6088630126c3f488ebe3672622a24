@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23bb5efb_e5b06629",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33
+      },
+      "writtenOn": "2024-07-26T11:19:15Z",
+      "side": 1,
+      "message": "I fetched the latest patch and started mvn clean package. Test fail now with: \n\n[INFO] Results:\n[INFO] \n[ERROR] Failures: \n[ERROR]   FoundryRewriteTest.testSearchRewriteFoundryWithUserSetting:58 expected: \u003c201\u003e but was: \u003c200\u003e\n[ERROR]   UserGroupControllerAdminTest.testUserGroupAdmin:199 expected: \u003c201\u003e but was: \u003c204\u003e\n[ERROR]   UserGroupControllerTest.testCreateGroupEmptyDescription:130 expected: \u003c201\u003e but was: \u003c204\u003e\n[ERROR]   UserGroupControllerTest.testCreateGroupMissingDescription:139 expected: \u003c201\u003e but was: \u003c204\u003e\n[ERROR]   UserGroupControllerTest.testUserGroup:200 expected: \u003c201\u003e but was: \u003c204\u003e\n[ERROR]   UserSettingControllerTest.testCreateSettingWithMap:69 expected: \u003c201\u003e but was: \u003c200\u003e\n[ERROR]   VirtualCorpusClientTest.testVC_withClient:43-\u003eVirtualCorpusTestBase.createVC:54 expected: \u003c201\u003e but was: \u003c204\u003e\n[ERROR]   VirtualCorpusControllerTest.testEditCorpusQuery:402 expected: \u003ckoral:doc\u003e but was: \u003ckoral:docGroup\u003e\n[ERROR]   VirtualCorpusSharingTest.testCreateShareProjectVC:82-\u003eVirtualCorpusTestBase.createVC:54 expected: \u003c201\u003e but was: \u003c204\u003e\n[INFO] \n[ERROR] Tests run: 544, Failures: 9, Errors: 0, Skipped: 35\n\n\nDid I did something wrong?",
+      "revId": "5e39ccc90db6088630126c3f488ebe3672622a24",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
