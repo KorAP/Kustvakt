@@ -246,6 +246,18 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
         return response;
     }
     
+    protected Response deleteRoleByGroupAndQuery (String vcCreator, String vcName,
+            String groupName, String deleteBy)
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~" + vcCreator).path(vcName).path("delete")
+                .path("@" + groupName).request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(deleteBy, "pass"))
+                .delete();
+        return response;
+    }
+    
     protected Response searchWithVCRef (String username, String vcCreator,
             String vcName) throws KustvaktException {
         Response response = target().path(API_VERSION).path("search")

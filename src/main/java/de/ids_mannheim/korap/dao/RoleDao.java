@@ -9,9 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.entity.QueryDO_;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.Role_;
+import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
 import de.ids_mannheim.korap.entity.UserGroup_;
@@ -30,6 +32,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.ListJoin;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 
 /**
  * Manages database queries and transactions regarding {@link Role}
@@ -162,25 +165,6 @@ public class RoleDao {
         return new HashSet<Role>(resultList);
     }
 
-    public void deleteRole (int roleId) throws KustvaktException {
-
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaDelete<Role> delete = cb.createCriteriaDelete(Role.class);
-        Root<Role> role = delete.from(Role.class);
-
-        delete.where(
-                cb.equal(role.get("id"), roleId));
-        
-        try {
-            entityManager.createQuery(delete).executeUpdate();
-        }
-        catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Role is not found", String.valueOf(roleId));
-        }
-        
-    }
-
     public Role retrieveRoleByGroupIdQueryIdPrivilege (int groupId, int queryId,
             PrivilegeType p) throws KustvaktException {
 
@@ -192,12 +176,51 @@ public class RoleDao {
         role.fetch(Role_.query, JoinType.INNER);
 
         query.select(role);
-        query.where(cb.equal(role.get(Role_.query).get(QueryDO_.id), queryId),
-                cb.equal(role.get(Role_.privilege), p), cb.equal(
-                        role.get(Role_.userGroup).get(UserGroup_.id), groupId));
+        query.where(
+                cb.equal(role.get(Role_.query).get(QueryDO_.id), queryId),
+                cb.equal(role.get(Role_.privilege), p), 
+                cb.equal(role.get(Role_.userGroup).get(UserGroup_.id),
+                        groupId));
 
         TypedQuery<Role> q = entityManager.createQuery(query);
         return (Role) q.getSingleResult();
+    }
+
+    @Deprecated
+    public void deleteRole (int roleId) throws KustvaktException {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<Role> delete = cb.createCriteriaDelete(Role.class);
+        Root<Role> role = delete.from(Role.class);
+
+        delete.where(
+                cb.equal(role.get("id"), roleId));
+        
+        entityManager.createQuery(delete).executeUpdate();
+    }
+    
+    public void deleteRoleByGroupAndQuery (String groupName,
+            String queryCreator, String queryName) throws KustvaktException {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        
+        CriteriaDelete<Role> delete = cb.createCriteriaDelete(Role.class);
+        Root<Role> deleteRole = delete.from(Role.class);
+        
+        Subquery<Integer> subquery = delete.subquery(Integer.class);
+        Root<Role> role = subquery.from(Role.class);
+        Join<Role, UserGroup> groupRole = role.join(Role_.userGroup);
+        Join<Role, QueryDO> queryRole = role.join(Role_.query);
+
+        subquery.select(role.get(Role_.id))
+                .where(cb.and(
+                        cb.equal(groupRole.get(UserGroup_.name), groupName),
+                        cb.equal(queryRole.get(QueryDO_.createdBy),
+                                queryCreator),
+                        cb.equal(queryRole.get(QueryDO_.name), queryName)));
+
+       
+        delete.where(deleteRole.get(Role_.id).in(subquery));
+        entityManager.createQuery(delete).executeUpdate();
     }
 
 }
