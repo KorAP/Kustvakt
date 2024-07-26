@@ -581,7 +581,7 @@ public class QueryService {
         return accessConverter.createQueryAccessDto(accessList);
     }
 
-    public List<QueryAccessDto> listQueryAccessByGroup (String username,
+    public List<QueryAccessDto> listRolesByGroup (String username,
             String groupName) throws KustvaktException {
         UserGroup userGroup = userGroupService
                 .retrieveUserGroupByName(groupName);
@@ -600,7 +600,8 @@ public class QueryService {
         return accessConverter.createRoleDto(roles);
     }
 
-    public void deleteQueryAccess (int roleId, String username)
+    @Deprecated
+    public void deleteRoleById (int roleId, String username)
             throws KustvaktException {
 
         Role role = roleDao.retrieveRoleById(roleId);
@@ -612,6 +613,23 @@ public class QueryService {
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
+        }
+
+    }
+    
+    public void deleteRoleByGroupAndQuery (String groupName,
+            String queryCreator, String queryName, String deleteBy)
+            throws KustvaktException {
+        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName,
+                false);
+        if (userGroupService.isUserGroupAdmin(deleteBy, userGroup)
+                || adminDao.isAdmin(deleteBy)) {
+            roleDao.deleteRoleByGroupAndQuery(groupName, queryCreator,
+                    queryName);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + deleteBy, deleteBy);
         }
 
     }

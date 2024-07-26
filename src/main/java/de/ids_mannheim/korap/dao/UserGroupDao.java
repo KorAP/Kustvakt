@@ -374,30 +374,4 @@ public class UserGroupDao {
         }
 
     }
-
-    public void deleteQueryFromGroup (int queryId, int groupId)
-            throws KustvaktException {
-        ParameterChecker.checkIntegerValue(queryId, "queryId");
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
-
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> criteriaQuery = criteriaBuilder
-                .createQuery(QueryAccess.class);
-
-        Root<QueryAccess> root = criteriaQuery.from(QueryAccess.class);
-        Join<QueryAccess, QueryDO> queryAccess = root.join(QueryAccess_.query);
-        Join<QueryAccess, UserGroup> group = root.join(QueryAccess_.userGroup);
-
-        Predicate query = criteriaBuilder.equal(queryAccess.get(QueryDO_.id),
-                queryId);
-        Predicate userGroup = criteriaBuilder.equal(group.get(UserGroup_.id),
-                groupId);
-
-        criteriaQuery.select(root);
-        criteriaQuery.where(criteriaBuilder.and(query, userGroup));
-        Query q = entityManager.createQuery(criteriaQuery);
-        QueryAccess access = (QueryAccess) q.getSingleResult();
-        entityManager.remove(access);
-    }
-
 }

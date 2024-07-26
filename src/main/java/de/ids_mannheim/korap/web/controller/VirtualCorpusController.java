@@ -346,6 +346,36 @@ public class VirtualCorpusController {
         }
         return Response.ok("SUCCESS").build();
     }
+    
+    /**
+     * Delete all roles for a given group name and vc. Only Group and
+     * system admin are eligible.
+     * 
+     * @param securityContext
+     * @param vcCreator
+     * @param vcName
+     * @param groupName
+     * @return HTTP status 200, if successful
+     */
+    @DELETE
+    @Path("~{vcCreator}/{vcName}/delete/@{groupName}")
+    public Response deleteRoleByGroupAndQuery (
+            @Context SecurityContext securityContext,
+            @PathParam("vcCreator") String vcCreator,
+            @PathParam("vcName") String vcName,
+            @PathParam("groupName") String groupName) {
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_VC_ACCESS);
+            service.deleteRoleByGroupAndQuery(groupName, vcCreator, vcName,
+                    context.getUsername());
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
 
     /**
      * Only VCA Admins and system admins are allowed to delete a
@@ -358,6 +388,7 @@ public class VirtualCorpusController {
      * @param accessId
      * @return
      */
+    @Deprecated
     @DELETE
     @Path("access/{accessId}")
     public Response deleteAccessById (
@@ -367,13 +398,16 @@ public class VirtualCorpusController {
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_VC_ACCESS);
-            service.deleteQueryAccess(accessId, context.getUsername());
+            service.deleteRoleById(accessId, context.getUsername());
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
+    
+
+    
 
     /**
      * Lists active VC-accesses available to user.
@@ -386,7 +420,7 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("access")
-    public List<QueryAccessDto> listAccess (
+    public List<QueryAccessDto> listRoles (
             @Context SecurityContext securityContext,
             @QueryParam("groupName") String groupName) {
         TokenContext context = (TokenContext) securityContext
@@ -394,7 +428,7 @@ public class VirtualCorpusController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
             if (groupName != null && !groupName.isEmpty()) {
-                return service.listQueryAccessByGroup(context.getUsername(),
+                return service.listRolesByGroup(context.getUsername(),
                         groupName);
             }
             else {
