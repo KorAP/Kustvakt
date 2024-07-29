@@ -24,8 +24,9 @@ import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.controller.usergroup.UserGroupTestBase;
 
-public class OAuth2AccessTokenTest extends OAuth2TestBase {
+public class OAuth2AccessTokenTest extends UserGroupTestBase {
 
     private String userAuthHeader;
 
@@ -46,6 +47,12 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(node.at("/scope").asText(), "all");
         String accessToken = node.at("/access_token").asText();
+        
+        createDoryGroup();
+        createMarlinGroup();
+        inviteMember(marlinGroupName, "marlin", "dory");
+        subscribe(marlinGroupName, "dory");
+        
         // test list user group
         response = target().path(API_VERSION).path("group").request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
@@ -53,6 +60,9 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(2, node.size());
+        
+        deleteGroupByName(doryGroupName, "dory");
+        deleteGroupByName(marlinGroupName, "marlin");
     }
 
     @Test
@@ -72,7 +82,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 .header(Attributes.AUTHORIZATION, "Bearer " + token).get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(4, node.size());
+        assertEquals(3, node.size());
     }
 
     @Test

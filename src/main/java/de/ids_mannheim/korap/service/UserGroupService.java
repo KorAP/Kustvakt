@@ -170,13 +170,6 @@ public class UserGroupService {
         return dtos;
     }
     
-    public List<UserGroupMember> retrieveQueryAccessAdmins (UserGroup userGroup)
-            throws KustvaktException {
-        List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
-                userGroup.getId(), PredefinedRole.QUERY_ACCESS_ADMIN);
-        return groupAdmins;
-    }
-
     private Set<Role> prepareMemberRoles (UserGroup userGroup) {
             Role r1 = new Role(PredefinedRole.GROUP_MEMBER,
                     PrivilegeType.DELETE_MEMBER, userGroup);

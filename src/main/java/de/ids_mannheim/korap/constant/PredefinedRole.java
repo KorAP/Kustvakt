@@ -9,8 +9,6 @@ package de.ids_mannheim.korap.constant;
 public enum PredefinedRole {
     GROUP_ADMIN, 
     GROUP_MEMBER, 
-    @Deprecated
-    QUERY_ACCESS_ADMIN,
     QUERY_ACCESS;
 
 //    USER_GROUP_ADMIN(1), USER_GROUP_MEMBER(2), VC_ACCESS_ADMIN(

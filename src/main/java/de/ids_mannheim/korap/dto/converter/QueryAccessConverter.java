@@ -7,7 +7,6 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.dto.QueryAccessDto;
-import de.ids_mannheim.korap.entity.QueryAccess;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 
@@ -22,25 +21,6 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
  */
 @Component
 public class QueryAccessConverter {
-
-    public List<QueryAccessDto> createQueryAccessDto (
-            List<QueryAccess> accessList) {
-        List<QueryAccessDto> dtos = new ArrayList<>(accessList.size());
-        for (QueryAccess access : accessList) {
-            QueryAccessDto dto = new QueryAccessDto();
-//            dto.setAccessId(access.getId());
-//            dto.setCreatedBy(access.getCreatedBy());
-
-            dto.setQueryId(access.getQuery().getId());
-            dto.setQueryName(access.getQuery().getName());
-
-            dto.setUserGroupId(access.getUserGroup().getId());
-            dto.setUserGroupName(access.getUserGroup().getName());
-
-            dtos.add(dto);
-        }
-        return dtos;
-    }
 
     public List<QueryAccessDto> createRoleDto (Set<Role> roles) {
         List<QueryAccessDto> dtos = new ArrayList<>(roles.size());

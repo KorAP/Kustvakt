@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +31,13 @@ public class UserGroupMemberDaoTest extends DaoTestBase {
     @Test
     public void testRetrieveMemberByRole () throws KustvaktException {
         UserGroup group = createDoryGroup();
-        
         // dory group
-        List<UserGroupMember> vcaAdmins = dao.retrieveMemberByRole(group.getId(),
-                PredefinedRole.QUERY_ACCESS_ADMIN);
+        List<UserGroupMember> groupAdmins = dao.retrieveMemberByRole(
+                group.getId(), PredefinedRole.GROUP_ADMIN);
         // System.out.println(vcaAdmins);
-        assertEquals(1, vcaAdmins.size());
-        assertEquals(vcaAdmins.get(0).getUserId(), "dory");
-        
+        assertEquals(1, groupAdmins.size());
+        assertEquals(groupAdmins.get(0).getUserId(), "dory");
+
         deleteUserGroup(group.getId(), "dory");
     }
 
@@ -56,14 +53,14 @@ public class UserGroupMemberDaoTest extends DaoTestBase {
         
         UserGroupMember member = dao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();
-        assertEquals(6, roles.size());
+        assertEquals(5, roles.size());
         
         roles.add(newRole);
         member.setRoles(roles);
         dao.updateMember(member);
         member = dao.retrieveMemberById("dory", groupId);
         member.getRoles();
-        assertEquals(7, roles.size());
+        assertEquals(6, roles.size());
         
         deleteUserGroup(group.getId(), "dory");
     }
