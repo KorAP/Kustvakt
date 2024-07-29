@@ -44,13 +44,13 @@ import jakarta.ws.rs.core.SecurityContext;
  * VirtualCorpusController defines web APIs related to virtual corpus
  * (VC) such as creating, deleting and listing user virtual corpora.
  * All the APIs in this class are available to logged-in users, except
- * retrieving info of system VC.
+ * retrieving a VC info.
  * 
- * This class also includes APIs related to virtual corpus access
- * (VCA) such as sharing and publishing VC. When a VC is published,
- * it is shared with all users, but not always listed like system
- * VC. It is listed for a user, once when he/she have searched for the
- * VC. A VC can be published by creating or editing the VC.
+ * This class also includes web-services to share and publish VC. When
+ * a VC is published, it is shared with all users, but not always listed 
+ * like system VC. It is listed for a user, once when he/she have searched 
+ * for the VC. A VC can be published by creating a new VC with type PUBLISHED
+ * or editing an existing VC.
  * 
  * VC name must follow the following regex [a-zA-Z_0-9-.], other
  * characters are not allowed.
@@ -202,18 +202,17 @@ public class VirtualCorpusController {
     }
 
     /**
-     * Lists all virtual corpora available to the user.
-     *
-     * System-admins can list available vc for a specific user by
-     * specifiying the username parameter.
+     * Lists all virtual corpora (VC) available to the authenticated
+     * user including PRIVATE VC created by the user, SYSTEM VC
+     * defined by system-admins, and PROJECT VC available to
+     * user-groups, wherein the user is a member of. The list can be
+     * filtered to show only SYSTEM VC or VC owned by the user.
      * 
-     * Normal users cannot list virtual corpora
-     * available for other users. Thus, username parameter is optional
-     * and must be identical to the authenticated username.
+     * This web-service requires OAuth2 access token with scope:
+     * vc_info.
      * 
      * @param securityContext
-     * @param username
-     *            a username (optional)
+     * @param filter filter the list by system, own, or empty (default)
      * @return a list of virtual corpora
      */
     @GET
@@ -282,9 +281,7 @@ public class VirtualCorpusController {
     }
 
     /**
-     * Only the VC owner and system admins can delete VC. VCA admins
-     * can delete VC-accesses e.g. of project VC, but not the VC
-     * themselves.
+     * Group and system admins can delete VC. 
      * 
      * @param securityContext
      * @param createdBy
@@ -313,7 +310,7 @@ public class VirtualCorpusController {
 
     /**
      * VC can only be shared with a group, not individuals.
-     * Only VCA admins are allowed to share VC and the VC must have
+     * Only group admins are allowed to share VC and the VC must have
      * been created by themselves.
      * 
      * <br /><br />
@@ -406,14 +403,10 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
     
-
-    
-
     /**
-     * Lists active VC-accesses available to user.
+     * Lists all member roles in a group.
      * 
-     * Only available to VCA and system admins.
-     * For system admins, list all VCA regardless of status.
+     * Only available to group and system admins.
      * 
      * @param securityContext
      * @return a list of VC accesses
@@ -427,17 +420,10 @@ public class VirtualCorpusController {
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
-            if (groupName != null && !groupName.isEmpty()) {
-                return service.listRolesByGroup(context.getUsername(),
-                        groupName);
-            }
-            else {
-                return service.listQueryAccessByUsername(context.getUsername());
-            }
+            return service.listRolesByGroup(context.getUsername(), groupName);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-
 }

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -110,7 +109,7 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         Form form = new Form();
         form.param("memberUsername", "marlin");
         form.param("role", PredefinedRole.GROUP_ADMIN.name());
-        form.param("role", PredefinedRole.QUERY_ACCESS_ADMIN.name());
+        form.param("role", PredefinedRole.QUERY_ACCESS.name());
         addMemberRole(doryGroupName, "dory", form);
         
         UserGroupMember member = memberDao.retrieveMemberById("marlin",

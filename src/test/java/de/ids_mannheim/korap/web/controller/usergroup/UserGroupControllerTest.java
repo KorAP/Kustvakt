@@ -245,7 +245,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         Form form = new Form();
         form.param("memberUsername", "dory");
         form.param("role", PredefinedRole.GROUP_ADMIN.name());
-        form.param("role", PredefinedRole.QUERY_ACCESS_ADMIN.name());
+        form.param("role", PredefinedRole.QUERY_ACCESS.name());
         addMemberRole(marlinGroupName, "marlin", form);
         
         // dory is a group admin in marlin-group

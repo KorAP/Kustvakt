@@ -25,7 +25,6 @@ import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dao.AdminDao;
-import de.ids_mannheim.korap.dao.QueryAccessDao;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.dao.RoleDao;
 import de.ids_mannheim.korap.dao.UserGroupDao;
@@ -34,7 +33,6 @@ import de.ids_mannheim.korap.dto.QueryAccessDto;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.dto.converter.QueryAccessConverter;
 import de.ids_mannheim.korap.dto.converter.QueryConverter;
-import de.ids_mannheim.korap.entity.QueryAccess;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
@@ -88,8 +86,6 @@ public class QueryService {
     @Autowired
     private UserGroupMemberDao memberDao;
 
-    @Autowired
-    private QueryAccessDao accessDao;
     @Autowired
     private AdminDao adminDao;
     @Autowired
@@ -539,47 +535,47 @@ public class QueryService {
         }
     }
 
-    public List<QueryAccessDto> listQueryAccessByUsername (String username)
-            throws KustvaktException {
-        List<QueryAccess> accessList = new ArrayList<>();
-        if (adminDao.isAdmin(username)) {
-            accessList = accessDao.retrieveAllAccess();
-        }
-        else {
-            List<UserGroup> groups = userGroupService
-                    .retrieveUserGroup(username);
-            for (UserGroup g : groups) {
-                if (userGroupService.isUserGroupAdmin(username, g)) {
-                    accessList.addAll(
-                            accessDao.retrieveActiveAccessByGroup(g.getId()));
-                }
-            }
-        }
-        return accessConverter.createQueryAccessDto(accessList);
-    }
-
-    public List<QueryAccessDto> listQueryAccessByQuery (String username,
-            String queryCreator, String queryName) throws KustvaktException {
-
-        List<QueryAccess> accessList;
-        if (adminDao.isAdmin(username)) {
-            accessList = accessDao.retrieveAllAccessByQuery(queryCreator,
-                    queryName);
-        }
-        else {
-            accessList = accessDao.retrieveActiveAccessByQuery(queryCreator,
-                    queryName);
-            List<QueryAccess> filteredAccessList = new ArrayList<>();
-            for (QueryAccess access : accessList) {
-                UserGroup userGroup = access.getUserGroup();
-                if (userGroupService.isUserGroupAdmin(username, userGroup)) {
-                    filteredAccessList.add(access);
-                }
-            }
-            accessList = filteredAccessList;
-        }
-        return accessConverter.createQueryAccessDto(accessList);
-    }
+//    public List<QueryAccessDto> listQueryAccessByUsername (String username)
+//            throws KustvaktException {
+//        List<QueryAccess> accessList = new ArrayList<>();
+//        if (adminDao.isAdmin(username)) {
+//            accessList = accessDao.retrieveAllAccess();
+//        }
+//        else {
+//            List<UserGroup> groups = userGroupService
+//                    .retrieveUserGroup(username);
+//            for (UserGroup g : groups) {
+//                if (userGroupService.isUserGroupAdmin(username, g)) {
+//                    accessList.addAll(
+//                            accessDao.retrieveActiveAccessByGroup(g.getId()));
+//                }
+//            }
+//        }
+//        return accessConverter.createQueryAccessDto(accessList);
+//    }
+//
+//    public List<QueryAccessDto> listQueryAccessByQuery (String username,
+//            String queryCreator, String queryName) throws KustvaktException {
+//
+//        List<QueryAccess> accessList;
+//        if (adminDao.isAdmin(username)) {
+//            accessList = accessDao.retrieveAllAccessByQuery(queryCreator,
+//                    queryName);
+//        }
+//        else {
+//            accessList = accessDao.retrieveActiveAccessByQuery(queryCreator,
+//                    queryName);
+//            List<QueryAccess> filteredAccessList = new ArrayList<>();
+//            for (QueryAccess access : accessList) {
+//                UserGroup userGroup = access.getUserGroup();
+//                if (userGroupService.isUserGroupAdmin(username, userGroup)) {
+//                    filteredAccessList.add(access);
+//                }
+//            }
+//            accessList = filteredAccessList;
+//        }
+//        return accessConverter.createQueryAccessDto(accessList);
+//    }
 
     public List<QueryAccessDto> listRolesByGroup (String username,
             String groupName) throws KustvaktException {
