@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.dto.QueryAccessDto;
+import de.ids_mannheim.korap.dto.RoleDto;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 
@@ -20,16 +20,19 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
  *
  */
 @Component
-public class QueryAccessConverter {
+public class RoleConverter {
 
-    public List<QueryAccessDto> createRoleDto (Set<Role> roles) {
-        List<QueryAccessDto> dtos = new ArrayList<>(roles.size());
+    public List<RoleDto> createRoleDto (Set<Role> roles) {
+        List<RoleDto> dtos = new ArrayList<>(roles.size());
         for (Role role : roles) {
-            QueryAccessDto dto = new QueryAccessDto();
+            RoleDto dto = new RoleDto();
             dto.setRoleId(role.getId());
-//            dto.setCreatedBy(role.getCreatedBy());
-            dto.setQueryId(role.getQuery().getId());
-            dto.setQueryName(role.getQuery().getName());
+            dto.setPrivilege(role.getPrivilege().name());
+            
+            if (role.getQuery() != null) {
+                dto.setQueryId(role.getQuery().getId());
+                dto.setQueryName(role.getQuery().getName());
+            }
             dto.setUserGroupId(role.getUserGroup().getId());
             dto.setUserGroupName(role.getUserGroup().getName());
             List<String> members = new ArrayList<>(

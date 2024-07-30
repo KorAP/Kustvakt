@@ -2,12 +2,13 @@ package de.ids_mannheim.korap.dto;
 
 import java.util.List;
 
-import de.ids_mannheim.korap.entity.UserGroupMember;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Defines the structure of query accesses, e.g. as JSON
+ * Defines the structure of query roles, e.g. as JSON
  * objects in HTTP Responses.
  * 
  * @author margaretha
@@ -15,9 +16,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class QueryAccessDto {
+public class RoleDto {
     private int roleId;
+    private String privilege;
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private int queryId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String queryName;
     private int userGroupId;
     private String userGroupName;

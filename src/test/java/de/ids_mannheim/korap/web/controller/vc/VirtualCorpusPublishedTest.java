@@ -57,7 +57,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
                 node.at("/members/0/roles/0").asText());
         String groupName = node.at("/name").asText();
 
-        node = listAccessByGroup("admin", groupName);
+        node = listRolesByGroup("admin", groupName);
         assertEquals(1, node.size());
         assertEquals(vcName, node.at("/0/queryName").asText());
         assertEquals(groupName, node.at("/0/userGroupName").asText());
@@ -80,7 +80,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     
     private void testHiddenGroupNotFound (String hiddenGroupName)
             throws KustvaktException {
-        JsonNode node = listAccessByGroup("admin", hiddenGroupName);
+        JsonNode node = listRolesByGroup("admin", hiddenGroupName);
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
         assertEquals("Group " + hiddenGroupName + " is not found",
@@ -122,7 +122,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         
         testDeletePublishedVC("marlin",vcName,"marlin", groupName);
         
-        node = listAccessByGroup("admin", marlinGroupName);
+        node = listRolesByGroup("admin", marlinGroupName);
         assertEquals(0, node.size());
         
         deleteGroupByName(marlinGroupName, "marlin");
@@ -144,7 +144,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         assertEquals(4, node.size());
         
         // check marlin-group access
-        node = listAccessByGroup("admin", marlinGroupName);
+        node = listRolesByGroup("admin", marlinGroupName);
         assertEquals(1, node.size());
         assertEquals(vcName, node.at("/0/queryName").asText());
         assertEquals(marlinGroupName, node.at("/0/userGroupName").asText());
@@ -153,7 +153,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         // check hidden group access
         node = getHiddenGroup(vcName);
         String hiddenGroupName = node.at("/name").asText();
-        node = listAccessByGroup("admin", hiddenGroupName);
+        node = listRolesByGroup("admin", hiddenGroupName);
         assertEquals(0, node.at("/0/members").size());
         
         testAddMemberAfterSharingPublishedVC(hiddenGroupName);
@@ -172,10 +172,10 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         node = listVC("nemo");
         assertEquals(3, node.size());
 
-        node = listAccessByGroup("admin", marlinGroupName);
+        node = listRolesByGroup("admin", marlinGroupName);
         assertEquals(3, node.at("/0/members").size());
 
-        node = listAccessByGroup("admin", hiddenGroupName);
+        node = listRolesByGroup("admin", hiddenGroupName);
         assertEquals(0, node.at("/0/members").size());
     }
     
@@ -199,7 +199,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         // check hidden group and roles
         node = getHiddenGroup(vcName);
         String hiddenGroupName = node.at("/name").asText();
-        node = listAccessByGroup("admin", hiddenGroupName);
+        node = listRolesByGroup("admin", hiddenGroupName);
         assertEquals(1, node.size());
         node = node.get(0);
         assertEquals(vcName, node.at("/queryName").asText());

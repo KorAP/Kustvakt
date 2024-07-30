@@ -174,7 +174,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(0, node2.size());
         createAccess(vcCreator, vcName, groupName, admin);
         
-        JsonNode node = listAccessByGroup("admin",groupName);
+        JsonNode node = listRolesByGroup("admin",groupName);
         assertEquals(1, node.size());
         String roleId = node.at("/0/roleId").asText();
         node2 = testAdminListVC_UsingAdminToken(vcCreator,
@@ -183,7 +183,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         
         Response response = deleteAccess("admin",roleId);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        node = listAccessByGroup("admin",groupName);
+        node = listRolesByGroup("admin",groupName);
         assertEquals(0, node.size());
         
         String json = "{\"type\": \"" + ResourceType.PRIVATE + "\"}";

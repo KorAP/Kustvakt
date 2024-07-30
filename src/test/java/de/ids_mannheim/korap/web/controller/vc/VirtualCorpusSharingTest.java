@@ -66,7 +66,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         inviteMember(marlinGroupName, "marlin", "nemo");
         subscribe(marlinGroupName, "nemo");
         
-        JsonNode node = listAccessByGroup("marlin", marlinGroupName);
+        JsonNode node = listRolesByGroup("marlin", marlinGroupName);
         assertEquals(0, node.size());
         
         // share by member unauthorized
@@ -81,7 +81,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
 
         response = shareVCByCreator("nemo", "nemo-vc", marlinGroupName);
         
-        node = listAccessByGroup("marlin", marlinGroupName);
+        node = listRolesByGroup("marlin", marlinGroupName);
         assertEquals(1, node.size());
         deleteGroupByName(marlinGroupName, "marlin");
     }
@@ -94,28 +94,32 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         String groupName = "DNB-group";
         Response response = createUserGroup(groupName, "DNB users", testUser);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        listUserGroup(testUser, groupName);
+        
+        JsonNode roleNodes = listRolesByGroup(testUser, groupName, false);
+        assertEquals(5, roleNodes.size());
+        
         String memberName = "darla";
         testInviteMember(groupName, testUser, memberName);
-        subscribeToGroup(memberName, groupName);
+        subscribe(groupName, memberName);
         
-        JsonNode node = listAccessByGroup(testUser, groupName);
-        assertEquals(0, node.size());
+        roleNodes = listRolesByGroup(testUser, groupName, false);
+        assertEquals(6, roleNodes.size());
         
         // share vc to group
         shareVCByCreator(testUser, vcName, groupName);
         
         // check member roles
-        node = listAccessByGroup(testUser, groupName);
-        assertEquals(1, node.size());
+        JsonNode queryRoleNodes = listRolesByGroup(testUser, groupName);
+        assertEquals(1, queryRoleNodes.size());
         
-        deleteRoleByGroupAndQuery(testUser, vcName, groupName, testUser);
-        
-        node = listAccessByGroup(testUser, groupName);
-        assertEquals(0, node.size());
+        testDeleteQueryAccessToGroup(testUser, groupName, vcName);
         
         deleteVC(vcName, testUser, testUser);
         deleteGroupByName(groupName, testUser);
+        
+        roleNodes = listRolesByGroup(testUser, groupName, false);
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                roleNodes.at("/errors/0/0").asInt());
     }
     
     @Test
@@ -141,16 +145,16 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         String memberName = "darla";
         response = createUserGroup(groupName, "Owid users", testUser);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        listUserGroup(testUser, groupName);
+
         testInviteMember(groupName, testUser, memberName);
-        subscribeToGroup(memberName, groupName);
+        subscribe(groupName, memberName);
         checkMemberInGroup(memberName, testUser, groupName);
         
         // share vc to group
         shareVCByCreator(testUser, vcName, groupName);
         
         // check member roles
-        node = listAccessByGroup(testUser, groupName);
+        node = listRolesByGroup(testUser, groupName);
         assertEquals(1, node.size());
         
         // search by member
@@ -159,7 +163,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         node = JsonUtils.readTree(response.readEntity(String.class));
         assertTrue(node.at("/matches").size() > 0);
         // delete project VC
-        deleteVC(vcName, testUser, testUser);
+        testDeleteSharedVC(vcName, testUser, testUser, groupName);
         // list VC
         node = listVC(testUser);
         assertEquals(1, node.size());
@@ -183,10 +187,10 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         String groupName = "DNB-group";
         Response response = createUserGroup(groupName, "DNB users", testUser);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        listUserGroup(testUser, groupName);
+        
         String memberName = "darla";
         testInviteMember(groupName, testUser, memberName);
-        subscribeToGroup(memberName, groupName);
+        subscribe(groupName, memberName);
         
         shareVC(testUser, vc1, groupName, testUser);
         shareVC(testUser, vc2, groupName, testUser);
@@ -214,32 +218,50 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         
         deleteGroupByName(groupName, testUser);
     }
+    
+    private void testDeleteQueryAccessToGroup (String username,
+            String groupName, String vcName) throws KustvaktException {
+        JsonNode roleNodes = listRolesByGroup(username, groupName, false);
+        assertEquals(7, roleNodes.size());
 
-    private JsonNode listUserGroup (String username, String groupName)
-            throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .get();
+        // delete group role
+        deleteRoleByGroupAndQuery(username, vcName, groupName, username);
+
+        JsonNode queryRoleNodes = listRolesByGroup(username, groupName);
+        assertEquals(0, queryRoleNodes.size());
+
+        roleNodes = listRolesByGroup(username, groupName, false);
+        assertEquals(6, roleNodes.size());
+
+    }
+    
+    private void testDeleteSharedVC (String vcName, String vcCreator,
+            String username, String groupName) throws KustvaktException {
+        JsonNode node = listRolesByGroup(username, groupName);
+        assertEquals(1, node.size());
+        
+        Response response = deleteVC(vcName, vcCreator, username);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        return node;
+        
+        node = listRolesByGroup(username, groupName);
+        assertEquals(0, node.size());
     }
 
-    private void subscribeToGroup (String username, String groupName)
-            throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("subscribe").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .post(Entity.form(new Form()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    }
+//    private JsonNode listUserGroup (String username, String groupName)
+//            throws KustvaktException {
+//        Response response = target().path(API_VERSION).path("group").request()
+//                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+//                        .createBasicAuthorizationHeaderValue(username, "pass"))
+//                .get();
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        String entity = response.readEntity(String.class);
+//        JsonNode node = JsonUtils.readTree(entity);
+//        return node;
+//    }
 
     private void checkMemberInGroup (String memberName, String testUser,
             String groupName) throws KustvaktException {
-        JsonNode node = listUserGroup(testUser, groupName).get(0);
+        JsonNode node = listUserGroups(testUser).get(0);
         assertEquals(2, node.get("members").size());
         assertEquals(memberName, node.at("/members/1/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
