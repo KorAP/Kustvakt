@@ -29,9 +29,9 @@ import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.dao.RoleDao;
 import de.ids_mannheim.korap.dao.UserGroupDao;
 import de.ids_mannheim.korap.dao.UserGroupMemberDao;
-import de.ids_mannheim.korap.dto.QueryAccessDto;
+import de.ids_mannheim.korap.dto.RoleDto;
 import de.ids_mannheim.korap.dto.QueryDto;
-import de.ids_mannheim.korap.dto.converter.QueryAccessConverter;
+import de.ids_mannheim.korap.dto.converter.RoleConverter;
 import de.ids_mannheim.korap.dto.converter.QueryConverter;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.entity.Role;
@@ -97,7 +97,7 @@ public class QueryService {
     @Autowired
     private QueryConverter converter;
     @Autowired
-    private QueryAccessConverter accessConverter;
+    private RoleConverter accessConverter;
 
     private void verifyUsername (String contextUsername, String pathUsername)
             throws KustvaktException {
@@ -577,16 +577,15 @@ public class QueryService {
 //        return accessConverter.createQueryAccessDto(accessList);
 //    }
 
-    public List<QueryAccessDto> listRolesByGroup (String username,
-            String groupName) throws KustvaktException {
+    public List<RoleDto> listRolesByGroup (String username,
+            String groupName, boolean hasQuery) throws KustvaktException {
         UserGroup userGroup = userGroupService
                 .retrieveUserGroupByName(groupName);
 
         Set<Role> roles;
         if (adminDao.isAdmin(username)
                 || userGroupService.isUserGroupAdmin(username, userGroup)) {
-            //            accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
-            roles = roleDao.retrieveRoleByGroupId(userGroup.getId(), true);
+            roles = roleDao.retrieveRoleByGroupId(userGroup.getId(), hasQuery);
 
         }
         else {

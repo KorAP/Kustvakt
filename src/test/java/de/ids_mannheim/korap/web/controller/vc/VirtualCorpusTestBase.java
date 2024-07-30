@@ -169,10 +169,18 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
                 .post(Entity.form(new Form()));
     }
 
-    protected JsonNode listAccessByGroup (String username, String groupName)
+    protected JsonNode listRolesByGroup (String username, String groupName)
+            throws KustvaktException {
+        return listRolesByGroup(username, groupName, true);
+    }
+    
+    protected JsonNode listRolesByGroup (String username, String groupName,
+            boolean hasQuery)
             throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("access")
-                .queryParam("groupName", groupName).request()
+                .queryParam("groupName", groupName)
+                .queryParam("hasQuery", hasQuery)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .get();

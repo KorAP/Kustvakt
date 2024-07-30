@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.dto.QueryAccessDto;
+import de.ids_mannheim.korap.dto.RoleDto;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -27,6 +27,7 @@ import de.ids_mannheim.korap.web.input.QueryJson;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -413,14 +414,15 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("access")
-    public List<QueryAccessDto> listRoles (
-            @Context SecurityContext securityContext,
-            @QueryParam("groupName") String groupName) {
+    public List<RoleDto> listRoles (@Context SecurityContext securityContext,
+            @QueryParam("groupName") String groupName,
+            @DefaultValue("true") @QueryParam("hasQuery") boolean hasQuery) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
-            return service.listRolesByGroup(context.getUsername(), groupName);
+            return service.listRolesByGroup(context.getUsername(), groupName,
+                    hasQuery);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

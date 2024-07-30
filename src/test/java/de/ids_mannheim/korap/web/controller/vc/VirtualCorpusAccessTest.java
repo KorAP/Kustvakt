@@ -22,36 +22,15 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
     private String testUser = "VirtualCorpusAccessTest";
 
     @Test
-    public void testlistAccessByNonVCAAdmin () throws KustvaktException {
+    public void testlistAccessUnauthorized () throws KustvaktException {
         createDoryGroup();
-        JsonNode node = listAccessByGroup("nemo", "dory-group");
+        JsonNode node = listRolesByGroup("nemo", "dory-group");
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals(node.at("/errors/0/1").asText(),
                 "Unauthorized operation for user: nemo");
         deleteGroupByName(doryGroupName, "dory");
     }
-
-    // @Test
-    // public void testlistAccessMissingId () throws KustvaktException
-    // {
-    // Response response =
-    // target().path(API_VERSION).path("vc")
-    // .path("access")
-    // .request().header(Attributes.AUTHORIZATION,
-    // HttpAuthorizationHandler
-    // .createBasicAuthorizationHeaderValue(
-    // testUser, "pass"))
-    // .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-    // .get();
-    // String entity = response.readEntity(String.class);
-    // JsonNode node = JsonUtils.readTree(entity);
-    // assertEquals(Status.BAD_REQUEST.getStatusCode(),
-    // response.getStatus());
-    // assertEquals(StatusCodes.MISSING_PARAMETER,
-    // node.at("/errors/0/0").asInt());
-    // assertEquals("vcId", node.at("/errors/0/1").asText());
-    // }
 
     @Test
     public void testDeleteSharedVC () throws KustvaktException {
@@ -64,7 +43,7 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
         String groupName = "dory-group";
         shareVCByCreator(username, vcName, groupName);
 
-        JsonNode node = listAccessByGroup(username, groupName);
+        JsonNode node = listRolesByGroup(username, groupName);
         assertEquals(1, node.size());
 //      System.out.println(node.toPrettyString());
       //        assertEquals(2, node.at("/0/queryId").asInt());
@@ -74,7 +53,7 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
 
         // delete project VC
         deleteVC(vcName, username, username);
-        node = listAccessByGroup(username, groupName);
+        node = listRolesByGroup(username, groupName);
         assertEquals(0, node.size());
 
         deleteGroupByName(doryGroupName, "dory");
@@ -98,7 +77,7 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
         node = retrieveVCInfo("marlin", "marlin", vcName);
         assertEquals(node.at("/type").asText(), "project");
         // list vc access by marlin
-        node = listAccessByGroup("marlin", groupName);
+        node = listRolesByGroup("marlin", groupName);
         assertEquals(1, node.size());
 
         // get access id
@@ -142,7 +121,7 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
         Response response = deleteAccess("nemo", roleId);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        JsonNode node = listAccessByGroup("nemo", groupName);
+        JsonNode node = listRolesByGroup("nemo", groupName);
         assertEquals(0, node.size());
     }
 
