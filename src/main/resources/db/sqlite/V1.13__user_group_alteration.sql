@@ -1,7 +1,7 @@
 --DROP INDEX IF EXISTS group_member_role_index;
 --DROP INDEX IF EXISTS user_group_member_index;
 --DROP INDEX IF EXISTS user_group_member_status_index;
---DROP INDEX IF EXISTS role_index;
+DROP INDEX IF EXISTS role_index;
 
 -- please commented out the triggers in V1.2__triggers.sql later
 --DROP TRIGGER IF EXISTS insert_member_status;
@@ -59,6 +59,7 @@ DROP TABLE role;
 ALTER TABLE role_new RENAME TO role;
 
 DROP TABLE privilege;
---DROP TABLE group_member_role;
---DROP TABLE query_access;
---DROP TABLE user_group_member;
+DROP TABLE query_access;
+
+CREATE UNIQUE INDEX IF NOT EXISTS role_index on role(name, 
+  privilege, group_id, query_id);

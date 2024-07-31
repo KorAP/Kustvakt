@@ -127,16 +127,17 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         subscribe(marlinGroupName, "dory");
         JsonNode marlinGroup = listUserGroups("marlin");
         int groupId = marlinGroup.at("/0/id").asInt();
-
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        form.param("role", PredefinedRole.GROUP_ADMIN.name());
-        addMemberRole(marlinGroupName, "marlin", form);
-
+        
         UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();
+        assertEquals(1, roles.size());
+        
+        addAdminRole(marlinGroupName, "dory", "marlin");
+        
+        member = memberDao.retrieveMemberById("dory", groupId);
+        roles = member.getRoles();
         assertEquals(6, roles.size());
-
+        
         testAddSameMemberRole(groupId);
         testDeleteMemberRole(groupId);
         testEditMemberRoleEmpty(groupId);
@@ -145,14 +146,9 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         deleteGroupByName(marlinGroupName, "marlin");
     }
 
-    // EM: not work as expected since role is new.
     private void testAddSameMemberRole (int groupId)
             throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        form.param("role", PredefinedRole.GROUP_MEMBER.name());
-
-        addMemberRole(marlinGroupName, "marlin", form);
+        addAdminRole(marlinGroupName, "dory", "marlin");
 
         UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();

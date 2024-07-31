@@ -150,7 +150,7 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
     }
 
     protected Response shareVCByCreator (String vcCreator, String vcName,
-            String groupName) throws ProcessingException, KustvaktException {
+            String groupName) throws KustvaktException {
 
         return target().path(API_VERSION).path("vc").path("~" + vcCreator)
                 .path(vcName).path("share").path("@" + groupName).request()
@@ -244,6 +244,7 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
     
+    @Deprecated
     protected Response deleteAccess (String username, String accessId)
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("access")

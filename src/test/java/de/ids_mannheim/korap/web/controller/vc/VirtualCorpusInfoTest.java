@@ -35,7 +35,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveSystemVCGuest ()
+    public void testRetrieveSystemVC_guest ()
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~system").path("system-vc").request().get();
@@ -46,7 +46,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveOwnerPrivateVC ()
+    public void testRetrievePrivateVC ()
             throws ProcessingException, KustvaktException {
         JsonNode node = retrieveVCInfo("dory", "dory", "dory-vc");
         assertEquals(node.at("/name").asText(), "dory-vc");
@@ -55,7 +55,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrievePrivateVCUnauthorized ()
+    public void testRetrievePrivateVC_unauthorized ()
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
@@ -66,7 +66,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveProjectVC ()
+    public void testRetrieveProjectVC_member ()
             throws ProcessingException, KustvaktException {
         createDoryGroup();
         inviteMember(doryGroupName, "dory", "nemo");
@@ -91,7 +91,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveProjectVCUnauthorized ()
+    public void testRetrieveProjectVC_unauthorized ()
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
@@ -102,7 +102,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveProjectVCbyNonActiveMember ()
+    public void testRetrieveProjectVC_nonActiveMember ()
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
@@ -113,7 +113,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testAdminRetrievePrivateVC ()
+    public void testRetrievePrivateVC_admin ()
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
@@ -128,7 +128,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testAdminRetrieveProjectVC ()
+    public void testRetrieveProjectVC_admin ()
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()

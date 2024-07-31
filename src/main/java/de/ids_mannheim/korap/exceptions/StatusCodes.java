@@ -81,16 +81,18 @@ public class StatusCodes {
     // policy errors
 
     // database codes
-    public static final int DB_GET_FAILED = 500;
+//    public static final int DB_GET_FAILED = 500;
     public static final int DB_INSERT_FAILED = 501;
-    public static final int DB_DELETE_FAILED = 502;
-    public static final int DB_UPDATE_FAILED = 503;
+//    public static final int DB_DELETE_FAILED = 502;
+//    public static final int DB_UPDATE_FAILED = 503;
 
-    public static final int DB_GET_SUCCESSFUL = 504;
-    public static final int DB_INSERT_SUCCESSFUL = 505;
-    public static final int DB_DELETE_SUCCESSFUL = 506;
-    public static final int DB_UPDATE_SUCCESSFUL = 507;
-    public static final int DB_ENTRY_EXISTS = 508;
+//    public static final int DB_GET_SUCCESSFUL = 504;
+//    public static final int DB_INSERT_SUCCESSFUL = 505;
+//    public static final int DB_DELETE_SUCCESSFUL = 506;
+//    public static final int DB_UPDATE_SUCCESSFUL = 507;
+//    public static final int DB_ENTRY_EXISTS = 508;
+    
+    public static final int DB_UNIQUE_CONSTRAINT_FAILED = 509;
 
     //    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
     // public static final int ARGUMENT_VALIDATION_FAILURE = 701;

@@ -40,7 +40,7 @@ public class Role implements Comparable<Role> {
     @Enumerated(EnumType.STRING)
     private PrivilegeType privilege;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "query_id", referencedColumnName = "id")
     private QueryDO query;
 
@@ -100,8 +100,9 @@ public class Role implements Comparable<Role> {
     @Override
     public boolean equals (Object obj) {
         Role r = (Role) obj;
-        if (this.id == r.getId() && this.name.equals(r.getName())
-                && this.privilege.equals(r.getPrivilege())) {
+        if (this.name.equals(r.getName())
+                && this.privilege.equals(r.getPrivilege())
+                && this.userGroup.equals(r.getUserGroup())) {
             return true;
         }
         return false;
