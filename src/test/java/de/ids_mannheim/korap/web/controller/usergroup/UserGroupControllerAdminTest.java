@@ -217,7 +217,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         for (int i = 0; i < node.size(); i++) {
             member = node.get(i);
             if (member.at("/userId").asText().equals(memberUsername)) {
-                assertEquals(6, member.at("/roles").size());
+                assertEquals(6, member.at("/privileges").size());
                 break;
             }
         }
@@ -242,7 +242,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         for (int i = 0; i < node.size(); i++) {
             member = node.get(i);
             if (member.at("/userId").asText().equals(memberUsername)) {
-                assertEquals(1, member.at("/roles").size());
+                assertEquals(1, member.at("/privileges").size());
                 break;
             }
         }
@@ -303,6 +303,6 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         assertEquals(node.at("/members/3/userId").asText(), "darla");
         assertEquals(GroupMemberStatus.PENDING.name(),
                 node.at("/members/1/status").asText());
-        assertEquals(0, node.at("/members/1/roles").size());
+        assertEquals(0, node.at("/members/1/privileges").size());
     }
 }

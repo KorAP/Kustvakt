@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -52,9 +53,9 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         assertEquals(username, node.at("/members/0/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(), 
                 node.at("/members/0/status").asText());
-        assertEquals(1, node.at("/members/0/roles").size());
-        assertEquals(PredefinedRole.QUERY_ACCESS.name(), 
-                node.at("/members/0/roles/0").asText());
+        assertEquals(1, node.at("/members/0/privileges").size());
+        assertEquals(PrivilegeType.READ_QUERY.name(), 
+                node.at("/members/0/privileges/0").asText());
         String groupName = node.at("/name").asText();
 
         node = listRolesByGroup("admin", groupName);

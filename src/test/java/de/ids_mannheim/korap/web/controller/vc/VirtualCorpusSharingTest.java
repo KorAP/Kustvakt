@@ -12,6 +12,7 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -308,8 +309,8 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         assertEquals(memberName, node.at("/members/1/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/1/status").asText());
-        assertEquals(PredefinedRole.GROUP_MEMBER.name(),
-                node.at("/members/1/roles/0").asText());
+        assertEquals(PrivilegeType.DELETE_MEMBER.name(),
+                node.at("/members/1/privileges/0").asText());
     }
 
     @Test

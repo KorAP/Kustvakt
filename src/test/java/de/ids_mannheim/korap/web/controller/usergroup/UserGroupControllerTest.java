@@ -107,7 +107,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         assertEquals(username, node.at("/members/0/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/0/status").asText());
-        assertEquals(5,  node.at("/members/0/roles").size());
+        assertEquals(5,  node.at("/members/0/privileges").size());
 
         testUpdateUserGroup(groupName);
         testInviteMember(groupName, username, "darla");

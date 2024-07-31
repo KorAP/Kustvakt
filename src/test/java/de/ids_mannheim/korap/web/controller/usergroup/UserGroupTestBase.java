@@ -86,7 +86,7 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
         assertEquals(node.at("/members/1/userId").asText(), invitee);
         assertEquals(GroupMemberStatus.PENDING.name(),
                 node.at("/members/1/status").asText());
-        assertEquals(0, node.at("/members/1/roles").size());
+        assertEquals(0, node.at("/members/1/privileges").size());
     }
 
     protected Response subscribe (String groupName, String username)
