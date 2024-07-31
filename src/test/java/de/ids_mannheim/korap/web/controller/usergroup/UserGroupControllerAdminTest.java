@@ -27,8 +27,6 @@ import jakarta.ws.rs.core.Response.Status;
  */
 public class UserGroupControllerAdminTest extends UserGroupTestBase {
 
-    private String sysAdminUser = "admin";
-
     private String testUser = "group-admin";
 
     private JsonNode listGroup (String username)
@@ -128,7 +126,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "pass"))
+                                        admin, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         MediaType.APPLICATION_FORM_URLENCODED)
                 .post(Entity.form(f));
@@ -146,7 +144,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "pass"))
+                                        admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
@@ -161,7 +159,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "pass"))
+                                        admin, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         MediaType.APPLICATION_FORM_URLENCODED)
                 .post(null);
@@ -197,28 +195,23 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         assertEquals(groupName, node.get("name").asText());
         testInviteMember(groupName);
         subscribe(groupName, "marlin");
-        testAddMemberRoles(groupName, "marlin");
+        testAddAdminRole(groupName, "marlin");
         testDeleteMemberRoles(groupName, "marlin");
         testDeleteMember(groupName);
         
         // delete group
-        deleteGroupByName(groupName, sysAdminUser);
+        deleteGroupByName(groupName, admin);
         // check group
         node = listGroup(testUser);
         assertEquals(0, node.size());
     }
 
 
-    private void testAddMemberRoles (String groupName, String memberUsername)
+    private void testAddAdminRole (String groupName, String memberUsername)
             throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("memberUsername", memberUsername);
-        // USER_GROUP_ADMIN
-        form.param("role", PredefinedRole.GROUP_ADMIN.name());
-        // USER_GROUP_MEMBER
-        form.param("role", PredefinedRole.GROUP_MEMBER.name());
-        addMemberRole(groupName, sysAdminUser, form);
-
+        Response response = addAdminRole(groupName, memberUsername, admin);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
         JsonNode node = retrieveGroup(groupName).at("/members");
         JsonNode member;
         for (int i = 0; i < node.size(); i++) {
@@ -241,7 +234,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "password"))
+                                        admin, "password"))
                 .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = retrieveGroup(groupName).at("/members");
@@ -262,7 +255,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "pass"))
+                                        admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").post(null);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
@@ -278,7 +271,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "pass"))
+                                        admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").delete();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // check group member
@@ -300,7 +293,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
-                                        sysAdminUser, "pass"))
+                                        admin, "pass"))
                 .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // list group

@@ -10,7 +10,6 @@ import com.google.common.net.HttpHeaders;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -242,11 +241,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         inviteMember(marlinGroupName, "marlin", "dory");
         subscribe(marlinGroupName, "dory");
         
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        form.param("role", PredefinedRole.GROUP_ADMIN.name());
-        form.param("role", PredefinedRole.QUERY_ACCESS.name());
-        addMemberRole(marlinGroupName, "marlin", form);
+        addAdminRole(marlinGroupName, "dory", "marlin");
         
         // dory is a group admin in marlin-group
         Response response = target().path(API_VERSION).path("group")

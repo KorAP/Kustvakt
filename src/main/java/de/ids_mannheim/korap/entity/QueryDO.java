@@ -64,7 +64,8 @@ public class QueryDO implements Comparable<QueryDO> {
     @Column(name = "query_language")
     private String queryLanguage;
 
-    @OneToMany(mappedBy = "query", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "query", fetch = FetchType.LAZY, 
+            cascade = CascadeType.REMOVE)
     private List<Role> roles;
 
     @Override

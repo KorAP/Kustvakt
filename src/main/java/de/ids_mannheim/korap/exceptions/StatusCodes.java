@@ -121,6 +121,7 @@ public class StatusCodes {
     public static final int GROUP_MEMBER_NOT_FOUND = 1604;
     public static final int INVITATION_EXPIRED = 1605;
     public static final int GROUP_DELETED = 1606;
+    public static final int GROUP_ADMIN_EXISTS = 1607;
 
     /**
      * 1800 Oauth2
