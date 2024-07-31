@@ -97,7 +97,7 @@ public class QueryService {
     @Autowired
     private QueryConverter converter;
     @Autowired
-    private RoleConverter accessConverter;
+    private RoleConverter roleConverter;
 
     private void verifyUsername (String contextUsername, String pathUsername)
             throws KustvaktException {
@@ -500,13 +500,14 @@ public class QueryService {
                 Throwable lastCause = null;
                 while ((cause = cause.getCause()) != null
                         && !cause.equals(lastCause)) {
-                    if (cause instanceof SQLException) {
-                        break;
-                    }
+//                    if (cause instanceof SQLException) {
+//                        break;
+//                    }
                     lastCause = cause;
                 }
-                throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
-                        e.getMessage());
+                throw new KustvaktException(
+                        StatusCodes.DB_UNIQUE_CONSTRAINT_FAILED,
+                        lastCause.getMessage());
             }
 
             ResourceType queryType = query.getType();
@@ -592,7 +593,7 @@ public class QueryService {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
-        return accessConverter.createRoleDto(roles);
+        return roleConverter.createRoleDto(roles);
     }
 
     @Deprecated

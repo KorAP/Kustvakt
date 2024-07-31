@@ -28,6 +28,10 @@ public class KustvaktResponseHandler extends CoreResponseHandler {
             r = Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getNotification()).build();
         }
+        else if (e.getStatusCode() == StatusCodes.DB_UNIQUE_CONSTRAINT_FAILED) {
+            r = Response.status(Response.Status.CONFLICT)
+                    .entity(e.getNotification()).build();
+        }
         else if (e.getStatusCode() == StatusCodes.USER_REAUTHENTICATION_REQUIRED
                 || e.getStatusCode() == StatusCodes.AUTHORIZATION_FAILED
                 || e.getStatusCode() >= StatusCodes.AUTHENTICATION_FAILED) {

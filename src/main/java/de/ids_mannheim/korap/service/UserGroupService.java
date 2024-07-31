@@ -649,31 +649,45 @@ public class UserGroupService {
                         memberUsername, member.getStatus().name());
             }
 
-            Set<Role> roles = member.getRoles();
+            Set<Role> existingRoles = member.getRoles();
             for (PredefinedRole role : roleNames) {
-                if (role.equals(PredefinedRole.GROUP_ADMIN)) {
-                    Role r1 = new Role(role,PrivilegeType.READ_MEMBER, userGroup);
-                    roleDao.addRole(r1);
-                    roles.add(r1);
-                    
-                    Role r2 = new Role(role,PrivilegeType.DELETE_MEMBER, userGroup);
-                    roleDao.addRole(r2);
-                    roles.add(r2);
+                boolean roleExists = false;
+                for (Role r :existingRoles) {
+                    if (r.getName().equals(role)) {
+                        roleExists = true;
+                        break;
+                    }
+                }
+                if (!roleExists) {
+                    if (role.equals(PredefinedRole.GROUP_ADMIN)) {
+                        Role r1 = new Role(role,PrivilegeType.READ_MEMBER, userGroup);
+                        roleDao.addRole(r1);
+                        existingRoles.add(r1);
+                        
+                        Role r2 = new Role(role,PrivilegeType.DELETE_MEMBER, userGroup);
+                        roleDao.addRole(r2);
+                        existingRoles.add(r2);
 
-                    Role r3 = new Role(role,PrivilegeType.WRITE_MEMBER, userGroup);
-                    roleDao.addRole(r3);
-                    roles.add(r3);
-                    
-                    Role r4 = new Role(role,PrivilegeType.SHARE_QUERY, userGroup);
-                    roleDao.addRole(r4);
-                    roles.add(r4);
-                    
-                    Role r5 = new Role(role,PrivilegeType.DELETE_QUERY, userGroup);
-                    roleDao.addRole(r5);
-                    roles.add(r5);
+                        Role r3 = new Role(role,PrivilegeType.WRITE_MEMBER, userGroup);
+                        roleDao.addRole(r3);
+                        existingRoles.add(r3);
+                        
+                        Role r4 = new Role(role,PrivilegeType.SHARE_QUERY, userGroup);
+                        roleDao.addRole(r4);
+                        existingRoles.add(r4);
+                        
+                        Role r5 = new Role(role,PrivilegeType.DELETE_QUERY, userGroup);
+                        roleDao.addRole(r5);
+                        existingRoles.add(r5);
+                    }
+//                    else {
+//                        throw new KustvaktException(StatusCodes.NOT_ALLOWED,
+//                                "Adding role " + role.name()
+//                                        + " is not allowed.");
+//                    }
                 }
             }
-            member.setRoles(roles);
+            member.setRoles(existingRoles);
             groupMemberDao.updateMember(member);
 
         }
@@ -681,6 +695,11 @@ public class UserGroupService {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
+    }
+    
+    private void checkRole () {
+        // TODO Auto-generated method stub
+
     }
 
     public void deleteMemberRoles (String username, String groupName,
