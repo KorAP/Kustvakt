@@ -582,47 +582,6 @@ public class UserGroupService {
         return groupDto;
     }
 
-    @Deprecated
-    public void editMemberRoles (String username, String groupName,
-            String memberUsername, List<PredefinedRole> roleList)
-            throws KustvaktException {
-
-        ParameterChecker.checkStringValue(username, "username");
-        ParameterChecker.checkStringValue(groupName, "groupName");
-        ParameterChecker.checkStringValue(memberUsername, "memberUsername");
-
-        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName, true);
-        UserGroupStatus groupStatus = userGroup.getStatus();
-        if (groupStatus == UserGroupStatus.DELETED) {
-            throw new KustvaktException(StatusCodes.GROUP_DELETED,
-                    "Usergroup has been deleted.");
-        }
-        else if (isUserGroupAdmin(username, userGroup)
-                || adminDao.isAdmin(username)) {
-
-            UserGroupMember member = groupMemberDao
-                    .retrieveMemberById(memberUsername, userGroup.getId());
-
-            if (!member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
-                throw new KustvaktException(StatusCodes.GROUP_MEMBER_INACTIVE,
-                        memberUsername + " has status " + member.getStatus(),
-                        memberUsername, member.getStatus().name());
-            }
-
-            Set<Role> roles = new HashSet<>();
-            for (int i = 0; i < roleList.size(); i++) {
-                roles.add(roleDao.retrieveRoleByName(roleList.get(i)));
-            }
-            member.setRoles(roles);
-            groupMemberDao.updateMember(member);
-
-        }
-        else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
-    }
-
     public void addAdminRole (String username, String groupName,
             String memberUsername) throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");

@@ -222,42 +222,6 @@ public class UserGroupController {
         }
     }
 
-    /** DEPRECATED for simplicity and easier maintenance.
-     * 
-     * Very similar to addMemberRoles web-service, but allows deletion
-     * as well.
-     * 
-     * @param securityContext
-     * @param groupName
-     *            the group name
-     * @param memberUsername
-     *            the username of a group-member
-     * @param roleId
-     *            a role id or multiple role ids
-     * @return
-     */
-    @Deprecated
-    @POST
-    @Path("@{groupName}/role/edit")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response editMemberRoles (@Context SecurityContext securityContext,
-            @PathParam("groupName") String groupName,
-            @FormParam("memberUsername") String memberUsername,
-            @FormParam("roles") List<PredefinedRole> roles) {
-        TokenContext context = (TokenContext) securityContext
-                .getUserPrincipal();
-        try {
-            scopeService.verifyScope(context,
-                    OAuth2Scope.EDIT_USER_GROUP_MEMBER_ROLE);
-            service.editMemberRoles(context.getUsername(), groupName,
-                    memberUsername, roles);
-            return Response.ok("SUCCESS").build();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-    }
-
     /**Add group admin role to a member in a group 
      * 
      * @param securityContext

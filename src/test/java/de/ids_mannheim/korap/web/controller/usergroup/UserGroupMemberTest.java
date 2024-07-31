@@ -142,8 +142,6 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         
         testAddSameMemberRole(groupId);
         testDeleteMemberRole(groupId);
-        testEditMemberRoleEmpty(groupId);
-        //        testEditMemberRole(groupId);
 
         deleteGroupByName(marlinGroupName, "marlin");
     }
@@ -177,39 +175,5 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();
         assertEquals(1, roles.size());
-    }
-
-    @Deprecated
-    private void testEditMemberRoleEmpty (int groupId)
-            throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@marlin-group").path("role").path("edit").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
-        Set<Role> roles = member.getRoles();
-        assertEquals(0, roles.size());
-    }
-
-    @Deprecated
-    private void testEditMemberRole (int groupId)
-            throws ProcessingException, KustvaktException {
-        Form form = new Form();
-        form.param("memberUsername", "dory");
-        form.param("roleId", "1");
-        form.param("roleId", "3");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@marlin-group").path("role").path("edit").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
-        Set<Role> roles = member.getRoles();
-        assertEquals(2, roles.size());
     }
 }
