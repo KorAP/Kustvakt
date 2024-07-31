@@ -103,6 +103,17 @@ public class Role implements Comparable<Role> {
         if (this.name.equals(r.getName())
                 && this.privilege.equals(r.getPrivilege())
                 && this.userGroup.equals(r.getUserGroup())) {
+            if (this.query != null && r.getQuery() == null) {
+                return false;
+            }
+            if (this.query == null && r.getQuery() != null) {
+                return false;
+            }
+            if(this.query != null && r.getQuery() != null
+                    && !this.query.equals(r.getQuery())) {
+                return false;
+            }
+
             return true;
         }
         return false;
