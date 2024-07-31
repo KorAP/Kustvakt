@@ -78,7 +78,7 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 group.at("/userMemberStatus").asText());
         
-        assertEquals(1, group.at("/userRoles").size());
+        assertEquals(1, group.at("/userPrivileges").size());
         
         // unsubscribe marlin from dory-group
         testUnsubscribeActiveMember("dory-group");
@@ -116,7 +116,7 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         for (int i = 0; i < node.size(); i++) {
             member = node.get(i);
             if (deletedMemberName.equals(member.at("/userId").asText())) {
-                assertEquals(0, node.at("/roles").size());
+                assertEquals(0, node.at("/privileges").size());
                 break;
             }
         }

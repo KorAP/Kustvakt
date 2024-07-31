@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.controller.usergroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +42,8 @@ public class UserGroupListTest extends UserGroupTestBase{
         assertEquals(node.at("/0/name").asText(), "dory-group");
         assertEquals(node.at("/0/owner").asText(), "dory");
         // group members are not allowed to see other members
-        assertEquals(0, node.at("/0/members").size());
+        assertTrue(node.at("/0/members").isMissingNode());
+        System.out.println(node.toPrettyString());
     }
     
     // marlin has 2 groups

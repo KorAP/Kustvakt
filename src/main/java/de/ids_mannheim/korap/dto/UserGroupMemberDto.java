@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.dto;
 import java.util.List;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,5 +19,5 @@ import lombok.Setter;
 public class UserGroupMemberDto {
     private String userId;
     private GroupMemberStatus status;
-    private List<PredefinedRole> roles;
+    private List<PrivilegeType> privileges;
 }
