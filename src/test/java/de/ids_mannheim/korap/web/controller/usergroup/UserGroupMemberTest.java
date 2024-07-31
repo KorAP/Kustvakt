@@ -98,27 +98,28 @@ public class UserGroupMemberTest extends UserGroupTestBase {
 //        assertEquals(node.at("/errors/0/2").asText(), "deleted-group");
     }
     
-    @Test
-    public void testAddMutipleRoles () throws KustvaktException {
-        createDoryGroup();
-        inviteMember(doryGroupName, "dory", "marlin");
-        subscribe(doryGroupName, "marlin");
-        JsonNode marlinGroup = listUserGroups("marlin");
-        int groupId = marlinGroup.at("/0/id").asInt();
-        
-        Form form = new Form();
-        form.param("memberUsername", "marlin");
-        form.param("role", PredefinedRole.GROUP_ADMIN.name());
-        form.param("role", PredefinedRole.QUERY_ACCESS.name());
-        addMemberRole(doryGroupName, "dory", form);
-        
-        UserGroupMember member = memberDao.retrieveMemberById("marlin",
-                groupId);
-        Set<Role> roles = member.getRoles();
-        assertEquals(6, roles.size());
-        
-        deleteGroupByName(doryGroupName, "dory");
-    }
+//    @Deprecated
+//    @Test
+//    public void testAddMutipleRoles () throws KustvaktException {
+//        createDoryGroup();
+//        inviteMember(doryGroupName, "dory", "marlin");
+//        subscribe(doryGroupName, "marlin");
+//        JsonNode marlinGroup = listUserGroups("marlin");
+//        int groupId = marlinGroup.at("/0/id").asInt();
+//        
+//        Form form = new Form();
+//        form.param("memberUsername", "marlin");
+//        form.param("role", PredefinedRole.GROUP_ADMIN.name());
+//        form.param("role", PredefinedRole.QUERY_ACCESS.name());
+//        addMemberRole(doryGroupName, "dory", form);
+//        
+//        UserGroupMember member = memberDao.retrieveMemberById("marlin",
+//                groupId);
+//        Set<Role> roles = member.getRoles();
+//        assertEquals(6, roles.size());
+//        
+//        deleteGroupByName(doryGroupName, "dory");
+//    }
     
     @Test
     public void testAddMemberRole () throws KustvaktException {
@@ -132,7 +133,8 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         Set<Role> roles = member.getRoles();
         assertEquals(1, roles.size());
         
-        addAdminRole(marlinGroupName, "dory", "marlin");
+        Response response = addAdminRole(marlinGroupName, "dory", "marlin");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         
         member = memberDao.retrieveMemberById("dory", groupId);
         roles = member.getRoles();
@@ -148,8 +150,14 @@ public class UserGroupMemberTest extends UserGroupTestBase {
 
     private void testAddSameMemberRole (int groupId)
             throws ProcessingException, KustvaktException {
-        addAdminRole(marlinGroupName, "dory", "marlin");
-
+        Response response = addAdminRole(marlinGroupName, "dory", "marlin");
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.GROUP_ADMIN_EXISTS,
+                node.at("/errors/0/0").asInt());
+        
         UserGroupMember member = memberDao.retrieveMemberById("dory", groupId);
         Set<Role> roles = member.getRoles();
         assertEquals(6, roles.size());

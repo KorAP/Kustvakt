@@ -116,7 +116,6 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         for (int i = 0; i < node.size(); i++) {
             member = node.get(i);
             if (deletedMemberName.equals(member.at("/userId").asText())) {
-                System.out.println(deletedMemberName);
                 assertEquals(0, node.at("/roles").size());
                 break;
             }

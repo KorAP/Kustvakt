@@ -23,6 +23,7 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
 
     protected String doryGroupName = "dory-group";
     protected String marlinGroupName = "marlin-group";
+    protected String admin = "admin";
 
     protected Response createUserGroup (String groupName, String description,
             String username) throws ProcessingException, KustvaktException {
@@ -110,22 +111,19 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
 //        assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    protected void addAdminRole (String groupName, String memberName,
+    protected Response addAdminRole (String groupName, String memberName,
             String addedBy) throws KustvaktException {
         Form form = new Form();
         form.param("memberUsername", memberName);
         form.param("role", PredefinedRole.GROUP_ADMIN.name());
-        addMemberRole(groupName, addedBy, form);
-    }
-    
-    protected void addMemberRole (String groupName, String addedBy,
-            Form form) throws KustvaktException {
+
         Response response = target().path(API_VERSION).path("group")
-                .path("@"+groupName).path("role").path("add").request()
+                .path("@" + groupName).path("role").path("add").path("admin")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(addedBy, "pass"))
                 .post(Entity.form(form));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        return response;
     }
 
     protected Response deleteMember (String groupName, String memberName,

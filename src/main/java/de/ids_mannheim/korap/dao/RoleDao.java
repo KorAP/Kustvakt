@@ -128,7 +128,7 @@ public class RoleDao {
 
         Root<Role> role = query.from(Role.class);
         role.fetch("userGroup", JoinType.INNER);
-        role.fetch("query", JoinType.INNER);
+//        role.fetch("query", JoinType.INNER);
 //        role.fetch("userGroupMembers", JoinType.INNER);
         
         Expression<?> queryId = role.get("query").get("id");

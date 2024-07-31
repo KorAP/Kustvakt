@@ -258,33 +258,28 @@ public class UserGroupController {
         }
     }
 
-    /**
-     * Adds roles of an active member of a user-group. Only user-group
-     * admins and system admins are allowed.
+    /**Add group admin role to a member in a group 
      * 
      * @param securityContext
      * @param groupName
      *            a group name
      * @param memberUsername
      *            a username of a group member
-     * @param roleId
-     *            a role id or multiple role ids
-     * @return if successful, HTTP response status OK
+     * @return HTTP status 200, if successful 
      */
     @POST
-    @Path("@{groupName}/role/add")
+    @Path("@{groupName}/role/add/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addMemberRoles (@Context SecurityContext securityContext,
+    public Response addAdminRole (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
-            @FormParam("memberUsername") String memberUsername,
-            @FormParam("role") List<PredefinedRole> roles) {
+            @FormParam("memberUsername") String memberUsername) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
-            service.addMemberRoles(context.getUsername(), groupName,
-                    memberUsername, roles);
+            service.addAdminRole(context.getUsername(), groupName,
+                    memberUsername);
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {

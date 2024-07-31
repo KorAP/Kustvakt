@@ -69,11 +69,8 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
                 marlinGroupName);
         testResponseUnauthorized(response, "nemo");
 
-        Form form = new Form();
-        form.param("memberUsername", "nemo");
-        form.param("role", PredefinedRole.GROUP_ADMIN.name());
-        addMemberRole(marlinGroupName, "marlin", form);
-
+        addAdminRole(marlinGroupName, "nemo", "marlin");
+        
         response = shareVCByCreator("nemo", "nemo-vc", marlinGroupName);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
