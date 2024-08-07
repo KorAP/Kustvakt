@@ -16,6 +16,23 @@
       "message": "mvn clean package only runs through with: \njdbc.url\u003djdbc:sqlite:file::memory:?cache\u003dshared\nin test-jdbc.properties\nFails if I change the jdbc.url to point to my test database. (Still no problem for developing I\u0027m changing it now after compiling back).",
       "revId": "4e11476de2f044d2c179427764bfadc1203205ff",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "661ea0c8_5230b3cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2024-08-07T13:41:10Z",
+      "side": 1,
+      "message": "Hi Helge, thanks for reviewing. Is the behavior okay?",
+      "revId": "4e11476de2f044d2c179427764bfadc1203205ff",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
