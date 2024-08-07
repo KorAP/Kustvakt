@@ -33,6 +33,23 @@
       "message": "Ah, runs through without failure if I copy the appropriate config files to data.",
       "revId": "5e39ccc90db6088630126c3f488ebe3672622a24",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a28f961b_4eb6e752",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2024-08-07T13:45:20Z",
+      "side": 1,
+      "message": "Could you please check the issue in GH? Which option would be better for showing the rewrite on the web UI?",
+      "revId": "5e39ccc90db6088630126c3f488ebe3672622a24",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
