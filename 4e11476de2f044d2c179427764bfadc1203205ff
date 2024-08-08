@@ -33,6 +33,23 @@
       "message": "Hi Helge, thanks for reviewing. Is the behavior okay?",
       "revId": "4e11476de2f044d2c179427764bfadc1203205ff",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b3ff6dc_d8564c6d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33
+      },
+      "writtenOn": "2024-08-08T11:12:56Z",
+      "side": 1,
+      "message": "Yes, the behavior is ok! Thanks for your help.\n\nI just found additionally a minor issue. When I authorise a client it leads to a warning. I don\u0027t know how important this warning and the mvn clean issue is, so I choose +1 and leave you to decide if it is +2.\n\nWarning (if authorising clients):\n\nAug. 08, 2024 11:36:19 AM org.glassfish.jersey.servlet.WebComponent filterFormParameters\nWARNUNG: A servlet request to the URI http://localhost:8089/api/v1.0/oauth2/authorize?response_type\u003dcode\u0026client_id\u003dM6R7FJ3M9L47MdLhfpmPf6\u0026scope\u003dsearch\u0026state\u003d8lv2i7stdgp5u1 contains form parameters in the request body but the request body has been consumed by the servlet or a servlet filter accessing the request parameters. Only resource methods using @FormParam will work as expected. Resource methods consuming the request body by other means will not work as expected.",
+      "revId": "4e11476de2f044d2c179427764bfadc1203205ff",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
