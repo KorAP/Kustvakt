@@ -224,7 +224,12 @@ public class NamedVCLoader implements Runnable {
 
         long start, end;
         start = System.currentTimeMillis();
-        VirtualCorpusCache.store(vcId, searchKrill.getIndex());
+        try {
+            VirtualCorpusCache.store(vcId, searchKrill.getIndex());
+        }
+        catch (Exception e) {
+            jlog.error("Failed caching vc "+vcId, e);
+        }
         end = System.currentTimeMillis();
         jlog.info("Duration : {}", (end - start));
         config.setVcInCaching("");
@@ -239,13 +244,14 @@ public class NamedVCLoader implements Runnable {
     private void storeVCinDB (String vcId, String koralQuery, QueryDO existingVC) {
         try {
             String info = (existingVC == null) ? "Storing" : "Updating";
-            jlog.info("{} {} in database ", info, vcId);
+            jlog.info("{} {} in the database ", info, vcId);
             
             vcService.storeQuery(existingVC, "system", vcId, ResourceType.SYSTEM,
                     QueryType.VIRTUAL_CORPUS, koralQuery, null, null, null,
                     true, "system", null, null);
         }
-        catch (KustvaktException e) {
+        catch (Exception e) {
+            jlog.error("Failed storing VC: "+vcId, e);
             throw new RuntimeException(e);
         }
     }
