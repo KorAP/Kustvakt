@@ -1,5 +1,5 @@
 # Use alpine linux as base image
-FROM openjdk:19-alpine as builder
+FROM openjdk:19-alpine AS builder
 
 # Copy repository respecting .dockerignore
 COPY . /kustvakt
