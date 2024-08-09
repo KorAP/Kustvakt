@@ -43,7 +43,7 @@ public class UserGroupListTest extends UserGroupTestBase{
         assertEquals(node.at("/0/owner").asText(), "dory");
         // group members are not allowed to see other members
         assertTrue(node.at("/0/members").isMissingNode());
-        System.out.println(node.toPrettyString());
+//        System.out.println(node.toPrettyString());
     }
     
     // marlin has 2 groups

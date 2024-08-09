@@ -47,9 +47,6 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     private String authenticationScheme;
 
-    private boolean isSoftDeleteAutoGroup;
-    private boolean isSoftDeleteGroupMember;
-
     private EncryptionIface.Encryption secureHashAlgorithm;
 
     private AuthenticationMethod OAuth2passwordAuthentication;
@@ -88,7 +85,6 @@ public class FullConfiguration extends KustvaktConfiguration {
 
         // EM: pattern for matching availability in Krill matches
         setLicensePatterns(properties);
-        setDeleteConfiguration(properties);
         setMailConfiguration(properties);
         ldapConfig = properties.getProperty("ldap.config");
 
@@ -166,19 +162,6 @@ public class FullConfiguration extends KustvaktConfiguration {
             setEmailAddressRetrieval(
                     properties.getProperty("mail.address.retrieval", "test"));
         }
-    }
-
-    private void setDeleteConfiguration (Properties properties) {
-//        setSoftDeleteGroup(
-//                parseDeleteConfig(properties.getProperty("delete.group", "")));
-        setSoftDeleteAutoGroup(parseDeleteConfig(
-                properties.getProperty("delete.auto.group", "")));
-        setSoftDeleteGroupMember(parseDeleteConfig(
-                properties.getProperty("delete.group.member", "")));
-    }
-
-    private boolean parseDeleteConfig (String deleteConfig) {
-        return deleteConfig.equals("soft") ? true : false;
     }
 
     private void setLicensePatterns (Properties properties) {
@@ -308,22 +291,6 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setAllOnlyRegex (String allOnlyRegex) {
         this.allOnlyRegex = allOnlyRegex;
-    }
-
-    public boolean isSoftDeleteGroupMember () {
-        return isSoftDeleteGroupMember;
-    }
-
-    public void setSoftDeleteGroupMember (boolean isSoftDeleteGroupMember) {
-        this.isSoftDeleteGroupMember = isSoftDeleteGroupMember;
-    }
-
-    public boolean isSoftDeleteAutoGroup () {
-        return isSoftDeleteAutoGroup;
-    }
-
-    public void setSoftDeleteAutoGroup (boolean isSoftDeleteAutoGroup) {
-        this.isSoftDeleteAutoGroup = isSoftDeleteAutoGroup;
     }
 
     public String getTestEmail () {

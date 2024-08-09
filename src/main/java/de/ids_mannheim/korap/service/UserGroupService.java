@@ -162,8 +162,7 @@ public class UserGroupService {
         List<UserGroupMember> members;
         UserGroupDto groupDto;
         for (UserGroup group : userGroups) {
-            members = groupMemberDao.retrieveMemberByGroupId(group.getId(),
-                    true);
+            members = groupMemberDao.retrieveMemberByGroupId(group.getId());
             groupDto = converter.createUserGroupDto(group, members, null, null);
             dtos.add(groupDto);
         }
@@ -370,11 +369,6 @@ public class UserGroupService {
                 || existingStatus.equals(status)) {
             return existingStatus;
         }
-        else if (existingStatus.equals(GroupMemberStatus.DELETED)) {
-            // hard delete, not customizable
-            doDeleteMember(username, groupId, "system", false);
-        }
-
         return null;
     }
 
@@ -445,13 +439,7 @@ public class UserGroupService {
         UserGroupMember member = groupMemberDao.retrieveMemberById(username,
                 userGroup.getId());
         GroupMemberStatus status = member.getStatus();
-        if (status.equals(GroupMemberStatus.DELETED)) {
-            throw new KustvaktException(StatusCodes.GROUP_MEMBER_DELETED,
-                    username + " has already been deleted from the group "
-                            + userGroup.getName(),
-                    username, userGroup.getName());
-        }
-        else if (member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
+        if (member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_EXISTS,
                     "Username " + username + " with status " + status
                             + " exists in the user-group "
@@ -506,47 +494,14 @@ public class UserGroupService {
         else if (memberId.equals(deletedBy)
                 || isUserGroupAdmin(deletedBy, userGroup)
                 || adminDao.isAdmin(deletedBy)) {
-            // soft delete
-            doDeleteMember(memberId, userGroup.getId(), deletedBy,
-                    config.isSoftDeleteGroupMember());
+            UserGroupMember member = groupMemberDao.retrieveMemberById(memberId,
+                    userGroup.getId());
+            groupMemberDao.deleteMember(member, deletedBy);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + deletedBy, deletedBy);
         }
-    }
-
-    /**
-     * Updates the {@link GroupMemberStatus} of a member to
-     * {@link GroupMemberStatus#DELETED}
-     * 
-     * @param userId
-     *            user to be deleted
-     * @param groupId
-     *            user-group id
-     * @param deletedBy
-     *            user that issue the delete
-     * @param isSoftDelete
-     *            true if database entry is to be deleted
-     *            permanently, false otherwise
-     * @throws KustvaktException
-     */
-    private void doDeleteMember (String username, int groupId, String deletedBy,
-            boolean isSoftDelete) throws KustvaktException {
-
-        UserGroup group = userGroupDao.retrieveGroupById(groupId);
-
-        UserGroupMember member = groupMemberDao.retrieveMemberById(username,
-                groupId);
-        GroupMemberStatus status = member.getStatus();
-        if (isSoftDelete && status.equals(GroupMemberStatus.DELETED)) {
-            throw new KustvaktException(StatusCodes.GROUP_MEMBER_DELETED,
-                    username + " has already been deleted from the group "
-                            + group.getName(),
-                    username, group.getName());
-        }
-
-        groupMemberDao.deleteMember(member, deletedBy, isSoftDelete);
     }
 
     public UserGroupDto searchByName (String groupName)

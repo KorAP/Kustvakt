@@ -53,7 +53,7 @@ public class UserGroupDaoTest extends DaoTestBase {
         // dory group
         List<UserGroupMember> members = userGroupDao
                 .retrieveGroupById(group.getId(), true).getMembers();
-        assertEquals(4, members.size());
+        assertEquals(3, members.size());
 
         UserGroupMember m = members.get(1);
         Set<Role> roles = m.getRoles();

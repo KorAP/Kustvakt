@@ -16,7 +16,6 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -27,9 +26,6 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
     private String username = "UserGroupControllerTest";
 
-    private String admin = "admin";
-
-    
     @Test
     public void testCreateGroupEmptyDescription ()
             throws ProcessingException, KustvaktException {
@@ -196,11 +192,11 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
+        assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "pearl has already been deleted from the group dory-group");
-        assertEquals(node.at("/errors/0/2").asText(), "[pearl, dory-group]");
+        assertEquals("pearl is not found in the group",
+                node.at("/errors/0/1").asText());
+        assertEquals("pearl",node.at("/errors/0/2").asText());
         
         deleteGroupByName(doryGroupName, "dory");
     }
@@ -208,30 +204,8 @@ public class UserGroupControllerTest extends UserGroupTestBase {
     private void testDeleteGroup (String groupName, String username)
             throws ProcessingException, KustvaktException {
         deleteGroupByName(groupName, username);
-        Form f = new Form();
-        f.param("username", username);
-        f.param("status", "DELETED");
-        // EM: this is so complicated because the group retrieval are not allowed
-        // for delete groups
-        // check group
-        Response response = target().path(API_VERSION).path("admin").path("group")
-                .path("list").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        MediaType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(f));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        for (int j = 0; j < node.size(); j++) {
-            JsonNode group = node.get(j);
-            // check group members
-            for (int i = 0; i < group.at("/0/members").size(); i++) {
-                assertEquals(GroupMemberStatus.DELETED.name(),
-                        group.at("/0/members/" + i + "/status").asText());
-            }
-        }
+        JsonNode node = listUserGroups(username);
+        assertEquals(0, node.size());
     }
 
     @Test

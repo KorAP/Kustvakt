@@ -195,9 +195,7 @@ public class UserGroupDao {
                 criteriaBuilder.equal(root.get(UserGroup_.status),
                         UserGroupStatus.ACTIVE),
                 criteriaBuilder.equal(members.get(UserGroupMember_.userId),
-                        userId),
-                criteriaBuilder.notEqual(members.get(UserGroupMember_.status),
-                        GroupMemberStatus.DELETED));
+                        userId));
         // criteriaBuilder.equal(members.get(UserGroupMember_.status),
         // GroupMemberStatus.ACTIVE));
 

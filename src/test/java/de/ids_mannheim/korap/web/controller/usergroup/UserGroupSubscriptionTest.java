@@ -32,8 +32,8 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "bruce is not found in the group");
+        assertEquals("bruce is not found in the group",
+                node.at("/errors/0/1").asText());
         
         testSubscribeDeletedMember();
         deleteGroupByName(doryGroupName, "dory");
@@ -50,10 +50,8 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
 
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
+        assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "pearl has already been deleted from the group dory-group");
         
         testUnsubscribeDeletedMember();
         testInviteDeletedMember("pearl", "dory");
@@ -143,8 +141,8 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Group non-existent is not found");
+        assertEquals("Group non-existent is not found",
+                node.at("/errors/0/1").asText());
     }
 
     @Test
@@ -210,11 +208,8 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
+        assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "pearl has already been deleted from the group dory-group");
-        assertEquals(node.at("/errors/0/2").asText(), "[pearl, dory-group]");
     }
 
 
@@ -243,8 +238,8 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "bruce is not found in the group");
+        assertEquals("bruce is not found in the group", 
+                node.at("/errors/0/1").asText());
         deleteGroupByName(doryGroupName, "dory");
     }
 
@@ -261,8 +256,8 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Group tralala-group is not found");
+        assertEquals("Group tralala-group is not found",
+                node.at("/errors/0/1").asText());
     }
 
 }

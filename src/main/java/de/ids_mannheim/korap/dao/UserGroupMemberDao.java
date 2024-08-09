@@ -53,8 +53,8 @@ public class UserGroupMemberDao {
         entityManager.merge(member);
     }
 
-    public void deleteMember (UserGroupMember member, String deletedBy,
-            boolean isSoftDelete) throws KustvaktException {
+    public void deleteMember (UserGroupMember member, String deletedBy)
+            throws KustvaktException {
         ParameterChecker.checkObjectValue(member, "UserGroupMember");
         ParameterChecker.checkStringValue(deletedBy, "deletedBy");
 
@@ -62,16 +62,8 @@ public class UserGroupMemberDao {
             member = entityManager.merge(member);
         }
 
-        if (isSoftDelete) {
-            member.setStatus(GroupMemberStatus.DELETED);
-            member.setDeletedBy(deletedBy);
-            member.setRoles(new HashSet<>());
-            entityManager.persist(member);
-        }
-        else {
-            member.setRoles(new HashSet<>());
-            entityManager.remove(member);
-        }
+        member.setRoles(new HashSet<>());
+        entityManager.remove(member);
     }
 
     public UserGroupMember retrieveMemberById (String userId, int groupId)
@@ -138,14 +130,9 @@ public class UserGroupMemberDao {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<UserGroupMember> retrieveMemberByGroupId (int groupId)
             throws KustvaktException {
-        return retrieveMemberByGroupId(groupId, false);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<UserGroupMember> retrieveMemberByGroupId (int groupId,
-            boolean isAdmin) throws KustvaktException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroupMember> query = criteriaBuilder
                 .createQuery(UserGroupMember.class);
@@ -154,12 +141,6 @@ public class UserGroupMemberDao {
 
         Predicate predicate = criteriaBuilder.and(criteriaBuilder
                 .equal(root.get(UserGroupMember_.group), groupId));
-
-        if (!isAdmin) {
-            predicate = criteriaBuilder.and(predicate,
-                    criteriaBuilder.notEqual(root.get(UserGroupMember_.status),
-                            GroupMemberStatus.DELETED));
-        }
 
         query.select(root);
         query.where(predicate);

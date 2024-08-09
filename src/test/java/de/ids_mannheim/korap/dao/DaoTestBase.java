@@ -39,9 +39,6 @@ public class DaoTestBase {
                 GroupMemberStatus.ACTIVE);
         userGroupService.addGroupMember("marlin", group, "dory",
                 GroupMemberStatus.PENDING);
-        userGroupService.addGroupMember("pearl", group, "dory",
-                GroupMemberStatus.DELETED);
-
         return group;
     }
     
