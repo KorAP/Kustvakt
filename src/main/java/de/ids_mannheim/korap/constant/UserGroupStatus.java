@@ -9,7 +9,7 @@ import de.ids_mannheim.korap.entity.UserGroup;
  *
  */
 public enum UserGroupStatus {
-    ACTIVE, DELETED,
+    ACTIVE, 
     // group members cannot see the group
     HIDDEN;
 }

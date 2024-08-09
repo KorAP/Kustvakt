@@ -264,17 +264,9 @@ public class UserGroupService {
     public void deleteGroup (String groupName, String username)
             throws KustvaktException {
         UserGroup userGroup = retrieveUserGroupByName(groupName);
-        if (userGroup.getStatus() == UserGroupStatus.DELETED) {
-            // EM: should this be "not found" instead?
-            throw new KustvaktException(StatusCodes.GROUP_DELETED,
-                    "Group " + userGroup.getName() + " has been deleted.",
-                    userGroup.getName());
-        }
-        else if (userGroup.getCreatedBy().equals(username)
+        if (userGroup.getCreatedBy().equals(username)
                 || adminDao.isAdmin(username)) {
-            // soft delete
-            userGroupDao.deleteGroup(userGroup.getId(), username,
-                    config.isSoftDeleteGroup());
+            userGroupDao.deleteGroup(userGroup.getId(), username);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -393,12 +385,6 @@ public class UserGroupService {
         ParameterChecker.checkStringValue(groupMembers, "members");
 
         UserGroup userGroup = retrieveUserGroupByName(groupName);
-        if (userGroup.getStatus() == UserGroupStatus.DELETED) {
-            throw new KustvaktException(StatusCodes.GROUP_DELETED,
-                    "Group " + userGroup.getName() + " has been deleted.",
-                    userGroup.getName());
-        }
-
         if (isUserGroupAdmin(inviter, userGroup) || adminDao.isAdmin(inviter)) {
             for (String memberName : members) {
                 inviteGroupMember(memberName, userGroup, inviter,
@@ -456,12 +442,6 @@ public class UserGroupService {
         ParameterChecker.checkStringValue(groupName, "groupName");
 
         UserGroup userGroup = retrieveUserGroupByName(groupName);
-        if (userGroup.getStatus() == UserGroupStatus.DELETED) {
-            throw new KustvaktException(StatusCodes.GROUP_DELETED,
-                    "Group " + userGroup.getName() + " has been deleted.",
-                    userGroup.getName());
-        }
-
         UserGroupMember member = groupMemberDao.retrieveMemberById(username,
                 userGroup.getId());
         GroupMemberStatus status = member.getStatus();
@@ -518,12 +498,7 @@ public class UserGroupService {
             String deletedBy) throws KustvaktException {
 
         UserGroup userGroup = retrieveUserGroupByName(groupName);
-        if (userGroup.getStatus() == UserGroupStatus.DELETED) {
-            throw new KustvaktException(StatusCodes.GROUP_DELETED,
-                    "Group " + userGroup.getName() + " has been deleted.",
-                    userGroup.getName());
-        }
-        else if (memberId.equals(userGroup.getCreatedBy())) {
+        if (memberId.equals(userGroup.getCreatedBy())) {
             throw new KustvaktException(StatusCodes.NOT_ALLOWED,
                     "Operation " + "'delete group owner'" + "is not allowed.",
                     "delete group owner");
@@ -589,11 +564,6 @@ public class UserGroupService {
         ParameterChecker.checkStringValue(memberUsername, "memberUsername");
 
         UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName, true);
-        UserGroupStatus groupStatus = userGroup.getStatus();
-        if (groupStatus == UserGroupStatus.DELETED) {
-            throw new KustvaktException(StatusCodes.GROUP_DELETED,
-                    "Usergroup has been deleted.");
-        }
 
         if (isUserGroupAdmin(username, userGroup)
                 || adminDao.isAdmin(username)) {

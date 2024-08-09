@@ -47,7 +47,7 @@ public class DaoTestBase {
     
     protected void deleteUserGroup (int groupId, String username)
             throws KustvaktException {
-        userGroupDao.deleteGroup(groupId, username, false);
+        userGroupDao.deleteGroup(groupId, username);
         KustvaktException exception = assertThrows(KustvaktException.class,
                 () -> {
                     userGroupDao.retrieveGroupById(groupId);

@@ -172,7 +172,7 @@ public class QueryService {
             if (query.getType().equals(ResourceType.PUBLISHED)) {
                 UserGroup group = userGroupDao
                         .retrieveHiddenGroupByQueryName(queryName);
-                userGroupDao.deleteGroup(group.getId(), deletedBy, false);
+                userGroupDao.deleteGroup(group.getId(), deletedBy);
             }
             if (type.equals(QueryType.VIRTUAL_CORPUS)
                     && VirtualCorpusCache.contains(queryName)) {
@@ -234,7 +234,7 @@ public class QueryService {
                     UserGroup group = userGroupDao
                             .retrieveHiddenGroupByQueryName(queryName);
                     int groupId = group.getId();
-                    userGroupDao.deleteGroup(groupId, username, false);
+                    userGroupDao.deleteGroup(groupId, username);
                     // EM: should the users within the hidden group
                     // receive
                     // notifications?

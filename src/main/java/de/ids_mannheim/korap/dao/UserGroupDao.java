@@ -100,8 +100,7 @@ public class UserGroupDao {
         return roles;
     }
 
-    public void deleteGroup (int groupId, String deletedBy,
-            boolean isSoftDelete) throws KustvaktException {
+    public void deleteGroup (int groupId, String deletedBy) throws KustvaktException {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
         ParameterChecker.checkStringValue(deletedBy, "deletedBy");
 
@@ -115,17 +114,11 @@ public class UserGroupDao {
                     "groupId: " + groupId);
         }
 
-        if (isSoftDelete) {
-            group.setStatus(UserGroupStatus.DELETED);
-            group.setDeletedBy(deletedBy);
-            entityManager.merge(group);
+        // EM: this seems weird
+        if (!entityManager.contains(group)) {
+            group = entityManager.merge(group);
         }
-        else {
-            if (!entityManager.contains(group)) {
-                group = entityManager.merge(group);
-            }
-            entityManager.remove(group);
-        }
+        entityManager.remove(group);
     }
 
     public void updateGroup (UserGroup group) throws KustvaktException {

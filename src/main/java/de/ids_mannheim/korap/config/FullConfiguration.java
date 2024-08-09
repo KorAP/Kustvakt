@@ -48,7 +48,6 @@ public class FullConfiguration extends KustvaktConfiguration {
     private String authenticationScheme;
 
     private boolean isSoftDeleteAutoGroup;
-    private boolean isSoftDeleteGroup;
     private boolean isSoftDeleteGroupMember;
 
     private EncryptionIface.Encryption secureHashAlgorithm;
@@ -170,8 +169,8 @@ public class FullConfiguration extends KustvaktConfiguration {
     }
 
     private void setDeleteConfiguration (Properties properties) {
-        setSoftDeleteGroup(
-                parseDeleteConfig(properties.getProperty("delete.group", "")));
+//        setSoftDeleteGroup(
+//                parseDeleteConfig(properties.getProperty("delete.group", "")));
         setSoftDeleteAutoGroup(parseDeleteConfig(
                 properties.getProperty("delete.auto.group", "")));
         setSoftDeleteGroupMember(parseDeleteConfig(
@@ -309,14 +308,6 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setAllOnlyRegex (String allOnlyRegex) {
         this.allOnlyRegex = allOnlyRegex;
-    }
-
-    public boolean isSoftDeleteGroup () {
-        return isSoftDeleteGroup;
-    }
-
-    public void setSoftDeleteGroup (boolean isSoftDeleteGroup) {
-        this.isSoftDeleteGroup = isSoftDeleteGroup;
     }
 
     public boolean isSoftDeleteGroupMember () {
