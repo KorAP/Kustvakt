@@ -1,5 +1,5 @@
 # Use alpine linux as base image
-FROM openjdk:19-alpine AS builder
+FROM eclipse-temurin:22-jdk-alpine AS builder
 
 # Copy repository respecting .dockerignore
 COPY . /kustvakt
@@ -94,7 +94,7 @@ USER kustvakt
 
 CMD ["sh"]
 
-FROM openjdk:19-alpine AS kustvakt-lite
+FROM eclipse-temurin:22-jdk-alpine AS kustvakt-lite
 
 RUN addgroup -S korap && \
     adduser -S kustvakt -G korap && \
@@ -115,7 +115,7 @@ ENTRYPOINT [ "java", "-jar" ]
 
 CMD [ "Kustvakt-lite.jar" ]
 
-FROM openjdk:19-alpine AS kustvakt-full
+FROM eclipse-temurin:22-jdk-alpine AS kustvakt-full
 
 RUN addgroup -S korap && \
     adduser -S kustvakt -G korap && \

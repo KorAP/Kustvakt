@@ -1,4 +1,8 @@
-# version 0.74-SNAPSHOT
+# version 0.74.1-SNAPSHOT
+
+- Switch Docker image to temurin (diewald).
+
+# version 0.74
 
 - Remove corpusQuery param in the statistics web-service (close #758).
 - Moved NamedVCLoader to the init package.
