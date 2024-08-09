@@ -1,3 +1,14 @@
+# version 0.75-SNAPSHOT
+
+- Alter role and remove privilege database tables (#763)
+- Update user-group and user-group member web-services (#763)
+- Remove edit member role web-service (#763)
+- Remove query access table (#763)
+- Remove query access admin, merged with user-group admin (#763)
+- Update share-query and query-access web-services (#763)
+- Add new web-service: delete role by query and group (#763)
+- Remove soft delete group and group status deleted (#765)
+
 # version 0.74
 
 - Remove corpusQuery param in the statistics web-service (close #758).
