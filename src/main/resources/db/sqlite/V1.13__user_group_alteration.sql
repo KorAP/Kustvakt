@@ -6,19 +6,19 @@ DROP INDEX IF EXISTS role_index;
 -- please commented out the triggers in V1.2__triggers.sql later
 --DROP TRIGGER IF EXISTS insert_member_status;
 --DROP TRIGGER IF EXISTS update_member_status;
---DROP TRIGGER IF EXISTS delete_member;
+DROP TRIGGER IF EXISTS delete_member;
 
---ALTER TABLE user_group
---DROP COLUMN deleted_by;
---
+ALTER TABLE user_group
+DROP COLUMN deleted_by;
+
 ALTER TABLE user_group
 ADD COLUMN created_date TIMESTAMP;
 --
 --ALTER TABLE user_group_member
 --DROP COLUMN created_by;
 --
---ALTER TABLE user_group_member
---DROP COLUMN deleted_by;
+ALTER TABLE user_group_member
+DROP COLUMN deleted_by;
 --
 --ALTER TABLE user_group_member
 --DROP COLUMN status;

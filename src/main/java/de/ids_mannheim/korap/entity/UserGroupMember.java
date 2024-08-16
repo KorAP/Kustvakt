@@ -47,8 +47,6 @@ public class UserGroupMember {
     private String userId;
     @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "deleted_by")
-    private String deletedBy;
 
     // auto update in the database
     @Column(name = "status_date")
@@ -74,7 +72,7 @@ public class UserGroupMember {
     @Override
     public String toString () {
         return "id=" + id + ", group= " + group + ", userId= " + userId
-                + ", createdBy= " + createdBy + ", deletedBy= " + deletedBy
+                + ", createdBy= " + createdBy 
                 + ", roles=" + roles;
     }
 }

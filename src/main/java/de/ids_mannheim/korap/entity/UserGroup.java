@@ -45,8 +45,6 @@ public class UserGroup implements Comparable<UserGroup> {
     private String description;
     @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "deleted_by")
-    private String deletedBy;
     @Column(name = "created_date")
     private ZonedDateTime createdDate;
 
