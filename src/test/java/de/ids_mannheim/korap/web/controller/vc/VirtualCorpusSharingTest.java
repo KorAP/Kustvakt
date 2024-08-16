@@ -57,9 +57,8 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
     @Test
     public void testShareVC_ByGroupAdmin () throws KustvaktException {
         createMarlinGroup();
-        inviteMember(marlinGroupName, "marlin", "nemo");
-        subscribe(marlinGroupName, "nemo");
-
+        addMember(marlinGroupName, "nemo", "marlin");
+        
         JsonNode node = listRolesByGroup("marlin", marlinGroupName);
         assertEquals(0, node.size());
 
@@ -101,9 +100,8 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         assertEquals(5, roleNodes.size());
 
         String memberName = "darla";
-        testInviteMember(groupName, testUser, memberName);
-        subscribe(groupName, memberName);
-
+        testAddMember(groupName, testUser, memberName);
+        
         roleNodes = listRolesByGroup(testUser, groupName, false);
         assertEquals(6, roleNodes.size());
 
@@ -150,8 +148,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         response = createUserGroup(groupName, "Owid users", testUser);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        testInviteMember(groupName, testUser, memberName);
-        subscribe(groupName, memberName);
+        testAddMember(groupName, testUser, memberName);
         checkMemberInGroup(memberName, testUser, groupName);
 
         // share vc to group
@@ -193,8 +190,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         String memberName = "darla";
-        testInviteMember(groupName, testUser, memberName);
-        subscribe(groupName, memberName);
+        testAddMember(groupName, testUser, memberName);
 
         shareVC(testUser, vc1, groupName, testUser);
         shareVC(testUser, vc2, groupName, testUser);

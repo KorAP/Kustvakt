@@ -11,7 +11,6 @@ import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
-import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
@@ -25,7 +24,7 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
     protected String admin = "admin";
 
     protected Response createUserGroup (String groupName, String description,
-            String username) throws ProcessingException, KustvaktException {
+            String username) throws KustvaktException {
         Form form = new Form();
         form.param("description", description);
         Response response = target().path(API_VERSION).path("group")
@@ -59,53 +58,46 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
         return node;
     }
 
-    protected Response inviteMember (String groupName, String invitor,
-            String invitee) throws KustvaktException {
+    
+    protected Response addMember (String groupName, String memberUsername,
+            String username) throws KustvaktException {
         Form form = new Form();
-        form.param("members", invitee);
+        form.param("members", memberUsername);
         Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("invite").request()
+                .path("@" + groupName).path("member").request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(invitor, "pass"))
-                .post(Entity.form(form));
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .put(Entity.form(form));
 //        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         return response;
     }
     
-    protected void testInviteMember (String groupName, String invitor,
-            String invitee)
-            throws ProcessingException, KustvaktException {
-        Response response = inviteMember(groupName, invitor, invitee);
+//    protected Response inviteMember (String groupName, String invitor,
+//            String invitee) throws KustvaktException {
+//        Form form = new Form();
+//        form.param("members", invitee);
+//        Response response = target().path(API_VERSION).path("group")
+//                .path("@" + groupName).path("invite").request()
+//                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+//                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+//                        .createBasicAuthorizationHeaderValue(invitor, "pass"))
+//                .post(Entity.form(form));
+////        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        return response;
+//    }
+    
+    protected void testAddMember (String groupName, String username,
+            String memberUsername)
+            throws KustvaktException {
+        Response response = addMember(groupName, memberUsername, username);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // list group
-        JsonNode node = listUserGroups(invitor);
+        JsonNode node = listUserGroups(username);
         node = node.get(0);
         assertEquals(2, node.get("members").size());
-        assertEquals(node.at("/members/1/userId").asText(), invitee);
-        assertEquals(0, node.at("/members/1/privileges").size());
-    }
-
-    protected Response subscribe (String groupName, String username)
-            throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@"+groupName).path("subscribe").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .post(Entity.form(new Form()));
-//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        return response;
-    }
-    
-    protected Response unsubscribe (String groupName, String username)
-            throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("unsubscribe").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete();
-        return response;
-//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(node.at("/members/1/userId").asText(), memberUsername);
+        assertEquals(1, node.at("/members/1/privileges").size());
     }
 
     protected Response addAdminRole (String groupName, String memberName,
@@ -134,8 +126,7 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
         return response;
     }
     
-    protected JsonNode createDoryGroup ()
-            throws ProcessingException, KustvaktException {
+    protected JsonNode createDoryGroup () throws KustvaktException {
         Response response = createUserGroup(doryGroupName,
                 "This is dory-group.", "dory");
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());

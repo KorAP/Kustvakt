@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
@@ -306,11 +305,12 @@ public class UserGroupService {
      *            the status of the membership
      * @throws KustvaktException
      */
+    @Deprecated
     public void inviteGroupMember (String username, UserGroup userGroup,
             String createdBy)
             throws KustvaktException {
 
-        addGroupMember(username, userGroup, createdBy);
+        addGroupMember(username, userGroup, createdBy,null);
 
         if (config.isMailEnabled()
                 && userGroup.getStatus() != UserGroupStatus.HIDDEN) {
@@ -320,41 +320,45 @@ public class UserGroupService {
     }
 
     public void addGroupMember (String username, UserGroup userGroup,
-            String createdBy)
-            throws KustvaktException {
-        addGroupMember(username, userGroup, createdBy, null);
-    }
-    
-    public void addGroupMember (String username, UserGroup userGroup,
             String createdBy, Set<Role> roles)
             throws KustvaktException {
-        int groupId = userGroup.getId();
-        ParameterChecker.checkIntegerValue(groupId, "userGroupId");
-
-        UserGroupMember member = new UserGroupMember();
-        member.setGroup(userGroup);
-        member.setUserId(username);
-        if (roles !=null) {
-            member.setRoles(roles);
+        
+        if (!isMember(username, userGroup)) {
+            int groupId = userGroup.getId();
+            ParameterChecker.checkIntegerValue(groupId, "userGroupId");
+    
+            UserGroupMember member = new UserGroupMember();
+            member.setGroup(userGroup);
+            member.setUserId(username);
+            if (roles !=null) {
+                member.setRoles(roles);
+            }
+            groupMemberDao.addMember(member);
         }
-        groupMemberDao.addMember(member);
+        else {
+            throw new KustvaktException(StatusCodes.GROUP_MEMBER_EXISTS,
+                    "Username: "+username+" exists in the user-group: "+
+                    userGroup.getName(), username, userGroup.getName());
+        }
     }
 
-    public void inviteGroupMembers (String groupName, String groupMembers,
-            String inviter) throws KustvaktException {
+    public void addGroupMembers (String groupName, String groupMembers,
+            String username) throws KustvaktException {
         String[] members = groupMembers.split(",");
         ParameterChecker.checkStringValue(groupName, "group name");
         ParameterChecker.checkStringValue(groupMembers, "members");
 
         UserGroup userGroup = retrieveUserGroupByName(groupName);
-        if (isUserGroupAdmin(inviter, userGroup) || adminDao.isAdmin(inviter)) {
+        if (isUserGroupAdmin(username, userGroup)
+                || adminDao.isAdmin(username)) {
+            Set<Role> memberRoles = prepareMemberRoles(userGroup);
             for (String memberName : members) {
-                inviteGroupMember(memberName, userGroup, inviter);
+                addGroupMember(memberName, userGroup, username,memberRoles);
             }
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + inviter, inviter);
+                    "Unauthorized operation for user: " + username, username);
         }
     }
 
@@ -396,6 +400,7 @@ public class UserGroupService {
      *            the username of the group member
      * @throws KustvaktException
      */
+    @Deprecated
     public void acceptInvitation (String groupName, String username)
             throws KustvaktException {
 
@@ -418,9 +423,9 @@ public class UserGroupService {
 //
 //            if (expiration.isAfter(now)) {
 //                member.setStatus(GroupMemberStatus.ACTIVE);
-//                Set<Role> memberRoles = prepareMemberRoles(userGroup);
-//                member.setRoles(memberRoles);
-//                groupMemberDao.updateMember(member);
+                Set<Role> memberRoles = prepareMemberRoles(userGroup);
+                member.setRoles(memberRoles);
+                groupMemberDao.updateMember(member);
 //            }
 //            else {
 //                throw new KustvaktException(StatusCodes.INVITATION_EXPIRED);

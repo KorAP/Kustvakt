@@ -12,7 +12,6 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.Response;
@@ -27,7 +26,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
     @Test
     public void testCreateGroupEmptyDescription ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         String groupName = "empty_group";
         Response response = createUserGroup(groupName, "", username);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
@@ -36,7 +35,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
     @Test
     public void testCreateGroupMissingDescription ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         String groupName = "missing-desc-group";
         Response response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
@@ -44,7 +43,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
     }
 
     private Response testCreateGroupWithoutDescription (String groupName)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -56,7 +55,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
     @Test
     public void testCreateGroupInvalidName ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         String groupName = "invalid-group-name$";
         Response response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -70,7 +69,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
     @Test
     public void testCreateGroupNameTooShort ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         String groupName = "a";
         Response response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -83,7 +82,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
     }
 
     @Test
-    public void testUserGroup () throws ProcessingException, KustvaktException {
+    public void testUserGroup () throws KustvaktException {
         String groupName = "new-user-group";
         String description = "This is new-user-group.";
         Response response = createUserGroup(groupName, description, username);
@@ -103,19 +102,14 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         assertEquals(5,  node.at("/members/0/privileges").size());
 
         testUpdateUserGroup(groupName);
-        testInviteMember(groupName, username, "darla");
-        
-        testDeleteMemberUnauthorizedByNonMember(groupName,"darla");
-        testDeleteMemberUnauthorizedByMember(groupName, "darla");
-
-        testDeleteMember(groupName, username);
+        testAddMember(groupName, username, "darla");
         testDeleteGroup(groupName,username);
 //        testSubscribeToDeletedGroup(groupName);
 //        testUnsubscribeToDeletedGroup(groupName);
     }
     
     private void testUpdateUserGroup (String groupName)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         String description = "Description is updated.";
         Response response = createUserGroup(groupName, description, username);
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -124,82 +118,9 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         assertEquals(description, node.get(0).get("description").asText());
     }
 
-    private void testDeleteMember (String groupName, String username)
-            throws ProcessingException, KustvaktException {
-        // delete darla from group
-        deleteMember(groupName, "darla", username);
-        // check group member
-        JsonNode node = listUserGroups(username);
-        node = node.get(0);
-        assertEquals(1, node.get("members").size());
-    }
-
-    private void testDeleteMemberUnauthorizedByNonMember (String groupName,
-            String memberName) throws ProcessingException, KustvaktException {
-
-        Response response = deleteMember(groupName, memberName, "nemo");
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: nemo");
-    }
-    
-    private void testDeleteMemberUnauthorizedByMember (String groupName,
-            String memberName) throws ProcessingException, KustvaktException {
-        inviteMember(groupName, "dory", "nemo");
-        subscribe(groupName, "nemo");
-        // nemo is a group member
-        Response response = deleteMember(groupName, memberName, "nemo");
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: nemo");
-    }
-
-    @Test
-    public void testDeletePendingMember ()
-            throws ProcessingException, KustvaktException {
-        createDoryGroup();
-        inviteMember(doryGroupName, "dory", "pearl");
-        // dory delete pearl
-        Response response = deleteMember(doryGroupName, "pearl", "dory");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        // check member
-        JsonNode node = listUserGroups("pearl");
-        assertEquals(0, node.size());
-        
-        deleteGroupByName(doryGroupName, "dory");
-    }
-
-    @Test
-    public void testDeleteDeletedMember ()
-            throws ProcessingException, KustvaktException {
-        createDoryGroup();
-        inviteMember(doryGroupName, "dory", "pearl");
-        subscribe(doryGroupName, "pearl");
-        deleteMember(doryGroupName, "pearl", "pearl");
-        
-        Response response = deleteMember(doryGroupName, "pearl", "pearl");
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
-                node.at("/errors/0/0").asInt());
-        assertEquals("pearl is not found in the group",
-                node.at("/errors/0/1").asText());
-        assertEquals("pearl",node.at("/errors/0/2").asText());
-        
-        deleteGroupByName(doryGroupName, "dory");
-    }
-
+   
     private void testDeleteGroup (String groupName, String username)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         deleteGroupByName(groupName, username);
         JsonNode node = listUserGroups(username);
         assertEquals(0, node.size());
@@ -207,10 +128,9 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
     @Test
     public void testDeleteGroupUnauthorized ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         createMarlinGroup();
-        inviteMember(marlinGroupName, "marlin", "dory");
-        subscribe(marlinGroupName, "dory");
+        addMember(marlinGroupName, "dory", "marlin");
         
         addAdminRole(marlinGroupName, "dory", "marlin");
         
@@ -234,7 +154,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
     @Test
     public void testDeleteDeletedGroup ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         createMarlinGroup();
         deleteGroupByName(marlinGroupName, "marlin");
         Response response = deleteGroupByName(marlinGroupName, "marlin");
@@ -243,7 +163,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
 
     @Test
     public void testDeleteGroupOwner ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         createMarlinGroup();
         // delete marlin from marlin-group
         // dory is a group admin in marlin-group

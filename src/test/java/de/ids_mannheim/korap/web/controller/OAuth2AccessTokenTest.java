@@ -50,8 +50,7 @@ public class OAuth2AccessTokenTest extends UserGroupTestBase {
         
         createDoryGroup();
         createMarlinGroup();
-        inviteMember(marlinGroupName, "marlin", "dory");
-        subscribe(marlinGroupName, "dory");
+        addMember(marlinGroupName, "dory", "marlin");
         
         // test list user group
         response = target().path(API_VERSION).path("group").request()

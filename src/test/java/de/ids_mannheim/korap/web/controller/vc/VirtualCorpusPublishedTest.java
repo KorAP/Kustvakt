@@ -41,7 +41,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     }
     
     private void testRetrievePublishedVC (String username, String vcCreator,
-            String vcName) throws ProcessingException, KustvaktException {
+            String vcName) throws KustvaktException {
         retrieveVCInfo(username, vcCreator, vcName);
         
         JsonNode node = getHiddenGroup(vcName);
@@ -127,8 +127,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     
     private String testSharePublishedVC (String vcName) throws KustvaktException {
         createMarlinGroup();
-        inviteMember(marlinGroupName, "marlin", "dory");
-        subscribe(marlinGroupName, "dory");
+        addMember(marlinGroupName, "dory", "marlin");
 
         JsonNode node = listVC("dory");
         assertEquals(3, node.size());
@@ -163,8 +162,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         JsonNode node = listVC("nemo");
         assertEquals(2, node.size());
 
-        inviteMember(marlinGroupName, "marlin", "nemo");
-        subscribe(marlinGroupName, "nemo");
+        addMember(marlinGroupName, "nemo", "marlin");
 
         node = listVC("nemo");
         assertEquals(3, node.size());

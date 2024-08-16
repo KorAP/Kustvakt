@@ -12,7 +12,6 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -24,7 +23,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveSystemVC ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         JsonNode node = retrieveVCInfo(testUser, "system", "system-vc");
         assertEquals(node.at("/name").asText(), "system-vc");
         assertEquals(ResourceType.SYSTEM.displayName(),
@@ -36,7 +35,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveSystemVC_guest ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~system").path("system-vc").request().get();
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
@@ -47,7 +46,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrievePrivateVC ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         JsonNode node = retrieveVCInfo("dory", "dory", "dory-vc");
         assertEquals(node.at("/name").asText(), "dory-vc");
         assertEquals(ResourceType.PRIVATE.displayName(),
@@ -56,7 +55,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrievePrivateVC_unauthorized ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -67,10 +66,9 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveProjectVC_member ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         createDoryGroup();
-        inviteMember(doryGroupName, "dory", "nemo");
-        subscribe(doryGroupName, "nemo");
+        addMember(doryGroupName, "nemo", "dory");
         
         createAccess("dory", "group-vc", doryGroupName, "dory");
         
@@ -79,8 +77,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
         
-        inviteMember(doryGroupName, "dory", "pearl");
-        subscribe(doryGroupName, "pearl");
+        addMember(doryGroupName, "pearl", "dory");
         
         node = retrieveVCInfo("pearl", "dory", "group-vc");
         assertEquals(node.at("/name").asText(), "group-vc");
@@ -92,7 +89,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveProjectVC_unauthorized ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -103,7 +100,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveProjectVC_nonActiveMember ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -114,7 +111,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrievePrivateVC_admin ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -129,7 +126,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveProjectVC_admin ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler

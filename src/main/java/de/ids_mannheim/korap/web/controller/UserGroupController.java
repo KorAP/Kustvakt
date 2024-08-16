@@ -201,10 +201,10 @@ public class UserGroupController {
      *            usernames separated by comma
      * @return if successful, HTTP response status OK
      */
-    @POST
-    @Path("@{groupName}/invite")
+    @PUT
+    @Path("@{groupName}/member")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response inviteGroupMembers (
+    public Response addGroupMembers (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("members") String members) {
@@ -213,8 +213,7 @@ public class UserGroupController {
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
-            service.inviteGroupMembers(groupName, members,
-                    context.getUsername());
+            service.addGroupMembers(groupName, members, context.getUsername());
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
@@ -295,6 +294,7 @@ public class UserGroupController {
      *            a group name
      * @return if successful, HTTP response status OK
      */
+    @Deprecated
     @POST
     @Path("@{groupName}/subscribe")
     public Response subscribeToGroup (@Context SecurityContext securityContext,
@@ -323,6 +323,7 @@ public class UserGroupController {
      * @param groupName
      * @return if successful, HTTP response status OK
      */
+    @Deprecated
     @DELETE
     @Path("@{groupName}/unsubscribe")
     public Response unsubscribeFromGroup (

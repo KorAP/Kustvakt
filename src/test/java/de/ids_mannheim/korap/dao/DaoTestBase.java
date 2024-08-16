@@ -34,8 +34,8 @@ public class DaoTestBase {
     
     protected UserGroup createDoryGroup () throws KustvaktException {
         UserGroup group = createUserGroup("dory-group", "dory");
-        userGroupService.addGroupMember("nemo", group, "dory");
-        userGroupService.addGroupMember("marlin", group, "dory");
+        userGroupService.addGroupMember("nemo", group, "dory",null);
+        userGroupService.addGroupMember("marlin", group, "dory",null);
         return group;
     }
     

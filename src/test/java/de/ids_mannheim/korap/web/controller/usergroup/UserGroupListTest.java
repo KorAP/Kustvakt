@@ -19,8 +19,8 @@ public class UserGroupListTest extends UserGroupTestBase{
     @Test
     public void testListDoryGroups () throws KustvaktException {
         createDoryGroup();
-        inviteMember(doryGroupName, "dory", "marlin");
-        inviteMember(doryGroupName, "dory", "nemo");
+        addMember(doryGroupName, "marlin", "dory");
+        addMember(doryGroupName, "nemo", "dory");
         
         JsonNode node = listUserGroups("dory");
         JsonNode group = node.get(0);
@@ -36,8 +36,6 @@ public class UserGroupListTest extends UserGroupTestBase{
     }
     
     public void testListNemoGroups () throws KustvaktException {
-        Response response = subscribe(doryGroupName, "nemo");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = listUserGroups("nemo");
         assertEquals(node.at("/0/name").asText(), "dory-group");
         assertEquals(node.at("/0/owner").asText(), "dory");
@@ -49,8 +47,6 @@ public class UserGroupListTest extends UserGroupTestBase{
     // marlin has 2 groups
     public void testListMarlinGroups () throws KustvaktException {
         createMarlinGroup();
-        Response response = subscribe(doryGroupName, "marlin");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = listUserGroups("marlin");
         assertEquals(2, node.size());
     }

@@ -14,7 +14,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
@@ -29,7 +28,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
     private String testUser = "group-admin";
 
     private JsonNode listGroup (String username)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("group").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
@@ -45,13 +44,11 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         createDoryGroup();
         
         createMarlinGroup();
-        inviteMember(marlinGroupName, "marlin", "dory");
-        subscribe(marlinGroupName, "dory");
+        addMember(marlinGroupName, "dory", "marlin");
         
         String testGroup = "test-group"; 
         createUserGroup("test-group", "Test group to be deleted.", "marlin");
-        inviteMember(testGroup, "marlin", "dory");
-        subscribe(testGroup, "dory");
+        addMember(testGroup, "dory", "marlin");
         deleteGroupByName("test-group", "marlin");
 
         
@@ -138,7 +135,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
     // same as list user-groups of the admin
     @Test
     public void testListWithoutUsername ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("group").request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
@@ -152,7 +149,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
 
     @Test
     public void testListByStatusAll ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("admin")
                 .path("group").path("list").request()
                 .header(Attributes.AUTHORIZATION,
@@ -176,14 +173,14 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
 
     @Test
     public void testListHiddenGroups ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         JsonNode node = listHiddenGroup();
         assertEquals(1, node.size());
     }
 
     @Test
     public void testUserGroupAdmin ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         String groupName = "admin-test-group";
         Response response = createUserGroup(groupName, "test group", testUser);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
@@ -192,8 +189,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         assertEquals(1, node.size());
         node = node.get(0);
         assertEquals(groupName, node.get("name").asText());
-        testInviteMember(groupName);
-        subscribe(groupName, "marlin");
+        testAddMember(groupName);
         testAddAdminRole(groupName, "marlin");
         testDeleteMemberRoles(groupName, "marlin");
         testDeleteMember(groupName);
@@ -207,7 +203,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
 
 
     private void testAddAdminRole (String groupName, String memberUsername)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = addAdminRole(groupName, memberUsername, admin);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         
@@ -223,7 +219,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
     }
 
     private void testDeleteMemberRoles (String groupName, String memberUsername)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Form form = new Form();
         form.param("memberUsername", memberUsername);
         // USER_GROUP_ADMIN
@@ -248,7 +244,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
     }
 
     private JsonNode retrieveGroup (String groupName)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("admin")
                 .path("group").path("@" + groupName).request()
                 .header(Attributes.AUTHORIZATION,
@@ -263,7 +259,7 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
     }
 
     private void testDeleteMember (String groupName)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         // delete marlin from group
         Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("~marlin").request()
@@ -280,24 +276,23 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         assertEquals(node.at("/members/1/userId").asText(), "nemo");
     }
 
-    private void testInviteMember (String groupName)
-            throws ProcessingException, KustvaktException {
+    private void testAddMember (String groupName)
+            throws KustvaktException {
         Form form = new Form();
         form.param("members", "marlin,nemo,darla");
         Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName).path("invite").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .path("@" + groupName).path("member").request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
                                         admin, "pass"))
-                .post(Entity.form(form));
+                .put(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         // list group
         JsonNode node = listGroup(testUser);
         node = node.get(0);
         assertEquals(4, node.get("members").size());
         assertEquals(node.at("/members/3/userId").asText(), "darla");
-        assertEquals(0, node.at("/members/1/privileges").size());
+        assertEquals(1, node.at("/members/1/privileges").size());
     }
 }

@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -19,7 +19,6 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.Response;
@@ -31,71 +30,261 @@ public class UserGroupMemberTest extends UserGroupTestBase {
     private UserGroupMemberDao memberDao;
 
     @Test
-    public void testInvitePendingMember ()
-            throws ProcessingException, KustvaktException {
+    public void testAddMultipleMembers ()
+            throws KustvaktException {
         createDoryGroup();
-        inviteMember(doryGroupName, "dory", "marlin");
+        addMember(doryGroupName, "nemo,marlin,pearl", "dory");
         
-        // marlin has status PENDING in dory-group
-        Response response = inviteMember(doryGroupName, "dory", "marlin");
-        String entity = response.readEntity(String.class);
-        // System.out.println(entity);
-        JsonNode node = JsonUtils.readTree(entity);
+        JsonNode node = listUserGroups("dory");
+        node = node.get(0);
+        assertEquals(4, node.get("members").size());
+        
+        testAddExistingMember();
+        
+        deleteGroupByName(doryGroupName, "dory");
+        
+        testAddMemberToDeletedGroup();
+    }
+    
+    private void testAddExistingMember () throws KustvaktException {
+        Response response = addMember(doryGroupName, "nemo", "dory");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.GROUP_MEMBER_EXISTS,
                 node.at("/errors/0/0").asInt());
         assertEquals(
-                "Username marlin with status PENDING exists in the user-group "
+                "Username: nemo exists in the user-group: "
                         + "dory-group",
                 node.at("/errors/0/1").asText());
         assertEquals(node.at("/errors/0/2").asText(),
-                "[marlin, PENDING, dory-group]");
+                "[nemo, dory-group]");
+    }
+    
+    private void testAddMemberToDeletedGroup () throws KustvaktException {
+        Response response = addMember(doryGroupName, "pearl", "dory");
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Group dory-group is not found",
+                node.at("/errors/0/1").asText());
+    }
+    
+    @Test
+    public void testAddMemberMissingGroupName () throws KustvaktException {
+        Response response = addMember("", "pearl","dory");
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void testAddMemberNonExistentGroup () throws KustvaktException {
+        Response response = addMember("non-existent", "pearl","dory");
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Group non-existent is not found",
+                node.at("/errors/0/1").asText());
+    }
+    
+ // if username is not found in LDAP
+    @Disabled
+    @Test
+    public void testMemberAddNonExistent () throws KustvaktException {
+        createDoryGroup();
+        
+        Response response = addMember(doryGroupName, "bruce", "dory");
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("bruce is not found in the group",
+                node.at("/errors/0/1").asText());
+        
+        testAddDeletedMember();
+        deleteGroupByName(doryGroupName, "dory");
+    }
+    
+    @Test
+    public void testAddDeletedMember () throws KustvaktException {
+        createDoryGroup();
+        addMember(doryGroupName, "pearl", "dory");
+        deleteMember(doryGroupName, "pearl", "dory");
+        
+        Response response = addMember(doryGroupName, "pearl", "dory");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = listUserGroups("pearl");
+        assertEquals(1, node.size());
         
         deleteGroupByName(doryGroupName, "dory");
     }
 
     @Test
-    public void testInviteActiveMember ()
-            throws ProcessingException, KustvaktException {
+    public void testDeleteMemberByGroupOwner ()
+            throws KustvaktException {
         createDoryGroup();
-        inviteMember(doryGroupName, "dory", "nemo");
-        subscribe(doryGroupName, "nemo");
-        // nemo has status active in dory-group
-        Form form = new Form();
-        form.param("members", "nemo");
-        Response response = target().path(API_VERSION).path("group")
-                .path("@dory-group").path("invite").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("dory", "pass"))
-                .post(Entity.form(form));
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        addMember(doryGroupName, "pearl", "dory");
+        addMember(doryGroupName, "marlin", "dory");
+
+        testDeleteMemberUnauthorizedByNonMember(doryGroupName, "pearl", "nemo");
+        testDeleteMemberUnauthorizedByMember(doryGroupName, "pearl", "marlin");
+        deleteMember(doryGroupName, "pearl", "dory");
+
+        // check group member
+        JsonNode node = listUserGroups("dory");
+        node = node.get(0);
+        assertEquals(2, node.get("members").size());
+
+        deleteGroupByName(doryGroupName, "dory");
+    }
+    
+    private void testDeleteMemberUnauthorizedByNonMember (String groupName,
+            String memberName, String deletedBy)
+            throws KustvaktException {
+        Response response = deleteMember(groupName, memberName, deletedBy);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.GROUP_MEMBER_EXISTS,
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(
-                "Username nemo with status ACTIVE exists in the user-group "
-                        + "dory-group",
-                node.at("/errors/0/1").asText());
-        assertEquals(node.at("/errors/0/2").asText(),
-                "[nemo, ACTIVE, dory-group]");
-        
-        deleteGroupByName(doryGroupName, "dory");
-        
-        testInviteMemberToDeletedGroup();
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Unauthorized operation for user: "+deletedBy);
+    }
+    
+    private void testDeleteMemberUnauthorizedByMember (String groupName,
+            String memberName, String deletedBy) 
+                    throws KustvaktException {
+        Response response = deleteMember(groupName, memberName, deletedBy);
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Unauthorized operation for user: "+deletedBy);
     }
 
-    private void testInviteMemberToDeletedGroup () throws KustvaktException {
-        Response response = inviteMember(doryGroupName, "dory", "nemo");
+    @Test
+    public void testDeleteMemberByGroupAdmin ()
+            throws KustvaktException {
+        createDoryGroup();
+        addMember(doryGroupName, "pearl", "dory");
+        addMember(doryGroupName, "nemo", "dory");
+        addAdminRole(doryGroupName, "nemo", "dory");
 
+        // check group member
+        JsonNode node = listUserGroups("dory");
+        node = node.get(0);
+        assertEquals(3, node.get("members").size());
+        
+        Response response = deleteMember(doryGroupName, "pearl", "nemo");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        // check group member
+        node = listUserGroups("dory");
+        node = node.get(0);
+        assertEquals(2, node.get("members").size());
+        
+        deleteGroupByName(doryGroupName, "dory");
+    }
+    
+    @Test
+    public void testDeleteMemberBySelf ()
+            throws KustvaktException {
+        createDoryGroup();
+        addMember(doryGroupName, "pearl", "dory");
+
+        // check group member
+        JsonNode node = listUserGroups("dory");
+        node = node.get(0);
+        assertEquals(2, node.get("members").size());
+        
+        Response response = deleteMember(doryGroupName, "pearl", "pearl");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        // check group member
+        node = listUserGroups("dory");
+        node = node.get(0);
+        assertEquals(1, node.get("members").size());
+        
+        deleteGroupByName(doryGroupName, "dory");
+    }
+    
+    @Test
+    public void testDeleteMemberDeletedGroup ()
+            throws KustvaktException {
+        createDoryGroup();
+        addMember(doryGroupName, "pearl", "dory");
+        deleteGroupByName(doryGroupName, "dory");
+        
+        Response response = deleteMember(doryGroupName, "pearl", "dory");
         assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
-//        String entity = response.readEntity(String.class);
-//        JsonNode node = JsonUtils.readTree(entity);
-//        assertEquals(StatusCodes.GROUP_DELETED, node.at("/errors/0/0").asInt());
-//        assertEquals(node.at("/errors/0/1").asText(),
-//                "Group deleted-group has been deleted.");
-//        assertEquals(node.at("/errors/0/2").asText(), "deleted-group");
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Group "+doryGroupName+" is not found",
+                node.at("/errors/0/1").asText());
+    }
+
+    @Test
+    public void testDeleteMemberAlreadyDeleted ()
+            throws KustvaktException {
+        createDoryGroup();
+        addMember(doryGroupName, "pearl", "dory");
+        deleteMember(doryGroupName, "pearl", "pearl");
+        
+        Response response = deleteMember(doryGroupName, "pearl", "pearl");
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("pearl is not found in the group",
+                node.at("/errors/0/1").asText());
+        assertEquals("pearl",node.at("/errors/0/2").asText());
+        
+        deleteGroupByName(doryGroupName, "dory");
+    }
+    
+    @Test
+    public void testDeleteMemberMissingGroupName () throws KustvaktException {
+        Response response = deleteMember("", "pearl","dory");
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testDeleteMemberNonExistent () throws KustvaktException {
+        createDoryGroup();
+        Response response = deleteMember(doryGroupName, "pearl", "dory");
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("pearl is not found in the group",
+                node.at("/errors/0/1").asText());
+        assertEquals("pearl",node.at("/errors/0/2").asText());
+        
+        deleteGroupByName(doryGroupName, "dory");
+    }
+    
+    @Test
+    public void testDeleteMemberNonExistentGroup () throws KustvaktException {
+        Response response = deleteMember("non-existent", "pearl","dory");
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Group non-existent is not found",
+                node.at("/errors/0/1").asText());
     }
     
 //    @Deprecated
@@ -124,8 +313,8 @@ public class UserGroupMemberTest extends UserGroupTestBase {
     @Test
     public void testAddMemberRole () throws KustvaktException {
         createMarlinGroup();
-        inviteMember(marlinGroupName, "marlin", "dory");
-        subscribe(marlinGroupName, "dory");
+        addMember(marlinGroupName, "dory", "marlin");
+        
         JsonNode marlinGroup = listUserGroups("marlin");
         int groupId = marlinGroup.at("/0/id").asInt();
         
@@ -147,7 +336,7 @@ public class UserGroupMemberTest extends UserGroupTestBase {
     }
 
     private void testAddSameMemberRole (int groupId)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Response response = addAdminRole(marlinGroupName, "dory", "marlin");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         
@@ -162,7 +351,7 @@ public class UserGroupMemberTest extends UserGroupTestBase {
     }
 
     private void testDeleteMemberRole (int groupId)
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         Form form = new Form();
         form.param("memberUsername", "dory");
         form.param("role", PredefinedRole.GROUP_ADMIN.name());
