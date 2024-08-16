@@ -1,12 +1,10 @@
 package de.ids_mannheim.korap.entity;
 
-import java.time.ZonedDateTime;
 import java.util.Set;
 
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,9 +16,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.PredefinedRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,15 +40,6 @@ public class UserGroupMember {
     private int id;
     @Column(name = "user_id")
     private String userId;
-    @Column(name = "created_by")
-    private String createdBy;
-
-    // auto update in the database
-    @Column(name = "status_date")
-    private ZonedDateTime statusDate;
-
-    @Enumerated(EnumType.STRING)
-    private GroupMemberStatus status;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "group_id")
@@ -72,7 +58,6 @@ public class UserGroupMember {
     @Override
     public String toString () {
         return "id=" + id + ", group= " + group + ", userId= " + userId
-                + ", createdBy= " + createdBy 
                 + ", roles=" + roles;
     }
 }

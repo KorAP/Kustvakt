@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.dto.UserGroupMemberDto;
@@ -28,8 +27,7 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
 public class UserGroupConverter {
 
     public UserGroupDto createUserGroupDto (UserGroup group,
-            List<UserGroupMember> members, GroupMemberStatus userMemberStatus,
-            Set<Role> roleSet) {
+            List<UserGroupMember> members, Set<Role> roleSet) {
 
         UserGroupDto dto = new UserGroupDto();
         dto.setId(group.getId());
@@ -37,7 +35,6 @@ public class UserGroupConverter {
         dto.setDescription(group.getDescription());
         dto.setStatus(group.getStatus());
         dto.setOwner(group.getCreatedBy());
-        dto.setUserMemberStatus(userMemberStatus);
 
         if (roleSet != null) {
             dto.setUserPrivileges(createPrivilegeList(roleSet));
@@ -50,7 +47,6 @@ public class UserGroupConverter {
 
                 UserGroupMemberDto memberDto = new UserGroupMemberDto();
                 memberDto.setUserId(member.getUserId());
-                memberDto.setStatus(member.getStatus());
                 memberDto.setPrivileges(createPrivilegeList(member.getRoles()));
                 memberDtos.add(memberDto);
             }

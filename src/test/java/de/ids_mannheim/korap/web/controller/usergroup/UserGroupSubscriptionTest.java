@@ -9,7 +9,6 @@ import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -73,8 +72,6 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         assertEquals(group.at("/owner").asText(), "dory");
         // group members are not allowed to see other members
         assertEquals(0, group.at("/members").size());
-        assertEquals(GroupMemberStatus.ACTIVE.name(),
-                group.at("/userMemberStatus").asText());
         
         assertEquals(1, group.at("/userPrivileges").size());
         
@@ -94,10 +91,6 @@ public class UserGroupSubscriptionTest extends UserGroupTestBase {
         // check member
         JsonNode node = listUserGroups(invitee);
         assertEquals(1, node.size());
-        JsonNode group = node.get(0);
-        assertEquals(GroupMemberStatus.PENDING.name(),
-                group.at("/userMemberStatus").asText());
-//        testDeletePendingMember();
     }
     
     private void checkGroupMemberRole (String groupName,

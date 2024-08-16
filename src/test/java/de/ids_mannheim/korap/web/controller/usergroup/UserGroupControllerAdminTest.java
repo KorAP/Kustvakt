@@ -9,7 +9,6 @@ import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -279,8 +278,6 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         node = node.get(0);
         assertEquals(3, node.get("members").size());
         assertEquals(node.at("/members/1/userId").asText(), "nemo");
-        assertEquals(GroupMemberStatus.PENDING.name(),
-                node.at("/members/1/status").asText());
     }
 
     private void testInviteMember (String groupName)
@@ -301,8 +298,6 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         node = node.get(0);
         assertEquals(4, node.get("members").size());
         assertEquals(node.at("/members/3/userId").asText(), "darla");
-        assertEquals(GroupMemberStatus.PENDING.name(),
-                node.at("/members/1/status").asText());
         assertEquals(0, node.at("/members/1/privileges").size());
     }
 }

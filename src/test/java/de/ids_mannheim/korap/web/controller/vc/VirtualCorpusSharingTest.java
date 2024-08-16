@@ -10,8 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -307,8 +305,6 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         JsonNode node = listUserGroups(testUser).get(0);
         assertEquals(2, node.get("members").size());
         assertEquals(memberName, node.at("/members/1/userId").asText());
-        assertEquals(GroupMemberStatus.ACTIVE.name(),
-                node.at("/members/1/status").asText());
         assertEquals(PrivilegeType.DELETE_MEMBER.name(),
                 node.at("/members/1/privileges/0").asText());
     }

@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
@@ -51,8 +49,6 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         assertEquals(UserGroupStatus.HIDDEN.name(), 
                 node.at("/status").asText());
         assertEquals(username, node.at("/members/0/userId").asText());
-        assertEquals(GroupMemberStatus.ACTIVE.name(), 
-                node.at("/members/0/status").asText());
         assertEquals(1, node.at("/members/0/privileges").size());
         assertEquals(PrivilegeType.READ_QUERY.name(), 
                 node.at("/members/0/privileges/0").asText());

@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.QueryType;
@@ -29,10 +28,10 @@ import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.dao.RoleDao;
 import de.ids_mannheim.korap.dao.UserGroupDao;
 import de.ids_mannheim.korap.dao.UserGroupMemberDao;
-import de.ids_mannheim.korap.dto.RoleDto;
 import de.ids_mannheim.korap.dto.QueryDto;
-import de.ids_mannheim.korap.dto.converter.RoleConverter;
+import de.ids_mannheim.korap.dto.RoleDto;
 import de.ids_mannheim.korap.dto.converter.QueryConverter;
+import de.ids_mannheim.korap.dto.converter.RoleConverter;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
@@ -732,7 +731,7 @@ public class QueryService {
                     memberRoles.add(r1);
                     
                     userGroupService.addGroupMember(username, userGroup,
-                            "system", GroupMemberStatus.ACTIVE, memberRoles);    
+                            "system", memberRoles);    
                     // member roles are not set (not necessary)
                 }
                 catch (NoResultException ne) {
@@ -743,7 +742,7 @@ public class QueryService {
                     memberRoles.add(r1);
                     
                     userGroupService.addGroupMember(username, userGroup,
-                            "system", GroupMemberStatus.ACTIVE, memberRoles);                
+                            "system", memberRoles);                
                 }
                 catch (KustvaktException e) {
                     // member exists

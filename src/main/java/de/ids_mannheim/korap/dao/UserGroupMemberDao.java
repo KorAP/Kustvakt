@@ -3,6 +3,17 @@ package de.ids_mannheim.korap.dao;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.entity.Role;
+import de.ids_mannheim.korap.entity.Role_;
+import de.ids_mannheim.korap.entity.UserGroupMember;
+import de.ids_mannheim.korap.entity.UserGroupMember_;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -12,19 +23,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.PredefinedRole;
-import de.ids_mannheim.korap.entity.Role;
-import de.ids_mannheim.korap.entity.Role_;
-import de.ids_mannheim.korap.entity.UserGroupMember;
-import de.ids_mannheim.korap.entity.UserGroupMember_;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
  * Manages database queries and transactions regarding
@@ -112,8 +110,6 @@ public class UserGroupMemberDao {
         Predicate predicate = criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(UserGroupMember_.group),
                         groupId),
-                criteriaBuilder.equal(root.get(UserGroupMember_.status),
-                        GroupMemberStatus.ACTIVE),
                 criteriaBuilder.equal(memberRole.get(Role_.NAME), role));
 
         query.select(root);

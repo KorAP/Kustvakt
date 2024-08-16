@@ -9,7 +9,6 @@ import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -101,8 +100,6 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         assertEquals(username, node.get("owner").asText());
         assertEquals(1, node.get("members").size());
         assertEquals(username, node.at("/members/0/userId").asText());
-        assertEquals(GroupMemberStatus.ACTIVE.name(),
-                node.at("/members/0/status").asText());
         assertEquals(5,  node.at("/members/0/privileges").size());
 
         testUpdateUserGroup(groupName);

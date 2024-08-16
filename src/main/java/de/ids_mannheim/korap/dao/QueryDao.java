@@ -9,7 +9,6 @@ import java.util.Set;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.QueryDO;
@@ -275,13 +274,11 @@ public class QueryDao {
         
         Predicate type = builder.equal(query.get(QueryDO_.queryType),
                 queryType);
-        Predicate memberStatus = builder.equal(
-                members.get(UserGroupMember_.status), GroupMemberStatus.ACTIVE);
         Predicate user = builder.equal(members.get(UserGroupMember_.userId),
                 userId);
 
         cq.select(query);
-        cq.where(builder.and(type, memberStatus, user));
+        cq.where(builder.and(type, user));
 
         Query q = entityManager.createQuery(cq);
         return q.getResultList();

@@ -8,7 +8,6 @@ import java.util.Set;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
@@ -74,8 +73,6 @@ public class UserGroupDao {
         
             UserGroupMember owner = new UserGroupMember();
             owner.setUserId(createdBy);
-            owner.setCreatedBy(createdBy);
-            owner.setStatus(GroupMemberStatus.ACTIVE);
             owner.setGroup(group);
             owner.setRoles(roles);
             entityManager.persist(owner);

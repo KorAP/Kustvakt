@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -35,10 +34,8 @@ public class DaoTestBase {
     
     protected UserGroup createDoryGroup () throws KustvaktException {
         UserGroup group = createUserGroup("dory-group", "dory");
-        userGroupService.addGroupMember("nemo", group, "dory",
-                GroupMemberStatus.ACTIVE);
-        userGroupService.addGroupMember("marlin", group, "dory",
-                GroupMemberStatus.PENDING);
+        userGroupService.addGroupMember("nemo", group, "dory");
+        userGroupService.addGroupMember("marlin", group, "dory");
         return group;
     }
     

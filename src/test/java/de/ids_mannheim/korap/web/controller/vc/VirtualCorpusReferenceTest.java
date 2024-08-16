@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.entity.QueryDO;
@@ -218,8 +217,6 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
                 node.at("/status").asText());
         node = node.at("/members");
         assertEquals("squirt", node.at("/0/userId").asText());
-        assertEquals(GroupMemberStatus.ACTIVE.name(),
-                node.at("/0/status").asText());
         deleteVC(vcName, "marlin", "marlin");
     }
 }
