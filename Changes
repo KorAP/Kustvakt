@@ -9,6 +9,7 @@
 - Add new web-service: delete role by query and group (#763)
 - Remove soft delete group and group status deleted (#765)
 - Remove soft delete group member and member status deleted (#765)
+- Removed SearchResourceFilters and UserGroupJson
 
 # version 0.74
 
