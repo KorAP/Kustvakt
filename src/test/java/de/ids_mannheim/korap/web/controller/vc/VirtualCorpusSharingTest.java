@@ -301,7 +301,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         JsonNode node = listUserGroups(testUser).get(0);
         assertEquals(2, node.get("members").size());
         assertEquals(memberName, node.at("/members/1/userId").asText());
-        assertEquals(PrivilegeType.DELETE_MEMBER.name(),
+        assertEquals(PrivilegeType.DELETE_SELF.name(),
                 node.at("/members/1/privileges/0").asText());
     }
 

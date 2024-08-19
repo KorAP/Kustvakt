@@ -10,7 +10,8 @@ package de.ids_mannheim.korap.constant;
 public enum PrivilegeType {
     READ_MEMBER, 
     WRITE_MEMBER, 
-    DELETE_MEMBER, 
+    DELETE_MEMBER,
+    DELETE_SELF,
     SHARE_QUERY,
     DELETE_QUERY,
     READ_QUERY,

@@ -104,8 +104,6 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         testUpdateUserGroup(groupName);
         testAddMember(groupName, username, "darla");
         testDeleteGroup(groupName,username);
-//        testSubscribeToDeletedGroup(groupName);
-//        testUnsubscribeToDeletedGroup(groupName);
     }
     
     private void testUpdateUserGroup (String groupName)

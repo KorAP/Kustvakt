@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
@@ -61,10 +60,6 @@ public class UserGroupService {
     private AdminDao adminDao;
     @Autowired
     private UserGroupConverter converter;
-    @Autowired
-    private FullConfiguration config;
-    @Autowired
-    private MailService mailService;
     @Autowired
     private RandomCodeGenerator random;
 
@@ -169,7 +164,7 @@ public class UserGroupService {
     
     private Set<Role> prepareMemberRoles (UserGroup userGroup) {
             Role r1 = new Role(PredefinedRole.GROUP_MEMBER,
-                    PrivilegeType.DELETE_MEMBER, userGroup);
+                    PrivilegeType.DELETE_SELF, userGroup);
             roleDao.addRole(r1);
             Set<Role>memberRoles = new HashSet<Role>();
             memberRoles.add(r1);
@@ -282,43 +277,6 @@ public class UserGroupService {
         return groupId;
     }
 
-    /**
-     * Adds a user to the specified usergroup. If the username with
-     * {@link GroupMemberStatus} DELETED exists as a member of the
-     * group,
-     * the entry will be deleted first, and a new entry will be added.
-     * 
-     * If a username with other statuses exists, a KustvaktException
-     * will
-     * be thrown.
-     * 
-     * @see GroupMemberStatus
-     * 
-     * @param username
-     *            a username
-     * @param userGroup
-     *            a user group
-     * @param createdBy
-     *            the user (query-access admin/system) adding the user
-     *            the user-group
-     * @param status
-     *            the status of the membership
-     * @throws KustvaktException
-     */
-    @Deprecated
-    public void inviteGroupMember (String username, UserGroup userGroup,
-            String createdBy)
-            throws KustvaktException {
-
-        addGroupMember(username, userGroup, createdBy,null);
-
-        if (config.isMailEnabled()
-                && userGroup.getStatus() != UserGroupStatus.HIDDEN) {
-            mailService.sendMemberInvitationNotification(username,
-                    userGroup.getName(), createdBy);
-        }
-    }
-
     public void addGroupMember (String username, UserGroup userGroup,
             String createdBy, Set<Role> roles)
             throws KustvaktException {
@@ -375,62 +333,6 @@ public class UserGroupService {
             }
         }
         return false;
-    }
-
-    public boolean isUserGroupAdmin (UserGroupMember member)
-            throws KustvaktException {
-
-        for (Role r : member.getRoles()) {
-            if (r.getName().equals(PredefinedRole.GROUP_ADMIN)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    
-    /**
-     * Updates the {@link GroupMemberStatus} of a pending member
-     * to {@link GroupMemberStatus#ACTIVE} and add default member
-     * roles.
-     * 
-     * @param groupId
-     *            groupId
-     * @param username
-     *            the username of the group member
-     * @throws KustvaktException
-     */
-    @Deprecated
-    public void acceptInvitation (String groupName, String username)
-            throws KustvaktException {
-
-        ParameterChecker.checkStringValue(username, "userId");
-        ParameterChecker.checkStringValue(groupName, "groupName");
-
-        UserGroup userGroup = retrieveUserGroupByName(groupName);
-        UserGroupMember member = groupMemberDao.retrieveMemberById(username,
-                userGroup.getId());
-        // status pending
-//        else {
-//            if (DEBUG) {
-//                jlog.debug("status: " + member.getStatusDate());
-//            }
-//            ZonedDateTime expiration = member.getStatusDate().plusMinutes(30);
-//            ZonedDateTime now = ZonedDateTime.now();
-//            if (DEBUG) {
-//                jlog.debug("expiration: " + expiration + ", now: " + now);
-//            }
-//
-//            if (expiration.isAfter(now)) {
-//                member.setStatus(GroupMemberStatus.ACTIVE);
-                Set<Role> memberRoles = prepareMemberRoles(userGroup);
-                member.setRoles(memberRoles);
-                groupMemberDao.updateMember(member);
-//            }
-//            else {
-//                throw new KustvaktException(StatusCodes.INVITATION_EXPIRED);
-//            }
-//        }
     }
 
     public boolean isMember (String username, UserGroup userGroup)

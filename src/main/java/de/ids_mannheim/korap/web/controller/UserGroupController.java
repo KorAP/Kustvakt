@@ -10,6 +10,7 @@ import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
@@ -201,6 +202,20 @@ public class UserGroupController {
      *            usernames separated by comma
      * @return if successful, HTTP response status OK
      */
+    @Deprecated
+    @POST
+    @Path("@{groupName}/invite")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response inviteGroupMembers (
+            @Context SecurityContext securityContext,
+            @PathParam("groupName") String groupName,
+            @FormParam("members") String members) {
+        throw kustvaktResponseHandler.throwit(new KustvaktException(
+                StatusCodes.DEPRECATED,
+                "This web-service is deprecated and will be completely removed "
+                + "in API v1.1."));
+    }
+    
     @PUT
     @Path("@{groupName}/member")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -214,11 +229,38 @@ public class UserGroupController {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
             service.addGroupMembers(groupName, members, context.getUsername());
-            return Response.ok("SUCCESS").build();
+            return Response.ok().build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
+    }
+    
+    /**
+     * Adds roles of an active member of a user-group. Only user-group
+     * admins and system admins are allowed.
+     * 
+     * @param securityContext
+     * @param groupName
+     *            a group name
+     * @param memberUsername
+     *            a username of a group member
+     * @param roleId
+     *            a role id or multiple role ids
+     * @return if successful, HTTP response status OK
+     */
+    @Deprecated
+    @POST
+    @Path("@{groupName}/role/add")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response addMemberRoles (@Context SecurityContext securityContext,
+            @PathParam("groupName") String groupName,
+            @FormParam("memberUsername") String memberUsername,
+            @FormParam("roleId") List<Integer> roleIds) {
+        throw kustvaktResponseHandler.throwit(new KustvaktException(
+                StatusCodes.DEPRECATED,
+                "This web-service is deprecated and will be completely removed "
+                + "in API v1.1."));
     }
 
     /**Add group admin role to a member in a group 
@@ -240,10 +282,10 @@ public class UserGroupController {
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
-                    OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
+                    OAuth2Scope.ADD_MEMBER_ROLE);
             service.addAdminRole(context.getUsername(), groupName,
                     memberUsername);
-            return Response.ok("SUCCESS").build();
+            return Response.ok().build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -270,15 +312,24 @@ public class UserGroupController {
     public Response deleteMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
+            @FormParam("roleId") List<Integer> roleIds,
             @FormParam("role") List<PredefinedRole> roles) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
-                    OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
-            service.deleteMemberRoles(context.getUsername(), groupName,
-                    memberUsername, roles);
-            return Response.ok("SUCCESS").build();
+                    OAuth2Scope.DELETE_MEMBER_ROLE);
+            if (roleIds != null && !roleIds.isEmpty()){
+                throw kustvaktResponseHandler.throwit(new KustvaktException(
+                        StatusCodes.DEPRECATED,
+                        "Parameter roleIds is deprecated and will be completely"
+                        + " removed in API v1.1."));
+            }
+            else {
+                service.deleteMemberRoles(context.getUsername(), groupName,
+                        memberUsername, roles);
+            }
+            return Response.ok().build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -299,17 +350,10 @@ public class UserGroupController {
     @Path("@{groupName}/subscribe")
     public Response subscribeToGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
-        TokenContext context = (TokenContext) securityContext
-                .getUserPrincipal();
-        try {
-            scopeService.verifyScope(context,
-                    OAuth2Scope.ADD_USER_GROUP_MEMBER);
-            service.acceptInvitation(groupName, context.getUsername());
-            return Response.ok("SUCCESS").build();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
+        throw kustvaktResponseHandler.throwit(new KustvaktException(
+                StatusCodes.DEPRECATED,
+                "This web-service is deprecated and will be completely removed "
+                + "in API v1.1."));
     }
 
     /**
@@ -329,17 +373,9 @@ public class UserGroupController {
     public Response unsubscribeFromGroup (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
-        TokenContext context = (TokenContext) securityContext
-                .getUserPrincipal();
-        try {
-            scopeService.verifyScope(context,
-                    OAuth2Scope.DELETE_USER_GROUP_MEMBER);
-            service.deleteGroupMember(context.getUsername(), groupName,
-                    context.getUsername());
-            return Response.ok("SUCCESS").build();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
+        throw kustvaktResponseHandler.throwit(new KustvaktException(
+                StatusCodes.DEPRECATED,
+                "This web-service is deprecated and will be complete removed "
+                + "in API v1.1."));
     }
 }

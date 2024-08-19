@@ -73,25 +73,12 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
         return response;
     }
     
-//    protected Response inviteMember (String groupName, String invitor,
-//            String invitee) throws KustvaktException {
-//        Form form = new Form();
-//        form.param("members", invitee);
-//        Response response = target().path(API_VERSION).path("group")
-//                .path("@" + groupName).path("invite").request()
-//                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-//                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-//                        .createBasicAuthorizationHeaderValue(invitor, "pass"))
-//                .post(Entity.form(form));
-////        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-//        return response;
-//    }
-    
     protected void testAddMember (String groupName, String username,
             String memberUsername)
             throws KustvaktException {
         Response response = addMember(groupName, memberUsername, username);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
         // list group
         JsonNode node = listUserGroups(username);
         node = node.get(0);
