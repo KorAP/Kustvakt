@@ -15,6 +15,8 @@
 - Removed GroupMemberStatus (#764)
 - Replace invite and subscribe to add member (#764)
 - Remove unsubscribe member (#764)
+- Added deprecation messages to deprecated services
+- Removed mail configuration (#764)
 
 # version 0.74
 

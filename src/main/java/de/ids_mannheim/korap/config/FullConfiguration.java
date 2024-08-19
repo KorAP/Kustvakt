@@ -27,13 +27,6 @@ import de.ids_mannheim.korap.utils.TimeUtils;
 
 public class FullConfiguration extends KustvaktConfiguration {
     public static Logger jlog = LogManager.getLogger(FullConfiguration.class);
-    // mail configuration
-    private boolean isMailEnabled;
-    private String testEmail;
-    private String noReply;
-    private String emailAddressRetrieval;
-
-    private String groupInvitationTemplate;
 
     private String ldapConfig;
 
@@ -85,7 +78,6 @@ public class FullConfiguration extends KustvaktConfiguration {
 
         // EM: pattern for matching availability in Krill matches
         setLicensePatterns(properties);
-        setMailConfiguration(properties);
         ldapConfig = properties.getProperty("ldap.config");
 
         setSecurityConfiguration(properties);
@@ -147,21 +139,6 @@ public class FullConfiguration extends KustvaktConfiguration {
                 .getProperty("oauth2.access.token.long.expiry", "365D")));
         setRefreshTokenLongExpiry(TimeUtils.convertTimeToSeconds(properties
                 .getProperty("oauth2.refresh.token.long.expiry", "365D")));
-    }
-
-    private void setMailConfiguration (Properties properties) {
-        setMailEnabled(Boolean
-                .valueOf(properties.getProperty("mail.enabled", "false")));
-        if (isMailEnabled) {
-            // other properties must be set in the kustvakt.conf
-            setTestEmail(
-                    properties.getProperty("mail.receiver", "test@localhost"));
-            setNoReply(properties.getProperty("mail.sender"));
-            setGroupInvitationTemplate(
-                    properties.getProperty("template.group.invitation"));
-            setEmailAddressRetrieval(
-                    properties.getProperty("mail.address.retrieval", "test"));
-        }
     }
 
     private void setLicensePatterns (Properties properties) {
@@ -291,46 +268,6 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setAllOnlyRegex (String allOnlyRegex) {
         this.allOnlyRegex = allOnlyRegex;
-    }
-
-    public String getTestEmail () {
-        return testEmail;
-    }
-
-    public void setTestEmail (String testEmail) {
-        this.testEmail = testEmail;
-    }
-
-    public boolean isMailEnabled () {
-        return isMailEnabled;
-    }
-
-    public void setMailEnabled (boolean isMailEnabled) {
-        this.isMailEnabled = isMailEnabled;
-    }
-
-    public String getNoReply () {
-        return noReply;
-    }
-
-    public void setNoReply (String noReply) {
-        this.noReply = noReply;
-    }
-
-    public String getGroupInvitationTemplate () {
-        return groupInvitationTemplate;
-    }
-
-    public void setGroupInvitationTemplate (String groupInvitationTemplate) {
-        this.groupInvitationTemplate = groupInvitationTemplate;
-    }
-
-    public String getEmailAddressRetrieval () {
-        return emailAddressRetrieval;
-    }
-
-    public void setEmailAddressRetrieval (String emailAddressRetrieval) {
-        this.emailAddressRetrieval = emailAddressRetrieval;
     }
 
     public EncryptionIface.Encryption getSecureHashAlgorithm () {
