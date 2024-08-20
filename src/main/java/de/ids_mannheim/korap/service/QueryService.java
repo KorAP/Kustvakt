@@ -679,14 +679,14 @@ public class QueryService {
             String createdBy, QueryType queryType) throws KustvaktException {
         QueryDO query = searchQueryByName(username, queryName, createdBy,
                 queryType);
-        // String json = query.getKoralQuery();
+
         String statistics = null;
         // long start,end;
         // start = System.currentTimeMillis();
-        // if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS))
-        // {
-        // statistics = krill.getStatistics(json);
-        // }
+         if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+              String json = query.getKoralQuery();
+              statistics = krill.getStatistics(json);
+         }
         // end = System.currentTimeMillis();
         // jlog.debug("{} statistics duration: {}", queryName, (end -
         // start));

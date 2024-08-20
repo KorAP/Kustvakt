@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.mozilla.javascript.Node;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -31,8 +32,17 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         // assertEquals("koral:doc", node.at("/koralQuery/collection/@type").asText());
         assertTrue(node.at("/query").isMissingNode());
         assertTrue(node.at("/queryLanguage").isMissingNode());
+        
+        testStatistics(node);
     }
 
+    private void testStatistics (JsonNode node) {
+        assertTrue(node.at("/numberOfDoc").asInt()>0);
+        assertTrue(node.at("/numberOfParagraphs").asInt()>0);
+        assertTrue(node.at("/numberOfSentences").asInt()>0);
+        assertTrue(node.at("/numberOfTokens").asInt()>0);
+    }
+    
     @Test
     public void testRetrieveSystemVC_guest ()
             throws KustvaktException {
@@ -51,6 +61,8 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         assertEquals(node.at("/name").asText(), "dory-vc");
         assertEquals(ResourceType.PRIVATE.displayName(),
                 node.at("/type").asText());
+        
+        testStatistics(node);
     }
 
     @Test
