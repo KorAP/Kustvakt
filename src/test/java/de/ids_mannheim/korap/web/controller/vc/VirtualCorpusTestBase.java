@@ -244,17 +244,6 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
     
-    @Deprecated
-    protected Response deleteAccess (String username, String accessId)
-            throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("access")
-                .path(accessId).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete();
-        return response;
-    }
-    
     protected Response deleteRoleByGroupAndQuery (String vcCreator, String vcName,
             String groupName, String deleteBy)
             throws ProcessingException, KustvaktException {

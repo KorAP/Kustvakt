@@ -17,6 +17,7 @@
 - Remove unsubscribe member (#764)
 - Added deprecation messages to deprecated services
 - Removed mail configuration (#764)
+- Deprecate VC access deletion.
 
 # version 0.74
 

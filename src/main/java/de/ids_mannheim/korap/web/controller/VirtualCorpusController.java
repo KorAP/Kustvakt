@@ -392,16 +392,10 @@ public class VirtualCorpusController {
     public Response deleteAccessById (
             @Context SecurityContext securityContext,
             @PathParam("accessId") int accessId) {
-        TokenContext context = (TokenContext) securityContext
-                .getUserPrincipal();
-        try {
-            scopeService.verifyScope(context, OAuth2Scope.DELETE_VC_ACCESS);
-            service.deleteRoleById(accessId, context.getUsername());
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        return Response.ok().build();
+        throw kustvaktResponseHandler.throwit(new KustvaktException(
+                StatusCodes.DEPRECATED,
+                "This web-service is deprecated and will be completely removed "
+                + "in API v1.1."));
     }
     
     /**

@@ -177,13 +177,13 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         
         JsonNode node = listRolesByGroup("admin",groupName);
         assertEquals(1, node.size());
-        String roleId = node.at("/0/roleId").asText();
+        
         node2 = testAdminListVC_UsingAdminToken(vcCreator,
                 ResourceType.PROJECT);
         assertEquals(1, node2.size());
         
-        Response response = deleteAccess("admin",roleId);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        // delete role
+        deleteRoleByGroupAndQuery(vcCreator, vcName, groupName, "admin");
         node = listRolesByGroup("admin",groupName);
         assertEquals(0, node.size());
         
