@@ -40,7 +40,6 @@
 			<array>
 				<value>classpath:test-jdbc.properties</value>
 				<value>file:./test-jdbc.properties</value>
-				<value>classpath:properties/mail.properties</value>
 				<value>classpath:test-hibernate.properties</value>
 				<value>file:./kustvakt-test.conf</value>
 				<value>classpath:kustvakt-test.conf</value>

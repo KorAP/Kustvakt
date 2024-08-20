@@ -42,8 +42,6 @@
 				<value>classpath:properties/jdbc.properties</value>
 				<value>file:./jdbc.properties</value>
 				<value>file:./data/jdbc.properties</value>
-				<value>classpath:properties/mail.properties</value>
-				<value>file:./mail.properties</value>
 				<value>classpath:properties/hibernate.properties</value>
 
 				<value>classpath:kustvakt.conf</value>
