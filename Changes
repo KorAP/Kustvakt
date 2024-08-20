@@ -19,6 +19,12 @@
 - Removed mail configuration (#764)
 - Deprecate VC access deletion.
 
+# version 0.74.1-SNAPSHOT
+
+- Switch Docker image to temurin (diewald).
+- - Introduce filter_by and deprecate authorized_only in OAuth2
+  client list (close #579)
+
 # version 0.74
 
 - Remove corpusQuery param in the statistics web-service (close #758).

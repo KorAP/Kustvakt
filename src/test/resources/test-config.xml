@@ -39,10 +39,12 @@
 		<property name="locations">
 			<array>
 				<value>classpath:test-jdbc.properties</value>
-				<value>file:./test-jdbc.properties</value>
+				<value>file:./data/test-jdbc.properties</value>
 				<value>classpath:test-hibernate.properties</value>
+				<value>file:./data/test-hibernate.properties</value>
 				<value>file:./kustvakt-test.conf</value>
 				<value>classpath:kustvakt-test.conf</value>
+				<value>file:./data/kustvakt-test.conf</value>
 			</array>
 		</property>
 	</bean>
