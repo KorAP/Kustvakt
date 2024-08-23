@@ -282,7 +282,7 @@ public class UserGroupController {
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
-                    OAuth2Scope.ADD_MEMBER_ROLE);
+                    OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
             service.addAdminRole(context.getUsername(), groupName,
                     memberUsername);
             return Response.ok().build();
@@ -318,7 +318,7 @@ public class UserGroupController {
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
-                    OAuth2Scope.DELETE_MEMBER_ROLE);
+                    OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
             if (roleIds != null && !roleIds.isEmpty()){
                 throw kustvaktResponseHandler.throwit(new KustvaktException(
                         StatusCodes.DEPRECATED,
