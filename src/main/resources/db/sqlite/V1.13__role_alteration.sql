@@ -34,10 +34,12 @@ ALTER TABLE role_new RENAME TO role;
 DROP TABLE privilege;
 DROP TABLE query_access;
 
-CREATE UNIQUE INDEX IF NOT EXISTS role_index_null_query
-ON role (name, privilege, group_id)
-WHERE query_id IS 0;
+--CREATE UNIQUE INDEX IF NOT EXISTS role_index_null_query
+--ON role (name, privilege, group_id)
+--WHERE query_id IS 0;
 
 CREATE UNIQUE INDEX IF NOT EXISTS role_index on role(name, 
   privilege, group_id, query_id);
+  
+DELETE FROM oauth2_access_scope where id="EDIT_USER_GROUP_MEMBER_ROLE";  
   
