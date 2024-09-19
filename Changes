@@ -18,6 +18,8 @@
 - Added deprecation messages to deprecated services
 - Removed mail configuration (#764)
 - Deprecate VC access deletion.
+- Change default port to 8089.
+- Disallow scope all for non super clients.
 
 # version 0.74.1-SNAPSHOT
 
