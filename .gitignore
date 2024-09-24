@@ -2,6 +2,7 @@
 !/.gitignore
 !/.github
 !/.dockerignore
+!/.gitlab-ci.yml
 target
 tmp
 logs
