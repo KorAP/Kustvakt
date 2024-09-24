@@ -402,6 +402,20 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(node.at("/collection/@type").asText(), "koral:doc");
         assertEquals(node.at("/collection/key").asText(), "corpusSigle");
         assertEquals(node.at("/collection/value").asText(), "WPD17");
+        
+        json = "{\"corpusQuery\": \"corpusSigle=GOE AND creationDate since "
+                + "1820\"}";
+        editVC("dory", "dory", "dory-vc", json);
+        node = testRetrieveKoralQuery("dory", "dory-vc");
+        assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
+        assertEquals(node.at("/collection/operation").asText(),
+                "operation:and");
+        assertEquals(node.at("/collection/operands/0/key").asText(),
+                "corpusSigle");
+        assertEquals(node.at("/collection/operands/0/value").asText(), "GOE");
+        assertEquals(node.at("/collection/operands/1/key").asText(),
+                "creationDate");
+        assertEquals(node.at("/collection/operands/1/value").asText(), "1820");
     }
 
     private JsonNode testRetrieveKoralQuery (String username, String vcName)

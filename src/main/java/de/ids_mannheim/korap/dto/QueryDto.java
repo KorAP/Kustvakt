@@ -17,7 +17,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@JsonInclude(Include.NON_DEFAULT)
+@JsonInclude(Include.NON_NULL)
 public class QueryDto {
 
     private int id;
