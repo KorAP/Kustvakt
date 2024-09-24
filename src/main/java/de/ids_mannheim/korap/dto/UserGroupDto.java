@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +29,6 @@ public class UserGroupDto {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<UserGroupMemberDto> members;
 
-    private GroupMemberStatus userMemberStatus;
-    private List<String> userRoles;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<PrivilegeType> userPrivileges;
 }

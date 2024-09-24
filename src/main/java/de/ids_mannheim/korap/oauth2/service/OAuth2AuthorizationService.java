@@ -25,6 +25,7 @@ import com.nimbusds.oauth2.sdk.id.State;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -88,6 +89,18 @@ public class OAuth2AuthorizationService {
             OAuth2Client client = clientService.authenticateClientId(clientId);
             redirectURI = verifyRedirectUri(client, redirectUri);
             //checkResponseType(authzRequest.getResponseType(), redirectURI);
+            
+            if (scope == null || scope.isEmpty()) {
+                throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                        "scope is required", OAuth2Error.INVALID_SCOPE);
+            }
+            else if (!client.isSuper()
+                    && scope.contains(OAuth2Scope.ALL.toString())) {
+                throw new KustvaktException(StatusCodes.NOT_ALLOWED,
+                        "Requested scope all is not allowed.", 
+                        OAuth2Error.INVALID_SCOPE);
+            }
+            
             code = codeGenerator.createRandomCode();
             URI responseURI = createAuthorizationResponse(requestURI,
                     redirectURI, code, state);
@@ -102,7 +115,7 @@ public class OAuth2AuthorizationService {
             throw e;
         }
     }
-
+    
     private URI createAuthorizationResponse (URI requestURI, URI redirectURI,
             String code, String state) throws KustvaktException {
         AuthorizationRequest authRequest = null;
@@ -171,10 +184,6 @@ public class OAuth2AuthorizationService {
             ZonedDateTime authenticationTime, String nonce)
             throws KustvaktException {
 
-        if (scope == null || scope.isEmpty()) {
-            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                    "scope is required", OAuth2Error.INVALID_SCOPE);
-        }
         Set<AccessScope> accessScopes = scopeService
                 .convertToAccessScope(scope);
 

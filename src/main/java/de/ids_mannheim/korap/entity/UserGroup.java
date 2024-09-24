@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.entity;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -44,17 +45,19 @@ public class UserGroup implements Comparable<UserGroup> {
     private String description;
     @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "deleted_by")
-    private String deletedBy;
+    @Column(name = "created_date")
+    private ZonedDateTime createdDate;
 
     @Enumerated(EnumType.STRING)
     private UserGroupStatus status;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, 
+            cascade = CascadeType.REMOVE)
     private List<UserGroupMember> members;
 
-    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<QueryAccess> queryAccess;
+    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY, 
+            cascade = CascadeType.REMOVE)
+    private List<Role> roles;
 
     @Override
     public String toString () {

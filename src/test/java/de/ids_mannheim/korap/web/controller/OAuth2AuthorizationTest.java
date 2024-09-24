@@ -277,6 +277,21 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
     }
 
     @Test
+    public void testAuthorizeScopeAll () throws KustvaktException {
+        String scope = "all";
+        Response response = requestAuthorizationCode("code",
+                confidentialClientId, "", scope, state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+
+        assertEquals(
+                "https://third.party.com/confidential/redirect?"
+                        + "error=invalid_scope&error_description=Requested+scope"
+                        + "+all+is+not+allowed.&state=thisIsMyState",
+                response.getLocation().toString());
+    }
+    
+    @Test
     public void testAuthorizeUnsupportedTokenResponseType ()
             throws KustvaktException {
         Response response = requestAuthorizationCode("token",

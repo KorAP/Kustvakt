@@ -39,11 +39,7 @@
 		<property name="locations">
 			<array>
 				<value>classpath:test-jdbc.properties</value>
-				<value>file:./test-jdbc.properties</value>
 				<value>file:./data/test-jdbc.properties</value>
-				<value>classpath:properties/mail.properties</value>
-				<value>file:./mail.properties</value>
-				<value>file:./data/mail.properties</value>
 				<value>classpath:test-hibernate.properties</value>
 				<value>file:./data/test-hibernate.properties</value>
 				<value>file:./kustvakt-test.conf</value>
@@ -292,42 +288,5 @@
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<!-- mail -->
-	<bean id="authenticator"
-		class="de.ids_mannheim.korap.service.MailAuthenticator">
-		<constructor-arg index="0" value="${mail.username}" />
-		<constructor-arg index="1" value="${mail.password}" />
-	</bean>
-	<bean id="smtpSession" class="jakarta.mail.Session"
-		factory-method="getInstance">
-		<constructor-arg index="0">
-			<props>
-				<prop key="mail.smtp.submitter">${mail.username}</prop>
-				<prop key="mail.smtp.auth">${mail.auth}</prop>
-				<prop key="mail.smtp.host">${mail.host}</prop>
-				<prop key="mail.smtp.port">${mail.port}</prop>
-				<prop key="mail.smtp.starttls.enable">${mail.starttls.enable}</prop>
-				<prop key="mail.smtp.connectiontimeout">${mail.connectiontimeout}</prop>
-			</props>
-		</constructor-arg>
-		<constructor-arg index="1" ref="authenticator" />
-	</bean>
-	<bean id="mailSender"
-		class="org.springframework.mail.javamail.JavaMailSenderImpl">
-		<property name="username" value="${mail.username}" />
-		<property name="password" value="${mail.password}" />
-		<property name="session" ref="smtpSession" />
-	</bean>
-	<bean id="velocityEngine"
-		class="org.apache.velocity.app.VelocityEngine">
-		<constructor-arg index="0">
-			<props>
-				<prop key="resource.loader">class</prop>
-				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
-				</prop>
-			</props>
-		</constructor-arg>
 	</bean>
 </beans>

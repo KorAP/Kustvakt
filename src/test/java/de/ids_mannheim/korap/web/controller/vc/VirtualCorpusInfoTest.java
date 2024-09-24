@@ -1,23 +1,20 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.junit.jupiter.api.Test;
+import org.mozilla.javascript.Node;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
+
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
@@ -27,7 +24,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveSystemVC ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         JsonNode node = retrieveVCInfo(testUser, "system", "system-vc");
         assertEquals(node.at("/name").asText(), "system-vc");
         assertEquals(ResourceType.SYSTEM.displayName(),
@@ -35,11 +32,20 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         // assertEquals("koral:doc", node.at("/koralQuery/collection/@type").asText());
         assertTrue(node.at("/query").isMissingNode());
         assertTrue(node.at("/queryLanguage").isMissingNode());
+        
+        testStatistics(node);
     }
 
+    private void testStatistics (JsonNode node) {
+        assertTrue(node.at("/numberOfDoc").asInt()>0);
+        assertTrue(node.at("/numberOfParagraphs").asInt()>0);
+        assertTrue(node.at("/numberOfSentences").asInt()>0);
+        assertTrue(node.at("/numberOfTokens").asInt()>0);
+    }
+    
     @Test
-    public void testRetrieveSystemVCGuest ()
-            throws ProcessingException, KustvaktException {
+    public void testRetrieveSystemVC_guest ()
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~system").path("system-vc").request().get();
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
@@ -49,17 +55,19 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveOwnerPrivateVC ()
-            throws ProcessingException, KustvaktException {
+    public void testRetrievePrivateVC ()
+            throws KustvaktException {
         JsonNode node = retrieveVCInfo("dory", "dory", "dory-vc");
         assertEquals(node.at("/name").asText(), "dory-vc");
         assertEquals(ResourceType.PRIVATE.displayName(),
                 node.at("/type").asText());
+        
+        testStatistics(node);
     }
 
     @Test
-    public void testRetrievePrivateVCUnauthorized ()
-            throws ProcessingException, KustvaktException {
+    public void testRetrievePrivateVC_unauthorized ()
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -69,17 +77,31 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveProjectVC ()
-            throws ProcessingException, KustvaktException {
+    public void testRetrieveProjectVC_member ()
+            throws KustvaktException {
+        createDoryGroup();
+        addMember(doryGroupName, "nemo", "dory");
+        
+        createAccess("dory", "group-vc", doryGroupName, "dory");
+        
         JsonNode node = retrieveVCInfo("nemo", "dory", "group-vc");
         assertEquals(node.at("/name").asText(), "group-vc");
         assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
+        
+        addMember(doryGroupName, "pearl", "dory");
+        
+        node = retrieveVCInfo("pearl", "dory", "group-vc");
+        assertEquals(node.at("/name").asText(), "group-vc");
+        assertEquals(ResourceType.PROJECT.displayName(),
+                node.at("/type").asText());
+        
+        deleteGroupByName(doryGroupName, "dory");
     }
 
     @Test
-    public void testRetrieveProjectVCUnauthorized ()
-            throws ProcessingException, KustvaktException {
+    public void testRetrieveProjectVC_unauthorized ()
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -89,8 +111,8 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveProjectVCbyNonActiveMember ()
-            throws ProcessingException, KustvaktException {
+    public void testRetrieveProjectVC_nonActiveMember ()
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -100,33 +122,8 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrievePublishedVC ()
-            throws ProcessingException, KustvaktException {
-        JsonNode node = retrieveVCInfo("gill", "marlin", "published-vc");
-        assertEquals(node.at("/name").asText(), "published-vc");
-        assertEquals(ResourceType.PUBLISHED.displayName(),
-                node.at("/type").asText());
-        Form f = new Form();
-        f.param("status", "HIDDEN");
-        // check gill in the hidden group of the vc
-        Response response = target().path(API_VERSION).path("admin")
-                .path("group").path("list").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        MediaType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(f));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        node = JsonUtils.readTree(entity);
-        assertEquals(3, node.at("/0/id").asInt());
-        String members = node.at("/0/members").toString();
-        assertTrue(members.contains("\"userId\":\"gill\""));
-    }
-
-    @Test
-    public void testAdminRetrievePrivateVC ()
-            throws ProcessingException, KustvaktException {
+    public void testRetrievePrivateVC_admin ()
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -140,8 +137,8 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testAdminRetrieveProjectVC ()
-            throws ProcessingException, KustvaktException {
+    public void testRetrieveProjectVC_admin ()
+            throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler

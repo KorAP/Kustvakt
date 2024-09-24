@@ -1,23 +1,24 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.apache.http.entity.ContentType;
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.net.HttpHeaders;
+
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.constant.ResourceType;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.utils.JsonUtils;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-
-import org.apache.http.entity.ContentType;
-import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
-import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.ResourceType;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
  * @author margaretha
@@ -161,34 +162,31 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     // 
     // return node.at("/accessId").asText();
     // }
-    private JsonNode testlistAccessByGroup (String groupName)
-            throws KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("access")
-                .queryParam("groupName", groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .get();
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(2, node.size());
-        return node.get(node.size() - 1);
-    }
 
     @Test
-    public void testVCSharing () throws ProcessingException, KustvaktException {
+    public void testShareVC () throws ProcessingException, KustvaktException {
+        createMarlinGroup();
+        
         String vcCreator = "marlin";
         String vcName = "marlin-vc";
         String groupName = "marlin-group";
         JsonNode node2 = testAdminListVC_UsingAdminToken(vcCreator,
                 ResourceType.PROJECT);
         assertEquals(0, node2.size());
-        testCreateVCAccess(vcCreator, vcName, groupName);
-        JsonNode node = testlistAccessByGroup(groupName);
-        String accessId = node.at("/accessId").asText();
-        testDeleteVCAccess(accessId);
+        createAccess(vcCreator, vcName, groupName, admin);
+        
+        JsonNode node = listRolesByGroup("admin",groupName);
+        assertEquals(1, node.size());
+        
         node2 = testAdminListVC_UsingAdminToken(vcCreator,
                 ResourceType.PROJECT);
         assertEquals(1, node2.size());
+        
+        // delete role
+        deleteRoleByGroupAndQuery(vcCreator, vcName, groupName, "admin");
+        node = listRolesByGroup("admin",groupName);
+        assertEquals(0, node.size());
+        
         String json = "{\"type\": \"" + ResourceType.PRIVATE + "\"}";
         editVC(admin, vcCreator, vcName, json);
         node = retrieveVCInfo(admin, vcCreator, vcName);
@@ -197,27 +195,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         node2 = testAdminListVC_UsingAdminToken(vcCreator,
                 ResourceType.PROJECT);
         assertEquals(0, node2.size());
-    }
-
-    private void testCreateVCAccess (String vcCreator, String vcName,
-            String groupName) throws ProcessingException, KustvaktException {
-        Response response;
-        // share VC
-        response = target().path(API_VERSION).path("vc").path("~" + vcCreator)
-                .path(vcName).path("share").path("@" + groupName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .post(Entity.form(new Form()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    }
-
-    private void testDeleteVCAccess (String accessId)
-            throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("access")
-                .path(accessId).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .delete();
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        deleteGroupByName(marlinGroupName, "marlin");
     }
 }

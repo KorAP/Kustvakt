@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,12 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -24,13 +23,10 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.init.NamedVCLoader;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-public class VirtualCorpusReferenceTest extends SpringJerseyTest {
+public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
 
     @Autowired
     private NamedVCLoader vcLoader;
@@ -202,30 +198,25 @@ public class VirtualCorpusReferenceTest extends SpringJerseyTest {
 
     @Test
     public void testSearchWithRefPublishedVc () throws KustvaktException {
+        String vcName = "marlin-published-vc";
+        createPublishedVC("marlin", vcName);
+
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("cq", "referTo \"marlin/published-vc\"").request()
+                .queryParam("cq", "referTo \"marlin/" + vcName + "\"").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("squirt", "pass"))
                 .get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
-        Form f = new Form();
-        f.param("status", "HIDDEN");
-        // check dory in the hidden group of the vc
-        response = target().path(API_VERSION).path("admin").path("group")
-                .path("list").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        MediaType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(f));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.readEntity(String.class);
-        node = JsonUtils.readTree(entity);
-        assertEquals(3, node.at("/0/id").asInt());
-        String members = node.at("/0/members").toString();
-        assertTrue(members.contains("\"userId\":\"squirt\""));
+
+        node = getHiddenGroup(vcName);
+        assertEquals("system", node.at("/owner").asText());
+        assertEquals(UserGroupStatus.HIDDEN.name(),
+                node.at("/status").asText());
+        node = node.at("/members");
+        assertEquals("squirt", node.at("/0/userId").asText());
+        deleteVC(vcName, "marlin", "marlin");
     }
 }

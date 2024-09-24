@@ -2,17 +2,20 @@ package de.ids_mannheim.korap.entity;
 
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
+import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,16 +35,55 @@ public class Role implements Comparable<Role> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(unique = true)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private PredefinedRole name;
+    @Enumerated(EnumType.STRING)
+    private PrivilegeType privilege;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "query_id", referencedColumnName = "id")
+    private QueryDO query;
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id", referencedColumnName = "id")
+    private UserGroup userGroup;
+    
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//        name = "role_user_roles",
+//        joinColumns = @JoinColumn(name = "role_id"),
+//        inverseJoinColumns = @JoinColumn(name = "user_role_id")
+//    )
+//    private Set<UserRole> user_roles;
+    
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     private List<UserGroupMember> userGroupMembers;
-
-    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    private List<Privilege> privileges;
+//
+//    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+//    private List<Privilege> privileges;
+    
+    public Role () {}
+    
+    public Role (PredefinedRole name, PrivilegeType privilege, UserGroup group) {
+        setName(name);
+        setPrivilege(privilege);
+        setUserGroup(group);
+    }
+    
+    public Role (PredefinedRole name, PrivilegeType privilege, UserGroup group,
+                 QueryDO query) {
+        setName(name);
+        setPrivilege(privilege);
+        setUserGroup(group);
+        setQuery(query);
+    }
 
     public String toString () {
-        return "id=" + id + ", name=" + name;
+        return "id=" + id + ", name=" + name + ", privilege=" + privilege
+                + ", usergroup=" + userGroup.getId() 
+//                + ", members=" + userGroupMembers 
+                + ", query=" + ((query!=null) ? query.getId() : query)
+                ;
     }
 
     @Override
@@ -58,7 +100,20 @@ public class Role implements Comparable<Role> {
     @Override
     public boolean equals (Object obj) {
         Role r = (Role) obj;
-        if (this.id == r.getId() && this.name.equals(r.getName())) {
+        if (this.name.equals(r.getName())
+                && this.privilege.equals(r.getPrivilege())
+                && this.userGroup.equals(r.getUserGroup())) {
+            if (this.query != null && r.getQuery() == null) {
+                return false;
+            }
+            if (this.query == null && r.getQuery() != null) {
+                return false;
+            }
+            if(this.query != null && r.getQuery() != null
+                    && !this.query.equals(r.getQuery())) {
+                return false;
+            }
+
             return true;
         }
         return false;

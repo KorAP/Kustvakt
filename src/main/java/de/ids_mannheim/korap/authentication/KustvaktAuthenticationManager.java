@@ -131,24 +131,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
         //		return entHandler.getAccount(username);
     }
 
-    @Override
-    public User getUser (String username, String method)
-            throws KustvaktException {
-        KorAPUser user = new KorAPUser();
-        user.setUsername(username);
-        String email = null;
-        switch (method.toLowerCase()) {
-            case "ldap":
-                email = config.getTestEmail();
-                break;
-            default:
-                email = config.getTestEmail();
-                break;
-        }
-        user.setEmail(email);
-        return user;
-    }
-
     public TokenContext refresh (TokenContext context)
             throws KustvaktException {
         AuthenticationIface provider = getProvider(context.getTokenType(),
@@ -315,6 +297,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
         return user;
     }
 
+    @Deprecated
     // todo: what if attributes null?
     private User authenticate (String username, String password,
             Map<String, Object> attr) throws KustvaktException {

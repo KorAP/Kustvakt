@@ -6,6 +6,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import de.ids_mannheim.korap.constant.QueryType;
+import de.ids_mannheim.korap.constant.ResourceType;
+import de.ids_mannheim.korap.entity.QueryDO;
+import de.ids_mannheim.korap.entity.QueryDO_;
+import de.ids_mannheim.korap.entity.Role;
+import de.ids_mannheim.korap.entity.Role_;
+import de.ids_mannheim.korap.entity.UserGroupMember;
+import de.ids_mannheim.korap.entity.UserGroupMember_;
+import de.ids_mannheim.korap.entity.UserGroup_;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
@@ -17,27 +33,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.QueryAccessStatus;
-import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.constant.ResourceType;
-import de.ids_mannheim.korap.constant.UserGroupStatus;
-import de.ids_mannheim.korap.entity.QueryAccess;
-import de.ids_mannheim.korap.entity.QueryAccess_;
-import de.ids_mannheim.korap.entity.QueryDO;
-import de.ids_mannheim.korap.entity.QueryDO_;
-import de.ids_mannheim.korap.entity.UserGroup;
-import de.ids_mannheim.korap.entity.UserGroupMember;
-import de.ids_mannheim.korap.entity.UserGroupMember_;
-import de.ids_mannheim.korap.entity.UserGroup_;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.user.User.CorpusAccess;
-import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
  * QueryDao manages database queries and transactions
@@ -273,35 +268,17 @@ public class QueryDao {
         CriteriaQuery<QueryDO> cq = builder.createQuery(QueryDO.class);
 
         Root<QueryDO> query = cq.from(QueryDO.class);
-        Join<QueryDO, QueryAccess> access = query.join(QueryDO_.queryAccess);
-
-        // Predicate corpusStatus = builder.and(
-        // builder.notEqual(access.get(QueryAccess_.status),
-        // VirtualCorpusAccessStatus.HIDDEN),
-        // builder.notEqual(access.get(QueryAccess_.status),
-        // VirtualCorpusAccessStatus.DELETED));
-
+        Join<QueryDO, Role> roles = query.join(QueryDO_.roles);
+        Join<Role, UserGroupMember> members = roles
+                .join(Role_.userGroupMembers);
+        
         Predicate type = builder.equal(query.get(QueryDO_.queryType),
                 queryType);
-
-        Predicate accessStatus = builder.notEqual(
-                access.get(QueryAccess_.status), QueryAccessStatus.DELETED);
-
-        Predicate userGroupStatus = builder.notEqual(
-                access.get(QueryAccess_.userGroup).get(UserGroup_.status),
-                UserGroupStatus.DELETED);
-        Join<UserGroup, UserGroupMember> members = access
-                .join(QueryAccess_.userGroup).join(UserGroup_.members);
-
-        Predicate memberStatus = builder.equal(
-                members.get(UserGroupMember_.status), GroupMemberStatus.ACTIVE);
-
         Predicate user = builder.equal(members.get(UserGroupMember_.userId),
                 userId);
 
         cq.select(query);
-        cq.where(builder.and(type, accessStatus, userGroupStatus, memberStatus,
-                user));
+        cq.where(builder.and(type, user));
 
         Query q = entityManager.createQuery(cq);
         return q.getResultList();
@@ -352,14 +329,12 @@ public class QueryDao {
                 .createQuery(QueryDO.class);
 
         Root<QueryDO> query = criteriaQuery.from(QueryDO.class);
-        Join<QueryDO, QueryAccess> queryAccess = query
-                .join(QueryDO_.queryAccess);
-        Join<QueryAccess, UserGroup> accessGroup = queryAccess
-                .join(QueryAccess_.userGroup);
+        Join<QueryDO, Role> query_role = query
+                .join(QueryDO_.roles);
 
         criteriaQuery.select(query);
-        criteriaQuery
-                .where(builder.equal(accessGroup.get(UserGroup_.id), groupId));
+        criteriaQuery.where(builder.equal(
+                query_role.get(Role_.userGroup).get(UserGroup_.id), groupId));
         Query q = entityManager.createQuery(criteriaQuery);
         return q.getResultList();
     }
