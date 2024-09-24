@@ -62,7 +62,6 @@ public class KustvaktConfiguration {
     private int returnhits;
     private String keystoreLocation;
     private String keystorePassword;
-    private Properties mailProperties;
     private String host;
     private String shibUserMapping;
     private String userConfig;
@@ -71,10 +70,6 @@ public class KustvaktConfiguration {
     private long loginAttemptNum;
     private boolean allowMultiLogIn;
     private int loadFactor;
-    @Deprecated
-    private int validationStringLength;
-    @Deprecated
-    private int validationEmaillength;
     
     // EM: determine if search and match info services restricted 
     // to logged in users. This replaces @SearchResourceFilters
@@ -134,7 +129,7 @@ public class KustvaktConfiguration {
     public KustvaktConfiguration () {}
 
     public void loadBasicProperties (Properties properties) {
-        port = Integer.valueOf(properties.getProperty("server.port", "8095"));
+        port = Integer.valueOf(properties.getProperty("server.port", "8089"));
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         setSecureRandomAlgorithm(
                 properties.getProperty("security.secure.random.algorithm", ""));
@@ -212,10 +207,6 @@ public class KustvaktConfiguration {
 
         loadFactor = Integer.valueOf(
                 properties.getProperty("security.encryption.loadFactor", "15"));
-        validationStringLength = Integer.valueOf(properties
-                .getProperty("security.validation.stringLength", "150"));
-        validationEmaillength = Integer.valueOf(properties
-                .getProperty("security.validation.emailLength", "40"));
 
         sharedSecret = properties.getProperty("security.sharedSecret", "")
                 .getBytes();

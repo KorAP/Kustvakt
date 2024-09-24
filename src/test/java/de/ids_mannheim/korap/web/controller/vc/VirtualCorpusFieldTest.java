@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -86,7 +86,8 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
         testRetrieveProhibitedField("system", "named-vc1", "tokens");
         testRetrieveProhibitedField("system", "named-vc1", "base");
         VirtualCorpusCache.delete("named-vc1");
-        deleteVcFromDB("named-vc1");
+        
+        deleteVC("named-vc1", "system", "admin");
     }
 
     private void testRetrieveUnknownTokens ()

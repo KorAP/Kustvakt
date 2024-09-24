@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,15 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
@@ -24,6 +21,10 @@ import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * @author margaretha
@@ -40,66 +41,103 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
+    public void testDeleteVC_unauthorized () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").path("~dory")
+                .path("dory-vc").request()
+                .header(Attributes.AUTHORIZATION, authHeader).delete();
+        testResponseUnauthorized(response, testUser);
+    }
+    
+    private void testDeleteSystemVC (String vcName) throws KustvaktException {
+        Response response = deleteVC(vcName, "system", "admin");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    private void testDeleteSystemVC_unauthorized (String vcName,
+            String username) throws KustvaktException {
+        Response response = deleteVC(vcName, "system", username);
+        testResponseUnauthorized(response, "dory");
+    }
+    
+    @Test
     public void testCreatePrivateVC () throws KustvaktException {
-        String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
-        createVC(authHeader, testUser, "new_vc", json);
+        createPrivateVC(testUser, "new_vc");
+        
         // list user VC
         JsonNode node = listVC(testUser);
         assertEquals(2, node.size());
         assertEquals(node.get(1).get("name").asText(), "new_vc");
+        
+        testCreateVC_sameName(testUser, "new_vc", ResourceType.PRIVATE);
+        
         // delete new VC
         deleteVC("new_vc", testUser, testUser);
         // list VC
         node = listVC(testUser);
         assertEquals(1, node.size());
     }
-
+    
     @Test
-    public void testCreatePublishedVC () throws KustvaktException {
-        String json = "{\"type\": \"PUBLISHED\""
+    public void testCreateSystemVC () throws KustvaktException {
+        String json = "{\"type\": \"SYSTEM\""
                 + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
-        String vcName = "new-published-vc";
-        createVC(authHeader, testUser, vcName, json);
-        // test list owner vc
-        JsonNode node = retrieveVCInfo(testUser, testUser, vcName);
-        assertEquals(vcName, node.get("name").asText());
-        // EM: check hidden access
-        node = listAccessByGroup("admin", "");
-        node = node.get(node.size() - 1);
-        assertEquals(node.at("/createdBy").asText(), "system");
-        assertEquals(vcName, node.at("/queryName").asText());
-        assertTrue(node.at("/userGroupName").asText().startsWith("auto"));
-        assertEquals(vcName, node.at("/queryName").asText());
-        String groupName = node.at("/userGroupName").asText();
-        // EM: check if hidden group has been created
-        node = testCheckHiddenGroup(groupName);
-        assertEquals(node.at("/status").asText(), "HIDDEN");
-        // EM: delete vc
-        deleteVC(vcName, testUser, testUser);
-        // EM: check if the hidden groups are deleted as well
-        node = testCheckHiddenGroup(groupName);
-        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Group " + groupName + " is not found",
-                node.at("/errors/0/1").asText());
-    }
-
-    private JsonNode testCheckHiddenGroup (String groupName)
-            throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("admin")
-                .path("group").path("@" + groupName).request()
+                + ",\"corpusQuery\": \"pubDate since 1820\"}";
+        String vcName = "new_system_vc";
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~system").path(vcName).request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").post(null);
-        String entity = response.readEntity(String.class);
-        return JsonUtils.readTree(entity);
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(Entity.json(json));
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+        JsonNode node = listSystemVC("pearl");
+        assertEquals(2, node.size());
+        assertEquals(ResourceType.SYSTEM.displayName(),
+                node.at("/0/type").asText());
+        assertEquals(ResourceType.SYSTEM.displayName(),
+                node.at("/1/type").asText());
+        
+        testDeleteSystemVC_unauthorized(vcName, "dory");
+        testDeleteSystemVC(vcName);
+        
+        node = listSystemVC("pearl");
+        assertEquals(1, node.size());
     }
 
     @Test
-    public void testCreateVCWithInvalidToken ()
+    public void testCreateSystemVC_unauthorized () throws KustvaktException {
+        String json = "{\"type\": \"SYSTEM\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"creationDate since 1820\"}";
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~" + testUser).path("new_vc").request()
+                .header(Attributes.AUTHORIZATION, authHeader)
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(Entity.json(json));
+        testResponseUnauthorized(response, testUser);
+    }
+
+    
+    private void testCreateVC_sameName (String username, String vcName,
+            ResourceType vcType) throws KustvaktException {
+        String vcJson = "{\"type\": \"" + vcType + "\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
+
+        String authHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue(username, "pass");
+
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~" + username).path(vcName).request()
+                .header(Attributes.AUTHORIZATION, authHeader)
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(Entity.json(vcJson));
+
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testCreateVC_invalidToken ()
             throws IOException, KustvaktException {
         String json = "{\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"corpusSigle=GOE\"}";
@@ -129,7 +167,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testCreateVCWithExpiredToken ()
+    public void testCreateVC_expiredToken ()
             throws IOException, KustvaktException {
         String json = "{\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"corpusSigle=GOE\"}";
@@ -153,43 +191,6 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(node.at("/errors/0/1").asText(),
                 "Access token is expired");
         checkWWWAuthenticateHeader(response);
-    }
-
-    @Test
-    public void testCreateSystemVC () throws KustvaktException {
-        String json = "{\"type\": \"SYSTEM\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"pubDate since 1820\"}";
-        String vcName = "new_system_vc";
-        Response response = target().path(API_VERSION).path("vc")
-                .path("~system").path(vcName).request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(Entity.json(json));
-        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        JsonNode node = listSystemVC("pearl");
-        assertEquals(2, node.size());
-        assertEquals(ResourceType.SYSTEM.displayName(),
-                node.at("/0/type").asText());
-        assertEquals(ResourceType.SYSTEM.displayName(),
-                node.at("/1/type").asText());
-        deleteVC(vcName, "system", "admin");
-        node = listSystemVC("pearl");
-        assertEquals(1, node.size());
-    }
-
-    @Test
-    public void testCreateSystemVC_unauthorized () throws KustvaktException {
-        String json = "{\"type\": \"SYSTEM\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"creationDate since 1820\"}";
-        Response response = target().path(API_VERSION).path("vc")
-                .path("~" + testUser).path("new_vc").request()
-                .header(Attributes.AUTHORIZATION, authHeader)
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(Entity.json(json));
-        testResponseUnauthorized(response, testUser);
     }
 
     @Test
@@ -326,7 +327,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 + ",\"queryType\": \"VIRTUAL_CORPUS\""
                 + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
         for (int i = 1; i < 6; i++) {
-            createVC(authHeader, testUser, "new_vc_" + i, json);
+            createPrivateVC(testUser, "new_vc_" + i);
         }
         Response response = target().path(API_VERSION).path("vc")
                 .path("~" + testUser).path("new_vc_6").request()
@@ -353,14 +354,6 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         node = listVC(testUser);
         // system-vc
         assertEquals(1, node.size());
-    }
-
-    @Test
-    public void testDeleteVC_unauthorized () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("~dory")
-                .path("dory-vc").request()
-                .header(Attributes.AUTHORIZATION, authHeader).delete();
-        testResponseUnauthorized(response, testUser);
     }
 
     @Test
@@ -442,38 +435,5 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals("Unauthorized operation for user: " + testUser,
                 node.at("/errors/0/1").asText());
         checkWWWAuthenticateHeader(response);
-    }
-
-    @Test
-    public void testPublishProjectVC () throws KustvaktException {
-        String vcName = "group-vc";
-        // check the vc type
-        JsonNode node = retrieveVCInfo("dory", "dory", vcName);
-        assertEquals(ResourceType.PROJECT.displayName(),
-                node.get("type").asText());
-        // edit vc
-        String json = "{\"type\": \"PUBLISHED\"}";
-        editVC("dory", "dory", vcName, json);
-        // check VC
-        node = testListOwnerVC("dory");
-        JsonNode n = node.get(1);
-        assertEquals(ResourceType.PUBLISHED.displayName(),
-                n.get("type").asText());
-        // check hidden VC access
-        node = listAccessByGroup("admin", "");
-        assertEquals(4, node.size());
-        node = node.get(node.size() - 1);
-        assertEquals(vcName, node.at("/queryName").asText());
-        assertEquals(node.at("/createdBy").asText(), "system");
-        assertTrue(node.at("/userGroupName").asText().startsWith("auto"));
-        // edit 2nd
-        json = "{\"type\": \"PROJECT\"}";
-        editVC("dory", "dory", vcName, json);
-        node = testListOwnerVC("dory");
-        assertEquals(ResourceType.PROJECT.displayName(),
-                node.get(1).get("type").asText());
-        // check VC access
-        node = listAccessByGroup("admin", "");
-        assertEquals(3, node.size());
     }
 }

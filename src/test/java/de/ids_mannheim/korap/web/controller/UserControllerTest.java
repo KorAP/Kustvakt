@@ -2,22 +2,18 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.net.URI;
-
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.junit.jupiter.api.Test;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponentsBuilder;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class UserControllerTest extends OAuth2TestBase {
 
@@ -40,7 +36,7 @@ public class UserControllerTest extends OAuth2TestBase {
     }
 
     private String registerClient ()
-            throws ProcessingException, KustvaktException {
+            throws KustvaktException {
         OAuth2ClientJson clientJson = createOAuth2Client();
         Response response = registerClient(username, clientJson);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
@@ -63,7 +59,7 @@ public class UserControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void getUsername () throws ProcessingException, KustvaktException {
+    public void getUsername () throws KustvaktException {
         String clientId = registerClient();
         String accessToken = requestOAuth2AccessToken(clientId);
         Response response = target().path(API_VERSION).path("user").path("info")

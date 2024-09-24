@@ -62,12 +62,4 @@ public class DummyAuthenticationManager extends AuthenticationManager {
         // TODO Auto-generated method stub
 
     }
-
-    @Override
-    public User getUser (String username, String method)
-            throws KustvaktException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

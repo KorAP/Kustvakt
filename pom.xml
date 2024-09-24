@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids-mannheim.korap.kustvakt</groupId>
 	<artifactId>Kustvakt</artifactId>
-	<version>0.74.1-SNAPSHOT</version>
+	<version>0.75-SNAPSHOT</version>
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -139,8 +139,6 @@
 												<exclude>com.novell.ldap</exclude>
 												<exclude>com.unboundid</exclude>
 												<exclude>org.glassfish.jersey.test-framework*</exclude>
-												<exclude>org.apache.velocity*</exclude>
-												<exclude>com.sun.mail</exclude>
 												<exclude>META-INF/*.SF</exclude>
 								                <exclude>META-INF/*.DSA</exclude>
 								                <exclude>META-INF/*.RSA</exclude>
@@ -419,11 +417,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 			<scope>compile</scope>
@@ -618,37 +611,6 @@
 			<groupId>com.unboundid</groupId>
 			<artifactId>unboundid-ldapsdk</artifactId>
 			<version>6.0.11</version>
-		</dependency>
-
-		<!-- velocity -->
-		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity-engine-core</artifactId>
-			<version>2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.velocity.tools</groupId>
-			<artifactId>velocity-tools-generic</artifactId>
-			<version>3.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- Mail -->
-		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>jakarta.mail</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>jakarta.activation</groupId>
-			<artifactId>jakarta.activation-api</artifactId>
-			<version>2.1.2</version>
 		</dependency>
 
 		<!-- OAuth -->

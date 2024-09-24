@@ -1,3 +1,26 @@
+# version 0.75-SNAPSHOT
+
+- Alter role and remove privilege database tables (#763)
+- Update user-group and user-group member web-services (#763)
+- Remove edit member role web-service (#763)
+- Remove query access table (#763)
+- Remove query access admin, merged with user-group admin (#763)
+- Update share-query and query-access web-services (#763)
+- Add new web-service: delete role by query and group (#763)
+- Remove soft delete group and group status deleted (#765)
+- Remove soft delete group member and member status deleted (#765)
+- Removed SearchResourceFilters and UserGroupJson
+- Removed deleted_by from user_group and user_group_member tables (#764)
+- Removed created_by, status and status_date from user_group_member table (#764)
+- Removed GroupMemberStatus (#764)
+- Replace invite and subscribe to add member (#764)
+- Remove unsubscribe member (#764)
+- Added deprecation messages to deprecated services
+- Removed mail configuration (#764)
+- Deprecate VC access deletion.
+- Change default port to 8089.
+- Disallow scope all for non super clients.
+
 # version 0.74.1-SNAPSHOT
 
 - Switch Docker image to temurin (diewald).
