@@ -114,6 +114,7 @@ public class KustvaktConfiguration {
     // EM: metadata restriction
     // another variable might be needed to define which metadata fields are restricted 
     private boolean isMetadataRestricted = false;
+    private boolean totalResultCacheEnabled;
 
     // EM: Maybe needed when we support pipe registration
     @Deprecated
@@ -220,6 +221,9 @@ public class KustvaktConfiguration {
 
         // network endpoint
         networkEndpointURL = properties.getProperty("network.endpoint.url", "");
+        // cache
+        totalResultCacheEnabled = Boolean.valueOf(properties.getProperty(
+                "cache.total.results.enabled","true"));
     }
 
     @Deprecated

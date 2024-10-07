@@ -211,7 +211,7 @@ public class SearchService extends BasicService {
 
         int hashedKoralQuery = createTotalResultCacheKey(query);
         boolean hasCutOff = hasCutOff(query);
-        if (!hasCutOff) {
+        if (config.isTotalResultCacheEnabled() && !hasCutOff) {
             query = precheckTotalResultCache(hashedKoralQuery, query);
         }
 
@@ -229,7 +229,10 @@ public class SearchService extends BasicService {
         }
         // jlog.debug("Query result: " + result);
 
-        result = afterCheckTotalResultCache(hashedKoralQuery, result);
+        if (config.isTotalResultCacheEnabled()) {
+            result = afterCheckTotalResultCache(hashedKoralQuery, result);
+        }
+        
         if (!hasCutOff) {
             result = removeCutOff(result);
         }
@@ -248,7 +251,7 @@ public class SearchService extends BasicService {
             throws KustvaktException {
         ObjectNode queryNode = (ObjectNode) JsonUtils.readTree(query);
         queryNode.remove("meta");
-        return queryNode.hashCode();
+        return queryNode.toString().hashCode();
     }
 
     private String afterCheckTotalResultCache (int hashedKoralQuery,
