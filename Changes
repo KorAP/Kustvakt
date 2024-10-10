@@ -27,6 +27,12 @@
 - - Introduce filter_by and deprecate authorized_only in OAuth2
   client list (close #579)
 
+# version 0.74 hot-fix
+
+- Removed admin & owner restriction on client info access.
+- Removed registered_by and restrict registration_date to admin/owner-
+  only.
+
 # version 0.74
 
 - Remove corpusQuery param in the statistics web-service (close #758).

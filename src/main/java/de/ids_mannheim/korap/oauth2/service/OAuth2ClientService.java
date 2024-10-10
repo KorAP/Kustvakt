@@ -341,22 +341,23 @@ public class OAuth2ClientService {
         return clientDao.retrieveClientById(clientId);
     }
 
+    // client info is available for all users but only via super client
     public OAuth2ClientInfoDto retrieveClientInfo (String clientId, String username)
             throws KustvaktException {
         OAuth2Client client = clientDao.retrieveClientById(clientId);
         
-        // all client info is only available to the owner/admin
-        if (adminDao.isAdmin(username)
-                || username.equals(client.getRegisteredBy())) {
-            return new OAuth2ClientInfoDto(client);
+        boolean showAllInfo = false;
+        if (isPlugin(client)) {
+                return new OAuth2ClientInfoDto(client, showAllInfo);
         }
-        // plugin info is available for all users inclusive guest
-        else if (isPlugin(client)) {
-                return new OAuth2ClientInfoDto(client, false);
-        } 
         else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
+            if (client.getRegisteredBy().equals(username) ||
+                    adminDao.isAdmin(username)) {
+                showAllInfo = true;
+            }
+            return new OAuth2ClientInfoDto(client, showAllInfo);
+//            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+//                    "Unauthorized operation for user: " + username, username);
         }
     }
     
