@@ -47,10 +47,6 @@ public class OAuth2ClientInfoDto {
     private boolean isPermitted;
     private JsonNode source;
 
-    public OAuth2ClientInfoDto (OAuth2Client client) throws KustvaktException {
-        this(client,true);
-    }
-    
     public OAuth2ClientInfoDto (OAuth2Client client, boolean showAllInfo) throws KustvaktException {
         this.setClientId(client.getId());
         this.setClientName(client.getName());
@@ -65,7 +61,7 @@ public class OAuth2ClientInfoDto {
         if (showAllInfo) {
             this.setSuper(client.isSuper());
             this.setRedirect_uri(client.getRedirectURI());
-            this.setRegisteredBy(client.getRegisteredBy());
+//            this.setRegisteredBy(client.getRegisteredBy());
             ZonedDateTime registrationDate = client.getRegistrationDate();
             if (registrationDate != null) {
                 this.setRegistrationDate(registrationDate.toString());
@@ -93,13 +89,13 @@ public class OAuth2ClientInfoDto {
         this.isSuper = isSuper;
     }
 
-    public String getRegisteredBy () {
-        return registeredBy;
-    }
-
-    public void setRegisteredBy (String registeredBy) {
-        this.registeredBy = registeredBy;
-    }
+//    public String getRegisteredBy () {
+//        return registeredBy;
+//    }
+//
+//    public void setRegisteredBy (String registeredBy) {
+//        this.registeredBy = registeredBy;
+//    }
 
     public String getClientId () {
         return clientId;
