@@ -20,6 +20,10 @@
 - Deprecate VC access deletion.
 - Change default port to 8089.
 - Disallow scope all for non super clients.
+- Changed memberUsername to member in the new member-role-addition web-service.
+- Removed user-privileges from user-group list response.
+- 
+
 
 # version 0.74.1-SNAPSHOT
 

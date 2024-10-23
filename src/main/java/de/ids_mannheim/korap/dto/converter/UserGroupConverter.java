@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
 public class UserGroupConverter {
 
     public UserGroupDto createUserGroupDto (UserGroup group,
-            List<UserGroupMember> members, Set<Role> roleSet) {
+            List<UserGroupMember> members) {
 
         UserGroupDto dto = new UserGroupDto();
         dto.setId(group.getId());
@@ -35,10 +35,6 @@ public class UserGroupConverter {
         dto.setDescription(group.getDescription());
         dto.setStatus(group.getStatus());
         dto.setOwner(group.getCreatedBy());
-
-        if (roleSet != null) {
-            dto.setUserPrivileges(createPrivilegeList(roleSet));
-        }
 
         if (members != null) {
             ArrayList<UserGroupMemberDto> memberDtos = new ArrayList<>(

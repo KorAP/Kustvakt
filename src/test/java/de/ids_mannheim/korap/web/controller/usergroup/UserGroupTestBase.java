@@ -90,7 +90,7 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
     protected Response addAdminRole (String groupName, String memberName,
             String addedBy) throws KustvaktException {
         Form form = new Form();
-        form.param("memberUsername", memberName);
+        form.param("member", memberName);
         form.param("role", PredefinedRole.GROUP_ADMIN.name());
 
         Response response = target().path(API_VERSION).path("group")

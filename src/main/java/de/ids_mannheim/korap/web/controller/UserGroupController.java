@@ -277,7 +277,7 @@ public class UserGroupController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addAdminRole (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
-            @FormParam("memberUsername") String memberUsername) {
+            @FormParam("member") String memberUsername) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
@@ -311,7 +311,8 @@ public class UserGroupController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
-            @FormParam("memberUsername") String memberUsername,
+            @FormParam("memberUsername") String memberUsername, // DEPRECATED
+            @FormParam("member") String member,
             @FormParam("roleId") List<Integer> roleIds,
             @FormParam("role") List<PredefinedRole> roles) {
         TokenContext context = (TokenContext) securityContext
@@ -326,6 +327,9 @@ public class UserGroupController {
                         + " removed in API v1.1."));
             }
             else {
+                memberUsername = (member!=null && !member.isEmpty()) 
+                        ? member : memberUsername;
+                        
                 service.deleteMemberRoles(context.getUsername(), groupName,
                         memberUsername, roles);
             }

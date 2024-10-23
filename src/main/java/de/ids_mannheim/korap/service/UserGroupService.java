@@ -93,10 +93,9 @@ public class UserGroupService {
         UserGroupDto groupDto;
         for (UserGroup group : userGroups) {
             members = retrieveMembers(group.getId(), username);
-            userAsMember = groupMemberDao.retrieveMemberById(username,
-                    group.getId());
-            groupDto = converter.createUserGroupDto(group, members, 
-                    userAsMember.getRoles());
+//            userAsMember = groupMemberDao.retrieveMemberById(username,
+//                    group.getId());
+            groupDto = converter.createUserGroupDto(group, members);
             dtos.add(groupDto);
         }
 
@@ -141,7 +140,7 @@ public class UserGroupService {
                 .retrieveHiddenGroupByQueryName(queryName);
         List<UserGroupMember> members = groupMemberDao
                 .retrieveMemberByGroupId(group.getId());
-        return converter.createUserGroupDto(group, members, null);
+        return converter.createUserGroupDto(group, members);
     }
 
     public List<UserGroupDto> retrieveUserGroupByStatus (String username,
@@ -156,7 +155,7 @@ public class UserGroupService {
         UserGroupDto groupDto;
         for (UserGroup group : userGroups) {
             members = groupMemberDao.retrieveMemberByGroupId(group.getId());
-            groupDto = converter.createUserGroupDto(group, members, null);
+            groupDto = converter.createUserGroupDto(group, members);
             dtos.add(groupDto);
         }
         return dtos;
@@ -373,7 +372,7 @@ public class UserGroupService {
             throws KustvaktException {
         UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName, true);
         UserGroupDto groupDto = converter.createUserGroupDto(userGroup,
-                userGroup.getMembers(), null);
+                userGroup.getMembers());
         return groupDto;
     }
 
