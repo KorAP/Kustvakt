@@ -28,6 +28,15 @@ public class UserGroupListTest extends UserGroupTestBase{
         assertEquals(group.at("/owner").asText(), "dory");
         assertEquals(3, group.at("/members").size());
         
+        assertEquals(group.at("/members/0/userId").asText(), "dory");
+        assertEquals(group.at("/members/0/roles").size(), 1);
+        assertEquals(group.at("/members/0/roles/0").asText(), "GROUP_ADMIN");
+        assertEquals(group.at("/members/0/privileges").size(), 5);
+        
+        assertEquals(group.at("/members/1/userId").asText(), "marlin");
+        assertEquals(group.at("/members/1/roles").size(), 1);
+        assertEquals(group.at("/members/1/roles/0").asText(), "GROUP_MEMBER");
+        
         testListNemoGroups();
         testListMarlinGroups();
         

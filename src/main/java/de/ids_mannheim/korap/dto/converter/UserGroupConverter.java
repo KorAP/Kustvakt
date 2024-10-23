@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.dto.converter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +44,7 @@ public class UserGroupConverter {
 
                 UserGroupMemberDto memberDto = new UserGroupMemberDto();
                 memberDto.setUserId(member.getUserId());
+                memberDto.setRoles(createUniqueRoles(member.getRoles()));
                 memberDto.setPrivileges(createPrivilegeList(member.getRoles()));
                 memberDtos.add(memberDto);
             }
@@ -53,6 +55,14 @@ public class UserGroupConverter {
         }
 
         return dto;
+    }
+
+    private Set<String> createUniqueRoles (Set<Role> roles) {
+        Set<String> uniqueRoles = new HashSet<String>();
+        for (Role r : roles) {
+            uniqueRoles.add(r.getName().name());
+        }
+        return uniqueRoles;
     }
 
     private List<PrivilegeType> createPrivilegeList (Set<Role> roles) {

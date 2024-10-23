@@ -22,7 +22,7 @@
 - Disallow scope all for non super clients.
 - Changed memberUsername to member in the new member-role-addition web-service.
 - Removed user-privileges from user-group list response.
-- 
+- Added role names to user-group list
 
 
 # version 0.74.1-SNAPSHOT
