@@ -24,6 +24,7 @@
 - Removed user-privileges from user-group list response.
 - Added role names to user-group list
 - Added not-timeExceeded to the totalResult constraints.
+- Replace EDIT_VC occurrences with CREATE_VC, and removed it.
 
 
 # version 0.74.1-SNAPSHOT

@@ -27,7 +27,7 @@ public class VirtualCorpusClientTest extends VirtualCorpusTestBase {
         String userAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue(username, "password");
         response = requestAuthorizationCode("code", clientId, clientRedirectUri,
-                "create_vc vc_info delete_vc edit_vc", "myState",
+                "create_vc vc_info delete_vc create_vc", "myState",
                 userAuthHeader);
         String code = parseAuthorizationCode(response);
         response = requestTokenWithAuthorizationCodeAndForm(clientId,

@@ -108,7 +108,7 @@ public class VirtualCorpusController {
                 .getUserPrincipal();
 
         try {
-            scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
+            scopeService.verifyScope(context, OAuth2Scope.CREATE_VC);
             ParameterChecker.checkObjectValue(vc, "request entity");
             if (vc.getQueryType() == null) {
                 vc.setQueryType(QueryType.VIRTUAL_CORPUS);
@@ -375,7 +375,8 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /**
+    /** DEPRECATED **
+     * 
      * Only VCA Admins and system admins are allowed to delete a
      * VC-access.
      * 
@@ -398,8 +399,10 @@ public class VirtualCorpusController {
                 + "in API v1.1."));
     }
     
-    /**
-     * Lists all member roles in a group.
+    /** This service may not be necessary thus it is hidden in the wiki.
+     * 
+     * Lists member roles in a group. It can be filtered by query, so only query
+     * related roles should be listed.
      * 
      * Only available to group and system admins.
      * 

@@ -493,7 +493,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         ZonedDateTime now = ZonedDateTime
                 .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
         Set<AccessScope> scopes = new HashSet<>();
-        scopes.add(new AccessScope(OAuth2Scope.EDIT_VC));
+        scopes.add(new AccessScope(OAuth2Scope.CREATE_VC));
 
         AccessToken accessToken = new AccessToken();
         accessToken.setCreatedDate(now.minusSeconds(5));

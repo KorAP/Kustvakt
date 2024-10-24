@@ -91,7 +91,7 @@ public class QueryReferenceController {
                 .getUserPrincipal();
 
         try {
-            scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
+            scopeService.verifyScope(context, OAuth2Scope.CREATE_VC);
             ParameterChecker.checkObjectValue(query, "request entity");
             if (query.getQueryType() == null) {
                 query.setQueryType(QueryType.QUERY);
