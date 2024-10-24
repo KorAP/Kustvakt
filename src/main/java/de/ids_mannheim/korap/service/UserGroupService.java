@@ -88,13 +88,10 @@ public class UserGroupService {
         List<UserGroup> userGroups = retrieveUserGroup(username);
 
         ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
-        UserGroupMember userAsMember;
         List<UserGroupMember> members;
         UserGroupDto groupDto;
         for (UserGroup group : userGroups) {
             members = retrieveMembers(group.getId(), username);
-//            userAsMember = groupMemberDao.retrieveMemberById(username,
-//                    group.getId());
             groupDto = converter.createUserGroupDto(group, members);
             dtos.add(groupDto);
         }

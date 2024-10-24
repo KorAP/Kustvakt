@@ -36,11 +36,9 @@ import jakarta.ws.rs.core.SecurityContext;
 /**
  * UserGroupController defines web APIs related to user groups,
  * such as creating a user group, listing groups of a user,
- * adding members to a group and subscribing (confirming an
- * invitation) to a group.
+ * adding members to a group.
  * 
- * These APIs are only available to logged-in users and not available
- * via third-party apps.
+ * These APIs are only available to logged-in users.
  * 
  * @author margaretha
  *
@@ -60,8 +58,7 @@ public class UserGroupController {
     private OAuth2ScopeService scopeService;
 
     /**
-     * Returns all user-groups in which a user is an active or a
-     * pending member.
+     * Returns all user-groups in which the authenticated user is a member.
      * 
      * Not suitable for system-admin, instead use
      * {@link UserGroupController#
@@ -87,9 +84,8 @@ public class UserGroupController {
     }
 
     /**
-     * Creates a user group with the group owner as the only group
-     * member. The group owner is the authenticated user in the token
-     * context.
+     * Creates a user group with the authenticated user as the group admin and 
+     * the only group member. 
      * 
      * @param securityContext
      * @param groupName
@@ -123,8 +119,8 @@ public class UserGroupController {
     }
 
     /**
-     * Deletes a user-group specified by the group name. Only group
-     * owner and system admins can delete groups.
+     * Deletes a user-group given the group name. Only group
+     * and system admins can delete groups.
      * 
      * @param securityContext
      * @param groupName
@@ -149,8 +145,8 @@ public class UserGroupController {
 
     /**
      * Removes a user-group member. Group owner cannot be removed.
-     * Only group admins, system admins and the member himself can
-     * remove a member.
+     * Group admins and system admins can remove any member. A member
+     * can remove himself from a group.
      * 
      * @param securityContext
      * @param memberUsername
@@ -179,7 +175,8 @@ public class UserGroupController {
         }
     }
 
-    /**
+    /** DEPRECATED **
+     * 
      * Invites users to join a user-group specified by the
      * groupName. Only user-group admins and system admins are
      * allowed to use this service.
@@ -236,7 +233,8 @@ public class UserGroupController {
         }
     }
     
-    /**
+    /** DEPRECATED **
+     *
      * Adds roles of an active member of a user-group. Only user-group
      * admins and system admins are allowed.
      * 
@@ -263,7 +261,8 @@ public class UserGroupController {
                 + "in API v1.1."));
     }
 
-    /**Add group admin role to a member in a group 
+    /**Add group admin role to a member in a group. Group admins can add this 
+     * role to a group member.
      * 
      * @param securityContext
      * @param groupName
@@ -293,9 +292,7 @@ public class UserGroupController {
     }
 
     /**
-     * Updates the roles of a member of a user-group by removing the
-     * given roles. Only user-group admins and system admins are
-     * allowed.
+     * Delete given roles of a member. 
      * 
      * @param securityContext
      * @param groupName
@@ -313,7 +310,7 @@ public class UserGroupController {
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername, // DEPRECATED
             @FormParam("member") String member,
-            @FormParam("roleId") List<Integer> roleIds,
+            @FormParam("roleId") List<Integer> roleIds, // DEPRECATED
             @FormParam("role") List<PredefinedRole> roles) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
@@ -340,7 +337,8 @@ public class UserGroupController {
         }
     }
 
-    /**
+    /** DEPRECATED **
+     * 
      * Handles requests to accept membership invitation. Only invited
      * users can subscribe to the corresponding user-group.
      * 
@@ -360,7 +358,8 @@ public class UserGroupController {
                 + "in API v1.1."));
     }
 
-    /**
+    /** DEPRECATED **
+     * 
      * Handles requests to reject membership invitation. A member can
      * only unsubscribe him/herself from a group.
      * 
