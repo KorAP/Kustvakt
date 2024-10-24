@@ -273,7 +273,9 @@ public class SearchService extends BasicService {
         else {
             JsonNode node = JsonUtils.readTree(result);
             totalResults = node.at("/meta/totalResults").asText();
-            if (totalResults != null && !totalResults.isEmpty()
+            boolean timeExceeded = node.at("/meta/timeExceeded").asBoolean();
+            
+            if (!timeExceeded && totalResults != null && !totalResults.isEmpty()
                     && Integer.parseInt(totalResults) > 0)
                 totalResultCache.storeInCache(hashedKoralQuery, totalResults);
         }
