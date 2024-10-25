@@ -367,9 +367,12 @@ public class UserGroupService {
 
     public UserGroupDto searchByName (String groupName)
             throws KustvaktException {
-        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName, true);
+        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName, false);
+        List<UserGroupMember> members = groupMemberDao
+                .retrieveMemberByGroupId(userGroup.getId());
+
         UserGroupDto groupDto = converter.createUserGroupDto(userGroup,
-                userGroup.getMembers());
+                members);
         return groupDto;
     }
 

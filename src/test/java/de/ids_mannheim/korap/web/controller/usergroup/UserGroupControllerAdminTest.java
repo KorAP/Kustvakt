@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.controller.vc.VirtualCorpusTestBase;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
@@ -23,7 +24,7 @@ import jakarta.ws.rs.core.Response.Status;
 /**
  * @author margaretha
  */
-public class UserGroupControllerAdminTest extends UserGroupTestBase {
+public class UserGroupControllerAdminTest extends VirtualCorpusTestBase {
 
     private String testUser = "group-admin";
 
@@ -178,6 +179,23 @@ public class UserGroupControllerAdminTest extends UserGroupTestBase {
         assertEquals(1, node.size());
     }
 
+    @Test
+    public void testRetrieveHiddenGroupEmptyMember() throws KustvaktException {
+        createDoryGroup();
+        createPublishedVC("dory", "dory-published");
+        
+        JsonNode node = listHiddenGroup();
+        assertEquals(2, node.size());
+        
+        String name  = node.at("/1/name").asText();
+        JsonNode groupNode = retrieveGroup(name);
+        
+        assertEquals(name, groupNode.at("/name").asText());
+        
+        deleteVC("dory-published", "dory", "dory");
+        deleteGroupByName(doryGroupName, "dory");
+    }
+    
     @Test
     public void testUserGroupAdmin ()
             throws KustvaktException {

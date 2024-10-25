@@ -210,6 +210,14 @@ public class UserGroupDao {
         }
     }
 
+    /** If fetchMembers=true, this method doesn't return groups with empty 
+     *  members.
+     * 
+     * @param groupName
+     * @param fetchMembers
+     * @return
+     * @throws KustvaktException
+     */
     public UserGroup retrieveGroupByName (String groupName,
             boolean fetchMembers) throws KustvaktException {
         ParameterChecker.checkStringValue(groupName, "groupName");

@@ -25,6 +25,7 @@
 - Added role names to user-group list
 - Added not-timeExceeded to the totalResult constraints.
 - Replace EDIT_VC occurrences with CREATE_VC, and removed it.
+- Fixed administrative user group retrieval to return groups with empty members.
 
 
 # version 0.74.1-SNAPSHOT
