@@ -1,4 +1,4 @@
-# version 0.75-SNAPSHOT
+# version 0.75
 
 - Alter role and remove privilege database tables (#763)
 - Update user-group and user-group member web-services (#763)
@@ -20,6 +20,7 @@
 - Deprecate VC access deletion.
 - Change default port to 8089.
 - Disallow scope all for non super clients.
+- Added config for total result cache and fixed inconsistency (#774).
 - Changed memberUsername to member in the new member-role-addition web-service.
 - Removed user-privileges from user-group list response.
 - Added role names to user-group list

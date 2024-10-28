@@ -357,7 +357,7 @@ public class VirtualCorpusController {
      */
     @DELETE
     @Path("~{vcCreator}/{vcName}/delete/@{groupName}")
-    public Response deleteRoleByGroupAndQuery (
+    public Response deleteVC_AccessfromGroup (
             @Context SecurityContext securityContext,
             @PathParam("vcCreator") String vcCreator,
             @PathParam("vcName") String vcName,
