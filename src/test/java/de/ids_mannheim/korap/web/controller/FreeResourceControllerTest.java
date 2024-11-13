@@ -19,13 +19,19 @@ public class FreeResourceControllerTest extends SpringJerseyTest {
         Response response = target().path(API_VERSION).path("resource")
                 .request().get();
         String entity = response.readEntity(String.class);
-        JsonNode n = JsonUtils.readTree(entity).get(0);
-        assertEquals("WPD17", n.at("/resourceId").asText());
-        assertEquals("Deutsche Wikipedia Artikel 2017",
-                n.at("/titles/de").asText());
-        assertEquals("German Wikipedia Articles 2017",
-                n.at("/titles/en").asText());
-        assertEquals(n.at("/languages").size(), 1);
-        assertEquals(n.at("/layers").size(), 6);
+        JsonNode n = JsonUtils.readTree(entity);
+        assertEquals(3, n.size());
+
+        n = n.get(0);
+        assertEquals(n.at("/resourceId").asText(), "WPD17");
+        assertEquals(n.at("/titles/de").asText(), 
+                "Deutsche Wikipedia Artikel 2017");
+        assertEquals(n.at("/titles/en").asText(), 
+                "German Wikipedia Articles 2017");
+        assertEquals(1, n.at("/languages").size());
+        assertEquals(6, n.at("/layers").size());
+        assertEquals("Wikimedia Foundation", n.at("/institution").asText());
+        assertEquals("https://korap.ids-mannheim.de?corpusSigle=WPD17", 
+                n.at("/landingPage").asText());
     }
 }

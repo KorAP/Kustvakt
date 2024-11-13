@@ -38,6 +38,11 @@ public class Resource {
 
     @Column(name = "en_description")
     private String englishDescription;
+    
+    @Column(name = "corpus_query")
+    private String corpusQuery;
+    
+    private String institution;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "resource_layer", joinColumns = @JoinColumn(name = "resource_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "layer_id", referencedColumnName = "id"))
@@ -46,19 +51,23 @@ public class Resource {
     public Resource () {}
 
     public Resource (String id, String germanTitle, String englishTitle,
-                     String englishDescription, Set<AnnotationLayer> layers) {
+                     String englishDescription, Set<AnnotationLayer> layers,
+                     String institution, String corpusQuery) {
         this.id = id;
         this.germanTitle = germanTitle;
         this.englishTitle = englishTitle;
         this.englishDescription = englishDescription;
         this.layers = layers;
+        this.corpusQuery = corpusQuery;
+        this.institution=institution;
     }
 
     @Override
     public String toString () {
         return "id=" + id + ", germanTitle=" + germanTitle + ", englishTitle="
                 + englishTitle + ", description=" + englishDescription
-                + ", layers= " + layers;
+                + ", layers= " + layers + ", institution=" + institution
+                + ", corpusQuery=" + corpusQuery;
     }
 
 }

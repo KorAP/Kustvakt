@@ -21,11 +21,14 @@ public class ResourceDto {
     private String description;
     private String[] languages;
     private Map<Integer, String> layers;
+    private String institution;
+    private String landingPage;
 
     @Override
     public String toString () {
         return "resourceId= " + resourceId + ", description= " + description
                 + ", titles= " + titles + ", languages= " + languages
-                + ", layers= " + layers;
+                + ", layers= " + layers + ", institution=" + institution
+                + ", landingPage=" + landingPage;
     }
 }

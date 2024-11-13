@@ -62,7 +62,10 @@ public class FreeResourceParser {
                     resourceDao.createResource(resource.at("/id").asText(),
                             resource.at("/de_title").asText(),
                             resource.at("/en_title").asText(),
-                            resource.at("/en_description").asText(), layers);
+                            resource.at("/en_description").asText(), 
+                            layers,
+                            resource.at("/institution").asText(),
+                            resource.at("/corpus_query").asText());
                 }
             }
             catch (Exception e) {

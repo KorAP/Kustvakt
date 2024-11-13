@@ -1,5 +1,7 @@
 # version 0.76-SNAPSHOT
 
+- Add institution & landingPage to the resource web-service (#777)
+
 # version 0.75
 
 - Alter role and remove privilege database tables (#763)

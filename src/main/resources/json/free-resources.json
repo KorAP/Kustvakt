@@ -10,7 +10,9 @@
         "opennlp/p",
         "tt/l",
         "tt/p"
-    ]
+    ],
+    "corpus_query":"corpusSigle=WPD17",
+    "institution" : "Wikimedia Foundation"
 },
 {
     "id": "WDD17",
@@ -24,7 +26,9 @@
         "opennlp/p",
         "tt/l",
         "tt/p"
-    ]
+    ],
+    "corpus_query":"corpusSigle=WDD17",
+    "institution" : "Wikimedia Foundation"
 },
 {
     "id": "WUD17",
@@ -38,6 +42,8 @@
         "opennlp/p",
         "tt/l",
         "tt/p"
-    ]
+    ],
+    "corpus_query":"corpusSigle=WUD17",
+    "institution" : "Wikimedia Foundation"
 }
 ]
