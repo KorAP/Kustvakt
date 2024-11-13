@@ -6,12 +6,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.AnnotationType;
-import de.ids_mannheim.korap.core.entity.Annotation;
-import de.ids_mannheim.korap.core.entity.AnnotationKey;
-import de.ids_mannheim.korap.core.entity.AnnotationKey_;
-import de.ids_mannheim.korap.core.entity.AnnotationLayer;
-import de.ids_mannheim.korap.core.entity.AnnotationLayer_;
-import de.ids_mannheim.korap.core.entity.Annotation_;
+import de.ids_mannheim.korap.entity.AnnotationKey_;
+import de.ids_mannheim.korap.entity.AnnotationLayer_;
+import de.ids_mannheim.korap.entity.Annotation_;
+import de.ids_mannheim.korap.entity.Annotation;
+import de.ids_mannheim.korap.entity.AnnotationKey;
+import de.ids_mannheim.korap.entity.AnnotationLayer;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import jakarta.persistence.EntityManager;

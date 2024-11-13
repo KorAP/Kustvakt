@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.core.entity;
+package de.ids_mannheim.korap.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
