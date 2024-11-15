@@ -24,8 +24,9 @@ public class OAuth2ClientJson {
     private OAuth2ClientType type;
     private String description;
 
-    // optional
+    // required for plugin, otherwise optional
     private String url;
+    
     // redirect URI determines where the OAuth 2.0 service will return
     // the user to after they have authorized a client.
     @JsonProperty("redirect_uri")

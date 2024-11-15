@@ -58,9 +58,15 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         json.setDescription("This is a plugin test client.");
         json.setSource(source);
         json.setRefreshTokenExpiry(refreshTokenExpiry);
+        
+        testRegisterMissingURL(username,json);
+        
+        json.setUrl("https://my.confidential.plugin.de");
+        
         Response response = registerClient(username, json);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
+        
         String clientId = node.at("/client_id").asText();
         String clientSecret = node.at("/client_secret").asText();
         assertNotNull(clientId);
@@ -87,11 +93,23 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         json.setType(OAuth2ClientType.PUBLIC);
         json.setDescription("This is a public plugin.");
         json.setSource(source);
+        json.setUrl("https://my.public.plugin.de");
         Response response = registerClient(username, json);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertFalse(node.at("/error_description").isMissingNode());
+    }
+    
+    private void testRegisterMissingURL (String username,
+            OAuth2ClientJson json) throws KustvaktException {
+        Response response = registerClient(username, json);
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
+
+        assertEquals(StatusCodes.MISSING_PARAMETER,
+                node.at("/errors/0/0").asInt());
+        assertEquals("URL is required for plugins.",
+                node.at("/errors/0/1").asText());
     }
 
     private void testRetrievePluginInfo (String clientId)

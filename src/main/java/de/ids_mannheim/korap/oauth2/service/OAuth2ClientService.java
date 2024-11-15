@@ -13,6 +13,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.nimbusds.oauth2.sdk.OAuth2Error;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
@@ -97,7 +98,7 @@ public class OAuth2ClientService {
                     "client_name");
             ParameterChecker.checkObjectValue(clientJson.getType(),
                     "client_type");
-            ParameterChecker.checkStringValue(clientJson.getName(),
+            ParameterChecker.checkStringValue(clientJson.getDescription(),
                     "client_description");
         }
         catch (KustvaktException e) {
@@ -105,6 +106,7 @@ public class OAuth2ClientService {
                     OAuth2Error.INVALID_REQUEST);
         }
 
+        JsonNode source = clientJson.getSource();
         String url = clientJson.getUrl();
         if (url != null && !url.isEmpty()) {
             if (!urlValidator.isValid(url)) {
@@ -112,6 +114,12 @@ public class OAuth2ClientService {
                         "Invalid URL", OAuth2Error.INVALID_REQUEST);
             }
         }
+        // url is obligatory for plugins 
+        else if (source != null && !source.isNull()) {
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                    "URL is required for plugins.", "url");
+        }
+            
 
         String redirectURI = clientJson.getRedirectURI();
         if (redirectURI != null && !redirectURI.isEmpty()
