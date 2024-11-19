@@ -47,7 +47,7 @@ public class KustvaktConfiguration {
 
     public final static Logger log = LoggerFactory
             .getLogger(KustvaktConfiguration.class);
-    
+
     private String vcInCaching;
 
     private String indexDir;
@@ -57,6 +57,9 @@ public class KustvaktConfiguration {
     private List<String> queryLanguages;
 
     private String serverHost;
+
+    private int maxTokenContext;
+    private int maxTokenMatch;
 
     private int maxhits;
     private int returnhits;
@@ -224,6 +227,9 @@ public class KustvaktConfiguration {
         // cache
         totalResultCacheEnabled = Boolean.valueOf(properties.getProperty(
                 "cache.total.results.enabled","true"));
+
+        maxTokenContext = Integer.parseInt(properties.getProperty(
+                "max.token.context.size", "0"));
     }
 
     @Deprecated
