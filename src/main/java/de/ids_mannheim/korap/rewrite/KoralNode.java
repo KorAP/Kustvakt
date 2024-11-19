@@ -92,22 +92,23 @@ public class KoralNode {
             else if (value instanceof JsonNode)
                 n.put(name, (JsonNode) value);
 
-            if (ident != null)
-                name = ident.toString();
+//            if (ident != null)
+//                name = ident.toString();
 
-            this.rewrites.add("override", name);
+            this.rewrites.add("override", null, ident);
         }
     }
 
     public void replaceAt (String path, Object value, RewriteIdentifier ident) {
-        if (this.node.isObject() && !this.node.at(path).isMissingNode()) {
+        if (this.node.isObject() && 
+                !this.node.at(path).isMissingNode()) {
             ObjectNode n = (ObjectNode) this.node.at(path);
             n.removeAll();
             n.putAll((ObjectNode) value);
 
             String name = path;
             if (ident != null)
-                name = ident.toString();
+                name = ident.toString(); // scope is simply RewriteIdentifier ?? 
 
             this.rewrites.add("override", name);
         }
@@ -169,16 +170,31 @@ public class KoralNode {
 
     public static class RewriteIdentifier {
 
-        private String key, value;
+        private String scope, value;
+        private Object source;
 
-        public RewriteIdentifier (String key, Object value) {
-            this.key = key;
-            this.value = value.toString();
+        public RewriteIdentifier (String scope, String value) {
+            this.scope = scope;
+            this.value = value;
         }
-
+        
+        public RewriteIdentifier (String scope, String value, Object source) {
+            this.scope = scope;
+            this.value = value;
+            this.source = source;
+        }
+        
+        public String getScope () {
+            return scope;
+        }
+        
+        public Object getSource () {
+            return source;
+        }
+        
         @Override
         public String toString () {
-            return key + "(" + value + ")";
+            return scope + "(" + value + ")";
         }
 
     }
@@ -200,6 +216,19 @@ public class KoralNode {
             rewrite.setOperation(op);
             if (scope != null) {
                 rewrite.setScope(scope.toString());
+            }
+            this.rewrites.add(rewrite);
+            return this;
+        }
+        
+        public KoralRewriteBuilder add (String op, String scope, RewriteIdentifier ri) {
+            KoralRewrite rewrite = new KoralRewrite();
+            rewrite.setOperation(op);
+            if (ri.getScope() != null) {
+                rewrite.setScope(ri.getScope());
+            }
+            if (ri.getSource() != null) {
+                rewrite.setSource(ri.getSource());
             }
             this.rewrites.add(rewrite);
             return this;
@@ -234,24 +263,27 @@ public class KoralNode {
 
     private static class KoralRewrite {
 
-        private Map<String, String> map;
+        private Map<String, Object> map;
 
         private KoralRewrite () {
             this.map = new LinkedHashMap<>();
             this.map.put("@type", "koral:rewrite");
             this.map.put("src", "Kustvakt");
+            this.map.put("origin", "Kustvakt");
         }
 
-        public KoralRewrite setOperation (String op) {
+        public void setOperation (String op) {
             if (!op.startsWith("operation:"))
                 op = "operation:" + op;
             this.map.put("operation", op);
-            return this;
         }
 
-        public KoralRewrite setScope (String scope) {
+        public void setScope (String scope) {
             this.map.put("scope", scope);
-            return this;
+        }
+        
+        public void setSource(Object source) {
+            this.map.put("source", source);
         }
 
     }
@@ -269,4 +301,11 @@ public class KoralNode {
         return this.wrapNode(this.node.get(i));
     }
 
+    public int asInt() {
+        return this.node.asInt();
+    }
+    
+    public String asText(){
+        return this.node.asText();
+    }
 }
