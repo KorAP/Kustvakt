@@ -150,7 +150,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         RewriteIdentifier identifier = new KoralNode.RewriteIdentifier(
-                Attributes.AVAILABILITY, user.getCorpusAccess());
+                Attributes.AVAILABILITY, user.getCorpusAccess().name());
         JsonNode rewrittenNode;
 
         if (jsonNode.has("collection")) {

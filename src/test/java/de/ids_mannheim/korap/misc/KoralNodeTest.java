@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.rewrite.KoralNode;
+import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -37,7 +38,8 @@ public class KoralNodeTest {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("value_1", "setting_1");
         KoralNode knode = KoralNode.wrapNode(node);
-        knode.replace("value_1", "settings_2", null);
+        knode.replace("value_1", "settings_2",
+                new RewriteIdentifier("value_1", "setting_1"));
         assertEquals(knode.rawNode().toString(),
                 "{\"value_1\":\"settings_2\"}");
     }
