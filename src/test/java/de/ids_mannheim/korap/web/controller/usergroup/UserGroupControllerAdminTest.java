@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.controller.usergroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -148,9 +149,9 @@ public class UserGroupControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(entity, "[]");
     }
 
-    @Test
-    public void testListByStatusAll ()
+    private void testListByStatusAll ()
             throws KustvaktException {
+        createDoryGroup();
         Response response = target().path(API_VERSION).path("admin")
                 .path("group").path("list").request()
                 .header(Attributes.AUTHORIZATION,
@@ -163,37 +164,27 @@ public class UserGroupControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        boolean containsHiddenStatus = false;
-        for (int i = 0; i < node.size(); i++) {
-            if (node.get(i).at("/status").asText().equals("HIDDEN")) {
-                containsHiddenStatus = true;
-            }
-        }
-        assertEquals(true, containsHiddenStatus);
+        assertEquals(2, node.size());
+        assertEquals("HIDDEN", node.get(0).at("/status").asText());
+
+        deleteGroupByName(doryGroupName, "dory");
     }
 
     @Test
-    public void testListHiddenGroups ()
-            throws KustvaktException {
-        JsonNode node = listHiddenGroup();
-        assertEquals(1, node.size());
-    }
-
-    @Test
-    public void testRetrieveHiddenGroupEmptyMember() throws KustvaktException {
-        createDoryGroup();
+    public void testHiddenGroupEmptyMember() throws KustvaktException {
         createPublishedVC("dory", "dory-published");
         
         JsonNode node = listHiddenGroup();
-        assertEquals(2, node.size());
+        assertEquals(1, node.size());
         
-        String name  = node.at("/1/name").asText();
+        String name  = node.at("/0/name").asText();
         JsonNode groupNode = retrieveGroup(name);
         
         assertEquals(name, groupNode.at("/name").asText());
         
+        testListByStatusAll();
+        
         deleteVC("dory-published", "dory", "dory");
-        deleteGroupByName(doryGroupName, "dory");
     }
     
     @Test

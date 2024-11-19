@@ -2,6 +2,7 @@
 
 - Add institution & landingPage to the resource web-service (#777)
 - Make URL mandatory for plugin registration (#573)
+- Remove hidden group from test database
 
 # version 0.75
 
