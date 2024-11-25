@@ -120,7 +120,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("CC.*", node.at("/collection/value").asText());
         assertEquals("availability(FREE)",
                 node.at("/collection/rewrites/0/scope").asText());
-        assertEquals("operation:insertion",
+        assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
 
@@ -183,7 +183,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("CC.*", node.at("/collection/value").asText());
         assertEquals("availability(FREE)",
                 node.at("/collection/rewrites/0/scope").asText());
-        assertEquals("operation:insertion",
+        assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
 
@@ -203,7 +203,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("CC.*", node.at("/collection/value").asText());
         assertEquals("availability(FREE)",
                 node.at("/collection/rewrites/0/scope").asText());
-        assertEquals("operation:insertion",
+        assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
 
@@ -232,7 +232,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("operation:or", node.at("/collection/operation").asText());
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());
-        assertEquals("operation:insertion",
+        assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
 
@@ -264,7 +264,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("operation:or", node.at("/collection/operation").asText());
         assertEquals("availability(ALL)",
                 node.at("/collection/rewrites/0/scope").asText());
-        assertEquals("operation:insertion",
+        assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
 
@@ -327,7 +327,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertNotNull(node);
-        assertEquals("operation:insertion",
+        assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
         assertEquals("availability(FREE)",
                 node.at("/collection/rewrites/0/scope").asText());

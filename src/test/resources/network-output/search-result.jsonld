@@ -64,7 +64,7 @@
             {
                 "@type": "koral:rewrite",
                 "src": "Kustvakt",
-                "operation": "operation:insertion",
+                "operation": "operation:injection",
                 "scope": "availability(FREE)"
             }
         ]

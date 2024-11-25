@@ -26,7 +26,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/operands/0/value").asText(),
                 "CC.*");
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:insertion");
+                "operation:injection");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
                 "availability(FREE)");
     }
@@ -63,7 +63,7 @@ public class AvailabilityTest extends SpringJerseyTest {
                         .asText(),
                 "QAO-NC");
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:insertion");
+                "operation:injection");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
                 "availability(PUB)");
     }
@@ -74,7 +74,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/operation").asText(),
                 "operation:and");
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:insertion");
+                "operation:injection");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
                 "availability(PUB)");
         assertEquals(node.at("/collection/operands/1/match").asText(),
@@ -104,7 +104,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/operation").asText(),
                 "operation:and");
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:insertion");
+                "operation:injection");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
                 "availability(ALL)");
         assertEquals(node.at("/collection/operands/1/match").asText(),

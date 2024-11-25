@@ -131,7 +131,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
                 "operation:deletion");
         assertEquals(node.at("/rewrites/1/scope").asText(), "ref(system-vc)");
         assertEquals(node.at("/rewrites/2/operation").asText(),
-                "operation:insertion");
+                "operation:injection");
     }
 
     @Test
