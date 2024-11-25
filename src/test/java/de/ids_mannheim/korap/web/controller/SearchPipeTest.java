@@ -117,7 +117,7 @@ public class SearchPipeTest extends SpringJerseyTest {
         assertEquals(2, node.at("/query/wrap/key").size());
         assertEquals(1, node.at("/collection/rewrites").size());
         assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:insertion");
+                "operation:injection");
         assertEquals(node.at("/collection/rewrites/0/scope").asText(),
                 "availability(FREE)");
         node = node.at("/query/wrap/rewrites");

@@ -102,7 +102,8 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         koralNode.remove("ref", new RewriteIdentifier("ref", ref));
 
         ref = ref.substring(vcOwner.length() + 1, ref.length());
-        koralNode.set("ref", ref, new RewriteIdentifier("ref", ref));
+        koralNode.put("ref", ref);
+//        koralNode.set("ref", ref, new RewriteIdentifier("ref", ref));
     }
 
     private void rewriteVC (QueryDO vc, KoralNode koralNode)

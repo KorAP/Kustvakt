@@ -24,8 +24,7 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 
 /**
  * CollectionRewrite determines which availability field values are
- * possible for a user with respect to his mean and location of
- * access.
+ * possible for a user with respect to login and location of access.
  * 
  * <br/><br/>
  * KorAP differentiates 3 kinds of access:
@@ -36,14 +35,12 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
  * </ul>
  * 
  * Each of these accesses corresponds to a regular expression of
- * license
- * formats defined in kustvakt.conf. For a given access, only those
+ * license formats defined in kustvakt.conf. For a given access, only those
  * resources whose availability field matches its regular expression
  * are allowed to be retrieved.
  * 
  * 
  * @author margaretha
- * @last-update 21 Nov 2017
  * @see CorpusAccess
  */
 public class CollectionRewrite implements RewriteTask.RewriteQuery {

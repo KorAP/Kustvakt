@@ -70,7 +70,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         node = node.at("/operands/1/rewrites");
         assertEquals(2, node.size());
         assertEquals(node.at("/0/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/1/operation").asText(), "operation:insertion");
+        assertEquals(node.at("/1/operation").asText(), "operation:injection");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         assertEquals(3, node.size());
         assertEquals(node.at("/0/operation").asText(), "operation:deletion");
         assertEquals(node.at("/1/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/2/operation").asText(), "operation:insertion");
+        assertEquals(node.at("/2/operation").asText(), "operation:injection");
     }
 
     @Test
@@ -111,7 +111,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         assertEquals(3, node.size());
         assertEquals(node.at("/0/operation").asText(), "operation:deletion");
         assertEquals(node.at("/1/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/2/operation").asText(), "operation:insertion");
+        assertEquals(node.at("/2/operation").asText(), "operation:injection");
     }
 
     @Test

@@ -44,7 +44,7 @@ public class TestVariables {
             + "\t\t}],\n" + "\t\t\"rewrites\": [{\n"
             + "\t\t\t\"@type\": \"koral:rewrite\",\n"
             + "\t\t\t\"src\": \"Kustvakt\",\n"
-            + "\t\t\t\"operation\": \"operation:insertion\",\n"
+            + "\t\t\t\"operation\": \"operation:injection\",\n"
             + "\t\t\t\"scope\": \"corpusSigle\"\n" + "\t\t}]\n" + "\t},\n"
             + "\t\"matches\": [{\n" + "\t\t\"field\": \"tokens\",\n"
             + "\t\t\"textClass\": \"wissenschaft populaerwissenschaft\",\n"

@@ -114,6 +114,10 @@ public class KoralNode {
         }
     }
 
+    // EM: we agree to use injection instead because it has been introduced to
+    // public in several occasions.
+    // This method is similar to put
+    @Deprecated
     public void set (String name, Object value, RewriteIdentifier ident) {
         if (this.node.isObject()) {
             ObjectNode n = (ObjectNode) this.node;
@@ -127,7 +131,7 @@ public class KoralNode {
             if (ident != null)
                 name = ident.toString();
 
-            this.rewrites.add("insertion", name);
+            this.rewrites.add("injection", name);
         }
     }
 
@@ -136,7 +140,7 @@ public class KoralNode {
             ObjectNode n = (ObjectNode) this.node;
             n.setAll(other);
         }
-        this.rewrites.add("insertion", null);
+        this.rewrites.add("injection", null);
     }
 
     public String get (String name) {
@@ -173,6 +177,11 @@ public class KoralNode {
         private String scope, value;
         private Object source;
 
+        public RewriteIdentifier (String scope) {
+            this.scope = scope;
+        }
+        
+        @Deprecated
         public RewriteIdentifier (String scope, String value) {
             this.scope = scope;
             this.value = value;
