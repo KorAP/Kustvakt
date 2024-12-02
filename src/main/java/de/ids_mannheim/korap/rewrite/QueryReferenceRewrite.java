@@ -93,9 +93,9 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
             throws KustvaktException {
         JsonNode jsonNode = koralNode.rawNode();
         koralNode.remove("@type",
-                new RewriteIdentifier("@type", jsonNode.at("/@type").asText()));
+                new RewriteIdentifier("@type", "", jsonNode.at("/@type").asText()));
         koralNode.remove("ref",
-                new RewriteIdentifier("ref", jsonNode.at("/ref").asText()));
+                new RewriteIdentifier("ref", "", jsonNode.at("/ref").asText()));
         koralNode.setAll((ObjectNode) qref);
     }
 }

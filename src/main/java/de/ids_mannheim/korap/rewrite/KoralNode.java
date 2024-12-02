@@ -74,11 +74,8 @@ public class KoralNode {
             set = true;
         }
 
-        if (ident != null)
-            identifier = ident.toString();
-
         if (set) {
-            this.rewrites.add("deletion", identifier);
+            this.rewrites.add("deletion", "", ident);
         }
     }
 
