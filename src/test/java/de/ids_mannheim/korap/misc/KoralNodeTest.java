@@ -29,7 +29,8 @@ public class KoralNodeTest {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("value_1", "setting_1");
         KoralNode knode = KoralNode.wrapNode(node);
-        knode.remove("value_1", null);
+        knode.remove("value_1",
+                new RewriteIdentifier("value_1", "", "settings_1"));
         assertEquals(knode.rawNode().toString(), "{}");
     }
 

@@ -46,8 +46,9 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
-        assertEquals(node.at("/@type").asText(), "koral:docGroup");
+        assertEquals("koral:docGroup", node.at("/@type").asText());
         assertTrue(node.at("/operands/1/rewrites").isMissingNode());
+        
         testRefCachedVCWithUsername();
         QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
         dao.deleteQuery(vc);
@@ -68,9 +69,13 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         node = node.at("/collection");
         assertEquals(node.at("/@type").asText(), "koral:docGroup");
         node = node.at("/operands/1/rewrites");
-        assertEquals(2, node.size());
-        assertEquals(node.at("/0/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/1/operation").asText(), "operation:injection");
+        
+        assertEquals(1, node.size());
+        assertEquals("koral:rewrite", node.at("/0/@type").asText());
+        assertEquals("Kustvakt", node.at("/0/origin").asText());
+        assertEquals("operation:override", node.at("/0/operation").asText());
+        assertEquals("ref", node.at("/0/scope").asText());
+        assertEquals("system/named-vc1", node.at("/0/source").asText());
     }
 
     @Test
@@ -82,16 +87,23 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
-        assertEquals(node.at("/@type").asText(), "koral:docGroup");
-        assertEquals(node.at("/operands/0/@type").asText(), "koral:doc");
-        assertEquals(node.at("/operands/1/@type").asText(), "koral:doc");
-        assertEquals(node.at("/operands/1/value").asText(), "GOE");
-        assertEquals(node.at("/operands/1/key").asText(), "corpusSigle");
+        assertEquals("koral:docGroup", node.at("/@type").asText());
+        assertEquals("koral:doc", node.at("/operands/0/@type").asText());
+        assertEquals("koral:doc", node.at("/operands/1/@type").asText());
+        assertEquals("GOE", node.at("/operands/1/value").asText());
+        assertEquals("corpusSigle", node.at("/operands/1/key").asText());
         node = node.at("/operands/1/rewrites");
+
         assertEquals(3, node.size());
-        assertEquals(node.at("/0/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/1/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/2/operation").asText(), "operation:injection");
+        assertEquals("operation:deletion", node.at("/0/operation").asText());
+        assertEquals("@type", node.at("/0/scope").asText());
+        assertEquals("koral:docGroupRef", node.at("/0/source").asText());
+
+        assertEquals("operation:deletion", node.at("/1/operation").asText());
+        assertEquals("ref", node.at("/1/scope").asText());
+        assertEquals("system-vc", node.at("/1/source").asText());
+    
+        assertEquals("operation:injection", node.at("/2/operation").asText());
     }
 
     @Test
@@ -105,13 +117,20 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
-        assertEquals(node.at("/@type").asText(), "koral:docGroup");
-        assertEquals(node.at("/operands/0/@type").asText(), "koral:docGroup");
+        assertEquals("koral:docGroup", node.at("/@type").asText());
+        assertEquals("koral:docGroup", node.at("/operands/0/@type").asText());
         node = node.at("/operands/1/rewrites");
+
         assertEquals(3, node.size());
-        assertEquals(node.at("/0/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/1/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/2/operation").asText(), "operation:injection");
+        assertEquals("operation:deletion", node.at("/0/operation").asText());
+        assertEquals("@type", node.at("/0/scope").asText());
+        assertEquals("koral:docGroupRef", node.at("/0/source").asText());
+
+        assertEquals("operation:deletion", node.at("/1/operation").asText());
+        assertEquals("ref", node.at("/1/scope").asText());
+        assertEquals("system/system-vc", node.at("/1/source").asText());
+
+        assertEquals("operation:injection", node.at("/2/operation").asText());
     }
 
     @Test
@@ -126,7 +145,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
-        assertEquals(node.at("/@type").asText(), "koral:docGroup");
+        assertEquals("koral:docGroup",node.at("/@type").asText());
         node = node.at("/operands/1/rewrites");
         assertEquals(3, node.size());
     }

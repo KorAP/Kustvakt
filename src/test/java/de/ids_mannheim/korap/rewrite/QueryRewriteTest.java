@@ -25,8 +25,8 @@ public class QueryRewriteTest extends SpringJerseyTest {
                 .request().get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Query system/examplequery is not found.");
+        assertEquals("Query system/examplequery is not found.",
+                node.at("/errors/0/1").asText());
     }
 
     @Test
@@ -36,8 +36,19 @@ public class QueryRewriteTest extends SpringJerseyTest {
                 .resolveTemplate("q", "[orth=der]{#system-q} Baum").request()
                 .get();
         String ent = response.readEntity(String.class);
-        // System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
+        
+        node = node.at("/query/operands/1/rewrites");
+        assertEquals(3,node.size());
+        assertEquals("Kustvakt", node.at("/0/origin").asText());
+        assertEquals("operation:deletion", node.at("/0/operation").asText());
+        assertEquals("@type", node.at("/0/scope").asText());
+        assertEquals("koral:queryRef", node.at("/0/source").asText());
+
+        assertEquals("ref", node.at("/1/scope").asText());
+        assertEquals("system-q", node.at("/1/source").asText());
+        
+        assertEquals("operation:injection", node.at("/2/operation").asText());
     }
 
     @Test
@@ -53,7 +64,16 @@ public class QueryRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.at("/query/operands/1/@type").asText(),
                 "koral:token");
-        assertEquals(node.at("/query/operands/1/rewrites/0/scope").asText(),
-                "@type(koral:queryRef)");
+        
+        node = node.at("/query/operands/1/rewrites");
+        assertEquals("Kustvakt", node.at("/0/origin").asText());
+        assertEquals("operation:deletion", node.at("/0/operation").asText());
+        assertEquals("@type", node.at("/0/scope").asText());
+        assertEquals("koral:queryRef", node.at("/0/source").asText());
+
+        assertEquals("ref", node.at("/1/scope").asText());
+        assertEquals("dory/dory-q", node.at("/1/source").asText());
+        
+        assertEquals("operation:injection", node.at("/2/operation").asText());
     }
 }

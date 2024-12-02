@@ -125,11 +125,16 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         assertEquals(node.at("/key").asText(), "corpusSigle");
         assertEquals(node.at("/rewrites/0/operation").asText(),
                 "operation:deletion");
-        assertEquals(node.at("/rewrites/0/scope").asText(),
-                "@type(koral:docGroupRef)");
+        assertEquals(node.at("/rewrites/0/scope").asText(), "@type");
+        assertEquals(node.at("/rewrites/0/source").asText(),
+                "koral:docGroupRef");
+        
         assertEquals(node.at("/rewrites/1/operation").asText(),
                 "operation:deletion");
-        assertEquals(node.at("/rewrites/1/scope").asText(), "ref(system-vc)");
+        assertEquals(node.at("/rewrites/1/scope").asText(), "ref");
+        assertEquals(node.at("/rewrites/1/source").asText(), "system-vc");
+        
+        
         assertEquals(node.at("/rewrites/2/operation").asText(),
                 "operation:injection");
     }
