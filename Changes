@@ -6,8 +6,8 @@
 - Implemented QueryContextRewrite (#755)
 - Replace operation:insertion with operation:injection (#778) 
 - Update VirtualCorpusRewrite Remove Owner (#779)
-- Add source to QueryReferenceRewrite (#783) and VirtualCorpusRewrite (#780).
-
+- Add source to QueryReferenceRewrite (#783) and VirtualCorpusRewrite (#780)
+- Use operation:override in virtual corpus (reference) rewrite (#780)
 
 # version 0.75
 
@@ -28,55 +28,55 @@
 - Remove unsubscribe member (#764)
 - Added deprecation messages to deprecated services
 - Removed mail configuration (#764)
-- Deprecate VC access deletion.
-- Change default port to 8089.
-- Disallow scope all for non super clients.
-- Added config for total result cache and fixed inconsistency (#774).
-- Changed memberUsername to member in the new member-role-addition web-service.
-- Removed user-privileges from user-group list response.
+- Deprecate VC access deletion
+- Change default port to 8089
+- Disallow scope all for non super clients
+- Added config for total result cache and fixed inconsistency (#774)
+- Changed memberUsername to member in the new member-role-addition web-service
+- Removed user-privileges from user-group list response
 - Added role names to user-group list
-- Added not-timeExceeded to the totalResult constraints.
-- Replace EDIT_VC occurrences with CREATE_VC, and removed it.
-- Fixed administrative user group retrieval to return groups with empty members.
+- Added not-timeExceeded to the totalResult constraints
+- Replace EDIT_VC occurrences with CREATE_VC, and removed it
+- Fixed administrative user group retrieval to return groups with empty members
 
 
 # version 0.74.1-SNAPSHOT
 
-- Switch Docker image to temurin (diewald).
+- Switch Docker image to temurin (diewald)
 - - Introduce filter_by and deprecate authorized_only in OAuth2
   client list (close #579)
 
 # version 0.74 hot-fix
 
-- Removed admin & owner restriction on client info access.
+- Removed admin & owner restriction on client info access
 - Removed registered_by and restrict registration_date to admin/owner-
-  only.
+  only
 
 # version 0.74
 
-- Remove corpusQuery param in the statistics web-service (close #758).
-- Moved NamedVCLoader to the init package.
-- Clean up Spring XML configs.
-- Fix some logging to write to file instead of stdout.
+- Remove corpusQuery param in the statistics web-service (close #758)
+- Moved NamedVCLoader to the init package
+- Clean up Spring XML configs
+- Fix some logging to write to file instead of stdout
 - Change CC RE from CC-BY.* to CC.* (kupietz)
-- Unified ResourceFilters and SearchResourceFilters.
-- Fixed supported versions in the configs & changed delimiter to comma.
+- Unified ResourceFilters and SearchResourceFilters
+- Fixed supported versions in the configs & changed delimiter to comma
 - Setup log4j2 config (#753)
 
 # version 0.73.2
 
 - Added tests for the DNB scenario with custom max match 
-  and context size. (#745)
-- Cleaned up named-vc.  
+  and context size (#745)
+- Cleaned up named-vc
 - Updated tests using the old match info web-services (#757)
 - Added deprecation warning for the old matchInfo service (#757)
 - Fixed empty named VC path in configuration (solves #754)
 - Restrict registration info for plugins (solves #572)  
-- Removed redirect uri from InstalledPluginDto & updated tests.
+- Removed redirect uri from InstalledPluginDto & updated tests
 
 # version 0.73.1
 
-- Fixed jakarta validation error.
+- Fixed jakarta validation error
 - Added openapi doc (#744)
 - Moved service.properties to src/main/resources/properties 
 - Moved free-resources.json to src/main/resources/json
@@ -85,9 +85,9 @@
   to use /data folder (#598)
 - Added KoralQuery check when updating VC (solved #676)
 - Setup vc-cache in the data folder (#598)
-- Changed generating adminToken in the data folder (#598).
+- Changed generating adminToken in the data folder (#598)
 - Moved disk store path cache_store into the data folder (#598)
-- Fixed invalid signature of the uber jar.
+- Fixed invalid signature of the uber jar
 - Updated configurations of the lite version to use the 
   data folder (#598)
 - Setup logs files to be generated inside the data folder (#598)
@@ -123,8 +123,8 @@
 - Removed Apache Oltu API from token requests (#650)
 - Removed OpenID
 - Fixed clearing cache
-- Fix JettyServerTest, init package, and some java docs.
-- Make scope extraction more flexible.
+- Fix JettyServerTest, init package, and some java docs
+- Make scope extraction more flexible
 - Updated token response using Nimbus (#650)
 - Remove Oltu request and validator implementations (#650)
 - Updated OAuth2 response handler (#650)
@@ -146,7 +146,7 @@
 - Resolved duplicate libraries
 - Fixed testing expiry access token
 - Fix lombok compile warning
-- Ensure the order of clean token tests.
+- Ensure the order of clean token tests
 
 # version 0.71
 
@@ -178,7 +178,7 @@
 - Added getting username from LDAP (#568)
 - Disabled LDAP auth provider and token API in the auth filter (#587)
 - Added LDAP log for users without idsC2Profile
-- Fixed log4j2 properties.
+- Fixed log4j2 properties
 
 
 # version 0.69.3
@@ -207,17 +207,17 @@
 - Allow admin access using admin token for the clean token API
 2023-02-10
 - Use admin filter instead of OAuth2 ADMIN scope  
-- Added a plugin test.
+- Added a plugin test
 2023-02-15
 - Moved user-group retrieval API to UserGroupAdminController 
-  and changed the service path URL of UserGroupAdminController. 
+  and changed the service path URL of UserGroupAdminController 
 2023-02-20
 - Deprecate API token (JWT) web-service
 - Fixed Slf4J binding
 2023-02-28
 - Exclude junit5 dependencies to keep test runner in Eclipse using JUnit 4
 2023-03-06
-- Fixed testing refresh token expiry.
+- Fixed testing refresh token expiry
 
 
 # version 0.69.1
@@ -248,13 +248,13 @@
 2022-05-27
  - Added maximum limit to custom refresh token expiry
 2022-06-01
- - Added new APIs: list user-installed plugins and uninstall plugin.
+ - Added new APIs: list user-installed plugins and uninstall plugin
  - Moved install and list plugin APIs to PluginController and updated their
-   service paths under /plugins.
+   service paths under /plugins
 2022-06-03 
  - Implemented searching option using a network endpoint
- - Implemented initial super client registration for user authentication.
- - Fixed admin clean token API and restrict plugins to confidential only.
+ - Implemented initial super client registration for user authentication
+ - Fixed admin clean token API and restrict plugins to confidential only
  
  
  
@@ -271,8 +271,8 @@
 # version 0.67
 
 2022-05-09
- - LDAP authentication and authorization is now configurable and supports SSL (LDAPS) connections.
- - An embedded LDAP server can now be started automatically if configured accordingly.
+ - LDAP authentication and authorization is now configurable and supports SSL (LDAPS) connections
+ - An embedded LDAP server can now be started automatically if configured accordingly
 2022-05-11
  - Changed the SQL script updating oauth2_client table
 
@@ -280,45 +280,45 @@
 # version 0.66
 
 2022-03-31
- - Updated query and user-group name pattern.
+ - Updated query and user-group name pattern
 2022-04-08
- - Added redirect_uri to client info API.
+ - Added redirect_uri to client info API
 2022-04-11
  - Added registration_date, refresh_token_expiry, source and is_permitted
    to the oauth2_client database table, and updated the OAuth2 client 
-   registration mechanism.
- - Added authorization request with GET and deprecated that with POST.
+   registration mechanism
+ - Added authorization request with GET and deprecated that with POST
 2022-04-13
  - Updated OAuth2Client list API (added redirect_uri, registration_date, 
-   permitted, source to OAuth2UserClientDto).
+   permitted, source to OAuth2UserClientDto)
 2022-04-20
- - Updated authorization error response. (Included error and error 
+ - Updated authorization error response (Included error and error 
    description in the client redirect URI except for missing or 
-   invalid client id or redirect URI.
+   invalid client id or redirect URI)
 
  
 # version 0.65.2
 
 2022-03-03
- - Removed VCLoader.
- - Added foreign keys to the DB tables of access and refresh token scopes.
+ - Removed VCLoader
+ - Added foreign keys to the DB tables of access and refresh token scopes
 2022-03-07
- - Added more parameter checks and OAuth2Client web-service tests.
+ - Added more parameter checks and OAuth2Client web-service tests
 2022-03-17
- - Updated admin filter by using admin token and role checks.
+ - Updated admin filter by using admin token and role checks
 2022-03-18
- - Added an OAuth2 admin API to delete expired/revoked access and refresh tokens.
+ - Added an OAuth2 admin API to delete expired/revoked access and refresh tokens
 2022-03-28
  - Updated admin filter (admintoken as a form param) and uses 
-   it for the closing index reader API. 
- - Removed unused admin API: clear access token cache.
+   it for the closing index reader API 
+ - Removed unused admin API: clear access token cache
 2022-03-29
  - Updated and moved admin API: updateClientPrivilege to OAuth2AdminController
 
 # version 0.65.1
 
 2022-03-01
- - Restricts the field retrieval web-service to admin only.
+ - Restricts the field retrieval web-service to admin only
 
 # version 0.65
 
@@ -326,57 +326,57 @@
 !!! Please also update Krill to version 0.60.2 and Koral to version 0.38 
 
 2021-12-02
- - Updated VC cache.
+ - Updated VC cache
 2021-12-03
- - Enabled listing system vc for authorized users.
+ - Enabled listing system vc for authorized users
 2021-12-08
- - Removed koralQuery and statistics from VC list.
+ - Removed koralQuery and statistics from VC list
  - Added a web-service to retrieve KoralQuery of a VC
 2021-12-10
- - [security] Updated log4j libs due to CVE-2021-44228.
+ - [security] Updated log4j libs due to CVE-2021-44228
 2021-12-13
- - Fixed broken test suite.
+ - Fixed broken test suite
 2022-01-03
  - [security] More log4j security updates
  - Bumped unboundid-ldapsdk
- - Updated tests.
+ - Updated tests
 2022-01-25
- - Added show-tokens option to the search API.
+ - Added show-tokens option to the search API
 2022-01-31
- - Added an API retrieving fields of a virtual corpus.
+ - Added an API retrieving fields of a virtual corpus
 
 # version 0.64.1
 
 2021-10-26
- - Bump Kustvakt and Krill versions.
+ - Bump Kustvakt and Krill versions
 
 
 # version 0.64
 2021-07-29
- - Updated the change files and made a new version.
+ - Updated the change files and made a new version
 2021-08-12
- - Fixed errors due to missing query type and added tests.
+ - Fixed errors due to missing query type and added tests
 2021-08-13
- - Fixed missing request entity.
- - Updated the query service to enable editing query references.
+ - Fixed missing request entity
+ - Updated the query service to enable editing query references
 2021-08-16
  - Fixed creator param when storing query or VC by admins for 
-  the system or other users.
+  the system or other users
 
 # version 0.63.2
 2021-06-11
- - Updated OAuth2 token length & secure random algorithm config.
- - Added character set filter to random code generator, e.g. for client_id.
+ - Updated OAuth2 token length & secure random algorithm config
+ - Added character set filter to random code generator, e.g. for client_id
 2021-06-14
- - Updated roleId and super client parameters.
+ - Updated roleId and super client parameters
 2021-06-24
- - Fixed broken test. 
+ - Fixed broken test 
 2021-07-22
- - Updated cache settings and some loggings.
+ - Updated cache settings and some loggings
 2021-07-26
  - Replaced annotation parsing with restoring the annotation tables to the
-database.
- - Moved cache config to the full config. 
+database
+ - Moved cache config to the full config 
 
 # version 0.63.1
 2021-02-22
@@ -409,9 +409,9 @@ parameters (margaretha)
 30/10/2020
  - Added database methods for storing query references (diewald) 
 04/12/2020
- - Fix hibernate dialect for SQLite. (margaretha)
+ - Fix hibernate dialect for SQLite (margaretha)
 04/12/2020
- - Fix pipe warning. (margaretha)
+ - Fix pipe warning (margaretha)
 14/01/2021
  - Updated Flyway (margaretha)
 21/01/2021
@@ -468,7 +468,7 @@ parameters (margaretha)
   
 # version 0.62.2
 17/10/2019
- - Handled vulnerability CVE-2019-17195. (margaretha)
+ - Handled vulnerability CVE-2019-17195 (margaretha)
 8/11/2019
  - Added user-group name pattern (margaretha, issue #33)
 11/11/2019
@@ -857,7 +857,7 @@ parameters (margaretha)
  - enabled custom implementation for email address retrieval (margaretha)
  - removed old policy and deprecated code (margaretha)
  - moved authentication related code to /full (margaretha)
- - added userRoles attribute to UserGroupDto. (margaretha)
+ - added userRoles attribute to UserGroupDto (margaretha)
  - fixed sqlite trigger (margaretha)
  - fixed member exist error message (margaretha)
  - fixed member invitation to join deleted group (margaretha)

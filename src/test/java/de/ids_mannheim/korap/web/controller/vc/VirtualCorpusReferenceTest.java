@@ -187,17 +187,14 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         assertEquals(node.at("/collection/operands/1/value").asText(), "GOE");
         assertEquals(node.at("/collection/operands/1/key").asText(),
                 "corpusSigle");
-        node = node.at("/collection/operands/1/rewrites");
-        assertEquals(3, node.size());
-        assertEquals(node.at("/0/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/0/scope").asText(), "@type");
-        assertEquals(node.at("/0/source").asText(), "koral:docGroupRef");
-        
-        assertEquals(node.at("/1/operation").asText(), "operation:deletion");
-        assertEquals(node.at("/1/scope").asText(), "ref");
-        assertEquals(node.at("/1/source").asText(), "marlin/published-vc");
-        
-        assertEquals(node.at("/2/operation").asText(), "operation:injection");
+
+        node = node.at("/collection/operands/1");
+        assertEquals(node.at("/rewrites/0/operation").asText(),
+                "operation:override");
+        assertEquals("koral:docGroupRef",
+                node.at("/rewrites/0/source/@type").asText());
+        assertEquals("marlin/published-vc",
+                node.at("/rewrites/0/source/ref").asText());
     }
 
     @Test
