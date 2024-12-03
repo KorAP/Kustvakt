@@ -95,6 +95,15 @@ public class KoralNode {
             this.rewrites.add("override", null, ident);
         }
     }
+    
+    public void replace (Object value, RewriteIdentifier ident) {
+        ObjectNode n = (ObjectNode) this.node;
+        if (value instanceof ObjectNode) {
+            n.removeAll();
+            n.setAll((ObjectNode) value);
+            this.rewrites.add("override", null, ident);
+        }
+    }
 
     public void replaceAt (String path, Object value, RewriteIdentifier ident) {
         if (this.node.isObject() && 

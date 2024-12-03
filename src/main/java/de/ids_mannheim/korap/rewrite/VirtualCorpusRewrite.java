@@ -106,13 +106,19 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
     private void rewriteVC (QueryDO vc, KoralNode koralNode)
             throws KustvaktException {
         String koralQuery = vc.getKoralQuery();
-        JsonNode kq = JsonUtils.readTree(koralQuery).at("/collection");
-        JsonNode jsonNode = koralNode.rawNode();
+        JsonNode newKoralQuery = JsonUtils.readTree(koralQuery).at("/collection");
+        
+        String source = koralNode.rawNode().toString();
+        JsonNode sourceNode = JsonUtils.readTree(source);
+        
+        koralNode.replace(newKoralQuery, new RewriteIdentifier(
+                null, "", sourceNode));
+        
         // rewrite
-        koralNode.remove("@type", new RewriteIdentifier("@type", "",
-                jsonNode.at("/@type").asText()));
-        koralNode.remove("ref",
-                new RewriteIdentifier("ref", "", jsonNode.at("/ref").asText()));
-        koralNode.setAll((ObjectNode) kq);
+//        koralNode.remove("@type", new RewriteIdentifier("@type", "",
+//                jsonNode.at("/@type").asText()));
+//        koralNode.remove("ref",
+//                new RewriteIdentifier("ref", "", jsonNode.at("/ref").asText()));
+//        koralNode.setAll((ObjectNode) kq);
     }
 }

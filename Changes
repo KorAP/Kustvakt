@@ -7,7 +7,7 @@
 - Replace operation:insertion with operation:injection (#778) 
 - Update VirtualCorpusRewrite Remove Owner (#779)
 - Add source to QueryReferenceRewrite (#783) and VirtualCorpusRewrite (#780).
-
+- Use operation:override in virtual corpus (reference) rewrite (#780)
 
 # version 0.75
 
