@@ -5,7 +5,10 @@
 - Remove hidden group from test database
 - Implemented QueryContextRewrite (#755)
 - Replace operation:insertion with operation:injection (#778) 
-
+- Add source to QueryReferenceRewrite (#783) and VirtualCorpus(Reference)Rewrite
+- Update VirtualCorpusRewrite Remove Owner (#779)
+- Update VirtualCorpusRewrite for non-cached VC (#780)
+- Use operation:override in virtual corpus (reference) rewrite (#780)
 
 # version 0.75
 
