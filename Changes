@@ -8,6 +8,7 @@
 - Update VirtualCorpusRewrite Remove Owner (#779)
 - Add source to QueryReferenceRewrite (#783) and VirtualCorpusRewrite (#780)
 - Use operation:override in virtual corpus (reference) rewrite (#780)
+- Use operation:override in query reference rewrite (#783)
 
 # version 0.75
 

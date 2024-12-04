@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,7 +16,7 @@ import jakarta.ws.rs.core.Response;
 /**
  * @author diewald
  */
-public class QueryRewriteTest extends SpringJerseyTest {
+public class QueryReferenceRewriteTest extends SpringJerseyTest {
 
     @Test
     public void testRewriteRefNotFound () throws KustvaktException, Exception {
@@ -37,18 +38,13 @@ public class QueryRewriteTest extends SpringJerseyTest {
                 .get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        
         node = node.at("/query/operands/1/rewrites");
-        assertEquals(3,node.size());
+        assertEquals(1, node.size());
         assertEquals("Kustvakt", node.at("/0/origin").asText());
-        assertEquals("operation:deletion", node.at("/0/operation").asText());
-        assertEquals("@type", node.at("/0/scope").asText());
-        assertEquals("koral:queryRef", node.at("/0/source").asText());
-
-        assertEquals("ref", node.at("/1/scope").asText());
-        assertEquals("system-q", node.at("/1/source").asText());
-        
-        assertEquals("operation:injection", node.at("/2/operation").asText());
+        assertEquals("operation:override", node.at("/0/operation").asText());
+        assertEquals("koral:queryRef", node.at("/0/source/@type").asText());
+        assertEquals("system-q", node.at("/0/source/ref").asText());
+        assertTrue(node.at("/0/scope").isMissingNode());
     }
 
     @Test
@@ -64,16 +60,13 @@ public class QueryRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.at("/query/operands/1/@type").asText(),
                 "koral:token");
-        
-        node = node.at("/query/operands/1/rewrites");
-        assertEquals("Kustvakt", node.at("/0/origin").asText());
-        assertEquals("operation:deletion", node.at("/0/operation").asText());
-        assertEquals("@type", node.at("/0/scope").asText());
-        assertEquals("koral:queryRef", node.at("/0/source").asText());
 
-        assertEquals("ref", node.at("/1/scope").asText());
-        assertEquals("dory/dory-q", node.at("/1/source").asText());
-        
-        assertEquals("operation:injection", node.at("/2/operation").asText());
+        node = node.at("/query/operands/1/rewrites");
+        assertEquals(1, node.size());
+        assertEquals("Kustvakt", node.at("/0/origin").asText());
+        assertEquals("operation:override", node.at("/0/operation").asText());
+        assertEquals("koral:queryRef", node.at("/0/source/@type").asText());
+        assertEquals("dory/dory-q", node.at("/0/source/ref").asText());
+        assertTrue(node.at("/0/scope").isMissingNode());
     }
 }

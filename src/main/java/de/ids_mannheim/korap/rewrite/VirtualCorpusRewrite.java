@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.QueryType;
@@ -103,7 +102,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         koralNode.replace("ref", newRef, new RewriteIdentifier("ref", "", ref));
     }
 
-    private void rewriteVC (QueryDO vc, KoralNode koralNode)
+    protected void rewriteVC (QueryDO vc, KoralNode koralNode)
             throws KustvaktException {
         String koralQuery = vc.getKoralQuery();
         JsonNode newKoralQuery = JsonUtils.readTree(koralQuery).at("/collection");

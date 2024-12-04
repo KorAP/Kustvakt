@@ -27,7 +27,7 @@ import jakarta.ws.rs.core.Response;
 /**
  * @author margaretha
  */
-public class VirtualCorpusRewriteTest extends SpringJerseyTest {
+public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
 
     @Autowired
     private NamedVCLoader vcLoader;
