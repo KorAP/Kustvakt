@@ -322,6 +322,53 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
+    public void testDetermineCorpusAccess () throws KustvaktException {
+        String vcName = "vc-all";
+        createPrivateVC(testUser, vcName);
+        JsonNode node = listVC(testUser);
+        assertEquals(2, node.size());
+        
+        node = node.get(1);
+        assertEquals(vcName, node.get("name").asText());
+        assertEquals("ALL", node.get("requiredAccess").asText());
+        deleteVC(vcName, testUser, testUser);
+        
+
+        vcName = "vc-pub-1";
+        String vcJson = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"availability=/ACA.*/\"}";
+
+        createVC(authHeader, testUser, vcName, vcJson);
+        node = listVC(testUser).get(1);
+        assertEquals(vcName, node.get("name").asText());
+        assertEquals("PUB", node.get("requiredAccess").asText());
+        deleteVC(vcName, testUser, testUser);
+        
+        vcName = "vc-pub-2";
+        vcJson = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"availability=QAO-NC\"}";
+
+        createVC(authHeader, testUser, vcName, vcJson);
+        node = listVC(testUser).get(1);
+        assertEquals(vcName, node.get("name").asText());
+        assertEquals("PUB", node.get("requiredAccess").asText());
+        deleteVC(vcName, testUser, testUser);
+        
+        vcName = "vc-free";
+        vcJson = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"availability=/CC.*/\"}";
+
+        createVC(authHeader, testUser, vcName, vcJson);
+        node = listVC(testUser).get(1);
+        assertEquals(vcName, node.get("name").asText());
+        assertEquals("FREE", node.get("requiredAccess").asText());
+        deleteVC(vcName, testUser, testUser);
+    }
+    
+    @Test
     public void testMaxNumberOfVC () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
                 + ",\"queryType\": \"VIRTUAL_CORPUS\""

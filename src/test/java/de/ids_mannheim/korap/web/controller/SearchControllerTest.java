@@ -19,6 +19,7 @@ import jakarta.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -33,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SearchControllerTest extends SpringJerseyTest {
 
     @Autowired
-    private KustvaktConfiguration config;
+    private FullConfiguration config;
 
     private JsonNode requestSearchWithFields (String fields)
             throws KustvaktException {
@@ -252,13 +253,14 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals("CC.*", node.at("/collection/operands/0/value").asText());
+        assertEquals(config.getFreeOnlyRegex(),
+                node.at("/collection/operands/0/value").asText());
         assertEquals("ACA.*",
                 node.at("/collection/operands/1/operands/0/value").asText());
         assertEquals("QAO-NC",
                 node.at("/collection/operands/1/operands/1/operands/0/value")
                         .asText());
-        assertEquals("QAO.*",
+        assertEquals(config.getAllOnlyRegex(),
                 node.at("/collection/operands/1/operands/1/operands/1/value")
                         .asText());
         assertEquals("operation:or", node.at("/collection/operation").asText());

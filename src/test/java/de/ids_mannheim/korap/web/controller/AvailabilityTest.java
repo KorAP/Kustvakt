@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import jakarta.ws.rs.ProcessingException;
@@ -13,11 +15,15 @@ import jakarta.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class AvailabilityTest extends SpringJerseyTest {
+    
+    @Autowired
+    public FullConfiguration config;    
 
     private void checkAndFree (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
@@ -100,37 +106,34 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     private void checkAndAllWithACA (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
-        assertNotNull(node);
-        assertEquals(node.at("/collection/operation").asText(),
-                "operation:and");
-        assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:injection");
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(ALL)");
-        assertEquals(node.at("/collection/operands/1/match").asText(),
-                "match:eq");
-        assertEquals(node.at("/collection/operands/1/type").asText(),
-                "type:regex");
-        assertEquals(node.at("/collection/operands/1/key").asText(),
-                "availability");
-        assertEquals(node.at("/collection/operands/1/value").asText(), "ACA.*");
+        System.out.println(node.toPrettyString());
+        assertEquals("operation:and",
+                node.at("/collection/operation").asText());
+        assertEquals("operation:injection",
+                node.at("/collection/rewrites/0/operation").asText());
+        assertEquals("availability(ALL)",
+                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals("match:eq",
+                node.at("/collection/operands/1/match").asText());
+        assertEquals("type:regex",
+                node.at("/collection/operands/1/type").asText());
+        assertEquals("availability",
+                node.at("/collection/operands/1/key").asText());
+        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
         node = node.at("/collection/operands/0");
-        assertEquals(node.at("/operands/0/match").asText(), "match:eq");
-        assertEquals(node.at("/operands/0/type").asText(), "type:regex");
-        assertEquals(node.at("/operands/0/key").asText(), "availability");
-        assertEquals(node.at("/operands/0/value").asText(), "CC.*");
-        assertEquals(
-                node.at("/operands/1/operands/1/operands/0/match").asText(),
-                "match:eq");
-        assertEquals(
-                node.at("/operands/1/operands/1/operands/0/value").asText(),
-                "QAO-NC");
-        assertEquals(
-                node.at("/operands/1/operands/1/operands/1/match").asText(),
-                "match:eq");
-        assertEquals(
-                node.at("/operands/1/operands/1/operands/1/value").asText(),
-                "QAO.*");
+        assertEquals("match:eq", node.at("/operands/0/match").asText());
+        assertEquals("type:regex", node.at("/operands/0/type").asText());
+        assertEquals("availability", node.at("/operands/0/key").asText());
+        assertEquals(config.getFreeOnlyRegex(),
+                node.at("/operands/0/value").asText());
+        assertEquals("match:eq",
+                node.at("/operands/1/operands/1/operands/0/match").asText());
+        assertEquals("QAO-NC",
+                node.at("/operands/1/operands/1/operands/0/value").asText());
+        assertEquals("match:eq",
+                node.at("/operands/1/operands/1/operands/1/match").asText());
+        assertEquals(config.getAllOnlyRegex(),
+                node.at("/operands/1/operands/1/operands/1/value").asText());
     }
 
     private Response searchQuery (String collectionQuery) {
