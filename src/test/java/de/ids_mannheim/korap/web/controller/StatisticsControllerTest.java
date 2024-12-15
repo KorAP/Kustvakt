@@ -102,7 +102,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     public void testGetStatisticsWithWrongcorpusQuery2 ()
             throws IOException, KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
-                .queryParam("cq", "creationDate >= 1810").request().get();
+                .queryParam("cq", "creationDate >= 1810-05").request().get();
         String ent = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(ent);
