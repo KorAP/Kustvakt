@@ -33,6 +33,24 @@
       "message": "Shouldn\u0027t the fix be then to use \"since\"?",
       "revId": "e7eef15ee6f3d67181f543a84cbdf9bcd4d7119b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d907597_33cf21bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2024-12-18T09:00:28Z",
+      "side": 1,
+      "message": "This test checks for a fail with \"Operator \u003e\u003d is not acceptable.\" to make sure nobody uses \u003e\u003d with dates.",
+      "parentUuid": "d1e7e3a3_a1ae1afa",
+      "revId": "e7eef15ee6f3d67181f543a84cbdf9bcd4d7119b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
