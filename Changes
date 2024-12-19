@@ -11,6 +11,7 @@
 - Use operation:override in query reference rewrite (#783)
 - Fixed availability regex for all access in the config (important to correctly 
   determine required access of stored VC)
+- Rename CollectionRewrite to AvailabilityRewrite  
   
 
 # version 0.75

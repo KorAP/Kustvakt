@@ -18,7 +18,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author hanl
  * @date 03/09/2015
  */
-public class CollectionRewriteTest extends SpringJerseyTest {
+public class AvailabilityRewriteTest extends SpringJerseyTest {
 
     @Autowired
     public KustvaktConfiguration config;
@@ -172,7 +172,7 @@ public class CollectionRewriteTest extends SpringJerseyTest {
     public void testPublicCollectionRewriteEmptyAdd ()
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
-        handler.add(CollectionRewrite.class);
+        handler.add(AvailabilityRewrite.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         String org = s.toJSON();
@@ -192,7 +192,7 @@ public class CollectionRewriteTest extends SpringJerseyTest {
     public void testPublicCollectionRewriteNonEmptyAdd ()
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
-        handler.add(CollectionRewrite.class);
+        handler.add(AvailabilityRewrite.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(docSigle=WPD_AAA & textClass=wissenschaft)");

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.rewrite.CollectionRewrite;
+import de.ids_mannheim.korap.rewrite.AvailabilityRewrite;
 import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -22,7 +22,7 @@ public class ResultRewriteTest extends SpringJerseyTest {
 
     @Test
     public void testPostRewriteNothingToDo () throws KustvaktException {
-        assertEquals(true, ha.add(CollectionRewrite.class),
+        assertEquals(true, ha.add(AvailabilityRewrite.class),
                 "Handler could not be added to rewrite handler instance!");
         String v = ha.processResult(TestVariables.RESULT, null);
         assertEquals(JsonUtils.readTree(TestVariables.RESULT),

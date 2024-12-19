@@ -190,8 +190,8 @@
 	<!-- Rewrite -->
 	<bean id="foundryRewrite"
 		class="de.ids_mannheim.korap.rewrite.FoundryRewrite" />
-	<bean id="collectionRewrite"
-		class="de.ids_mannheim.korap.rewrite.CollectionRewrite" />
+	<bean id="availabilityRewrite"
+		class="de.ids_mannheim.korap.rewrite.AvailabilityRewrite" />
 	<bean id="virtualCorpusRewrite"
 		class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite" />
 	<bean id="queryReferenceRewrite"
@@ -203,7 +203,7 @@
 	<util:list id="rewriteTasks"
 		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
 		<ref bean="foundryRewrite" />
-		<ref bean="collectionRewrite" />
+		<ref bean="availabilityRewrite" />
 		<ref bean="virtualCorpusRewrite" />
 		<ref bean="queryReferenceRewrite" />
 		<ref bean="queryContextRewrite" />

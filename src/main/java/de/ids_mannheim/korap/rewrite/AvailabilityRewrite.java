@@ -23,7 +23,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 
 /**
- * CollectionRewrite determines which availability field values are
+ * AvailabilityRewrite determines which availability field values are
  * possible for a user with respect to login and location of access.
  * 
  * <br/><br/>
@@ -43,13 +43,13 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
  * @author margaretha
  * @see CorpusAccess
  */
-public class CollectionRewrite implements RewriteTask.RewriteQuery {
+public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
 
-    public static Logger jlog = LogManager.getLogger(CollectionRewrite.class);
+    public static Logger jlog = LogManager.getLogger(AvailabilityRewrite.class);
 
     public static boolean DEBUG = false;
 
-    public CollectionRewrite () {
+    public AvailabilityRewrite () {
         super();
     }
 
