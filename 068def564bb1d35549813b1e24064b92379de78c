@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87b650d3_1539513f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2024-12-20T11:18:16Z",
+      "side": 1,
+      "message": "Hi Nils, could you please review the rewrite? It is updated mainly with operation:override instead of operation injection, as described in the GH issue. I haven\u0027t added hint/purpose property.",
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
