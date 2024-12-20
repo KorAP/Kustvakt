@@ -12,6 +12,7 @@
 - Fixed availability regex for all access in the config (important to correctly 
   determine required access of stored VC)
 - Rename CollectionRewrite to AvailabilityRewrite  
+- Improve AvailabilityRewrite and implement operation:override (#781) 
   
 
 # version 0.75

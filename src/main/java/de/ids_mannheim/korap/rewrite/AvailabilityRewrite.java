@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.rewrite;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -47,23 +46,13 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
 
     public static Logger jlog = LogManager.getLogger(AvailabilityRewrite.class);
 
-    public static boolean DEBUG = false;
-
     public AvailabilityRewrite () {
         super();
     }
 
     private List<String> checkAvailability (JsonNode node,
-            List<String> originalAvailabilities,
-            List<String> updatedAvailabilities, boolean isOperationOr) {
-        if (DEBUG) {
-            try {
-                jlog.debug(JsonUtils.toJSON(node));
-            }
-            catch (KustvaktException e) {
-                e.printStackTrace();
-            }
-        }
+    		List<String> availabilityRules,
+    		List<String> actualAvailabilities, boolean isOperationOr) {
 
         if (node.has("operands")) {
             ArrayList<JsonNode> operands = Lists
@@ -72,10 +61,10 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
             if (node.at("/operation").asText()
                     .equals(KoralOperation.AND.toString())) {
                 for (int i = 0; i < operands.size(); i++) {
-                    updatedAvailabilities = checkAvailability(operands.get(i),
-                            originalAvailabilities, updatedAvailabilities,
+                    actualAvailabilities = checkAvailability(operands.get(i),
+                            availabilityRules, actualAvailabilities,
                             false);
-                    if (updatedAvailabilities.isEmpty())
+                    if (actualAvailabilities.isEmpty())
                         break;
                 }
             }
@@ -86,14 +75,14 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
                             .equals("availability")) {
                         jlog.debug("RESET availabilities 1, key="
                                 + node.at("/key").asText());
-                        updatedAvailabilities.clear();
-                        updatedAvailabilities.addAll(originalAvailabilities);
+                        actualAvailabilities.clear();
+                        actualAvailabilities.addAll(availabilityRules);
                         break;
                     }
                     else {
-                        updatedAvailabilities = checkAvailability(
-                                operands.get(i), originalAvailabilities,
-                                updatedAvailabilities, true);
+                        actualAvailabilities = checkAvailability(
+                                operands.get(i), availabilityRules,
+                                actualAvailabilities, true);
                     }
                 }
             }
@@ -103,126 +92,112 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
             String queryAvailability = node.at("/value").asText();
             String matchOp = node.at("/match").asText();
 
-            if (originalAvailabilities.contains(queryAvailability)
+            if (availabilityRules.contains(queryAvailability)
                     && matchOp.equals(KoralMatchOperator.EQUALS.toString())) {
-                if (DEBUG) {
-                    jlog.debug("REMOVE " + queryAvailability);
-                }
-                updatedAvailabilities.remove(queryAvailability);
+                actualAvailabilities.remove(queryAvailability);
             }
             else if (isOperationOr) {
-                if (DEBUG) {
-                    jlog.debug("RESET availabilities 2");
-                }
-                updatedAvailabilities.clear();
-                updatedAvailabilities.addAll(originalAvailabilities);
-                return updatedAvailabilities;
+                actualAvailabilities.clear();
+                actualAvailabilities.addAll(availabilityRules);
+                return actualAvailabilities;
             }
         }
-        return updatedAvailabilities;
+        return actualAvailabilities;
     }
 
     @Override
-    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode koralNode, KustvaktConfiguration config,
             User user) throws KustvaktException {
-        JsonNode jsonNode = node.rawNode();
+        JsonNode jsonNode = koralNode.rawNode();
 
         FullConfiguration fullConfig = (FullConfiguration) config;
+        CorpusAccess corpusAccess = user.getCorpusAccess();
+		List<String> availabilityRules = getAvailabilityRules(corpusAccess,
+				fullConfig);
 
-        List<String> userAvailabilities = new ArrayList<String>();
-        switch (user.getCorpusAccess()) {
-            case PUB:
-                userAvailabilities.addAll(fullConfig.getFreeRegexList());
-                userAvailabilities.addAll(fullConfig.getPublicRegexList());
-                break;
-            case ALL:
-                userAvailabilities.addAll(fullConfig.getFreeRegexList());
-                userAvailabilities.addAll(fullConfig.getPublicRegexList());
-                userAvailabilities.addAll(fullConfig.getAllRegexList());
-                break;
-            case FREE:
-                userAvailabilities.addAll(fullConfig.getFreeRegexList());
-                break;
-        }
-
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        RewriteIdentifier identifier = new KoralNode.RewriteIdentifier(
-                Attributes.AVAILABILITY, user.getCorpusAccess().name());
-        JsonNode rewrittenNode;
-
+        String availabilityQuery = getCorpusQuery(corpusAccess, fullConfig);
+        
         if (jsonNode.has("collection")) {
-            List<String> avalabilityCopy = new ArrayList<String>(
-                    userAvailabilities.size());
-            avalabilityCopy.addAll(userAvailabilities);
-            if (DEBUG) {
-                jlog.debug("Availabilities: "
-                        + Arrays.toString(userAvailabilities.toArray()));
-            }
+            if (jsonNode.toString().contains("availability")) {
+            	List<String> actualAvalability = new ArrayList<>();
+                actualAvalability.addAll(availabilityRules);
 
-            userAvailabilities = checkAvailability(jsonNode.at("/collection"),
-                    avalabilityCopy, userAvailabilities, false);
-            if (!userAvailabilities.isEmpty()) {
-                builder.with(buildAvailability(avalabilityCopy));
-                if (DEBUG) {
-                    jlog.debug("corpus query: " + builder.toString());
+                actualAvalability = checkAvailability(jsonNode.at("/collection"),
+                		availabilityRules, actualAvalability, false);
+                if (!actualAvalability.isEmpty()) {
+                	createOperationAnd(availabilityQuery, jsonNode,
+    						corpusAccess.name(), koralNode);
+                	
+//                    builder.with(availabilityQuery);
+//                    builder.setBaseQuery(builder.toJSON());
+//                    rewrittenNode = builder.mergeWith(jsonNode).at("/collection");
+//                    koralNode.set("collection", rewrittenNode, identifier);
                 }
-                builder.setBaseQuery(builder.toJSON());
-                rewrittenNode = builder.mergeWith(jsonNode).at("/collection");
-                node.set("collection", rewrittenNode, identifier);
-            }
+			}
+			else {
+				createOperationAnd(availabilityQuery, jsonNode,
+						corpusAccess.name(), koralNode);
+			}
         }
-        else {
-            builder.with(buildAvailability(userAvailabilities));
-            if (DEBUG) {
-                jlog.debug("corpus query: " + builder.toString());
-            }
-            rewrittenNode = JsonUtils.readTree(builder.toJSON())
-                    .at("/collection");
-            node.set("collection", rewrittenNode, identifier);
-        }
+		else {
+			KoralCollectionQueryBuilder builder = 
+					new KoralCollectionQueryBuilder();
+			builder.with(availabilityQuery);
+			JsonNode rewrittenNode = JsonUtils.readTree(builder.toJSON())
+					.at("/collection");
+			RewriteIdentifier identifier = new KoralNode.RewriteIdentifier(
+					Attributes.AVAILABILITY, corpusAccess.name());
+			koralNode.set("collection", rewrittenNode, identifier);
+		}
 
-        node = node.at("/collection");
-        if (DEBUG) {
-            jlog.debug("REWRITES: " + node.toString());
-        }
-
-        return node;
+        koralNode = koralNode.at("/collection");
+        return koralNode;
     }
+    
+    private void createOperationAnd (String availabilityQuery,
+			JsonNode jsonNode, String corpusAccess, KoralNode node)
+			throws KustvaktException {
 
-    private String buildAvailability (List<String> userAvailabilities) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < userAvailabilities.size(); i++) {
-            parseAvailability(sb, userAvailabilities.get(i), "|");
-        }
-        String availabilities = sb.toString();
-        return availabilities.substring(0, availabilities.length() - 3);
-    }
+		KoralCollectionQueryBuilder availabilityBuilder = 
+				new KoralCollectionQueryBuilder();
+		availabilityBuilder.with(availabilityQuery);
+		JsonNode availabilityNode = JsonUtils
+				.readTree(availabilityBuilder.toJSON());
 
-    private void parseAvailability (StringBuilder sb, String availability,
-            String operator) {
-        String uaArr[] = null;
-        if (availability.contains("|")) {
-            uaArr = availability.split("\\|");
-            for (int j = 0; j < uaArr.length; j++) {
-                parseAvailability(sb, uaArr[j].trim(), "|");
-            }
-        }
-        // EM: not supported
-        //        else if (availability.contains("&")){
-        //            uaArr = availability.split("&");
-        //            for (int j=0; j < uaArr.length -1; j++){
-        //                parseAvailability(sb, uaArr[j], "&");
-        //            }
-        //            parseAvailability(sb, uaArr[uaArr.length-1], "|");
-        //        } 
-        else {
-            sb.append("availability=/");
-            sb.append(availability);
-            sb.append("/ ");
-            sb.append(operator);
-            sb.append(" ");
-        }
+		String source = jsonNode.at("/collection").toString();
+		JsonNode sourceNode = JsonUtils.readTree(source);
 
-    }
+		KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+		// Base query must contains collection
+		builder.setBaseQuery(availabilityNode);
+		JsonNode rewrittenNode = builder.mergeWith(jsonNode).at("/collection");
+		RewriteIdentifier identifier = new KoralNode.RewriteIdentifier(null,
+				corpusAccess, sourceNode);
+		node.replace("collection", rewrittenNode, identifier);
+	}
+    
+    private List<String> getAvailabilityRules (CorpusAccess access,
+			FullConfiguration fullConfig) {
+		switch (access) {
+			case PUB:
+				return fullConfig.getPublicRegexList();
+			case ALL:
+				return fullConfig.getAllRegexList();
+			default: // free
+				return fullConfig.getFreeRegexList();
+		}
+	}
 
+	private String getCorpusQuery (CorpusAccess access,
+			FullConfiguration fullConfig) {
+		switch (access) {
+			case PUB:
+				return fullConfig.getPublicAvailabilityQuery();
+			case ALL:
+				return fullConfig.getAllAvailabilityQuery();
+			default: // free
+				return fullConfig.getFreeAvailabilityQuery();
+		}
+
+	}
 }
