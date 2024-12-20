@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
 /**
@@ -33,11 +35,15 @@ public class FullConfiguration extends KustvaktConfiguration {
     private String freeOnlyRegex;
     private String publicOnlyRegex;
     private String allOnlyRegex;
+    
+    private String freeAvailabilityQuery;
+    private String publicAvailabilityQuery;
+    private String allAvailabilityQuery;
 
     private List<String> freeRegexList;
     private List<String> publicRegexList;
     private List<String> allRegexList;
-
+    
     private String authenticationScheme;
 
     private EncryptionIface.Encryption secureHashAlgorithm;
@@ -71,13 +77,9 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     @Override
     public void load (Properties properties) throws Exception {
-
         super.load(properties);
-        // EM: regex used for storing vc
+        
         setLicenseRegex(properties);
-
-        // EM: pattern for matching availability in Krill matches
-        setLicensePatterns(properties);
         ldapConfig = properties.getProperty("ldap.config");
 
         setSecurityConfiguration(properties);
@@ -141,38 +143,54 @@ public class FullConfiguration extends KustvaktConfiguration {
                 .getProperty("oauth2.refresh.token.long.expiry", "365D")));
     }
 
-    private void setLicensePatterns (Properties properties) {
-        setFreeLicensePattern(compilePattern(getFreeOnlyRegex()));
-        setPublicLicensePattern(compilePattern(
-                getFreeOnlyRegex() + "|" + getPublicOnlyRegex()));
-        setAllLicensePattern(compilePattern(getFreeOnlyRegex() + "|"
-                + getPublicOnlyRegex() + "|" + getAllOnlyRegex()));
-    }
-
     private void setLicenseRegex (Properties properties) {
-        setFreeOnlyRegex(properties.getProperty("availability.regex.free", ""));
+        // EM: regex used for storing vc
+        freeOnlyRegex = properties.getProperty("availability.regex.free", "")
+                .trim();
         freeRegexList = splitAndAddToList(getFreeOnlyRegex());
+        freeAvailabilityQuery = createCorpusQuery(freeRegexList);
 
-        setPublicOnlyRegex(
-                properties.getProperty("availability.regex.public", ""));
-        publicRegexList = splitAndAddToList(getPublicOnlyRegex());
+        // EM: pattern for matching availability in Krill matches
+        freeLicensePattern = compilePattern(getFreeOnlyRegex());
+        
+        publicOnlyRegex = properties
+                .getProperty("availability.regex.public", "").trim();
+        publicRegexList = new ArrayList<>();
+        publicRegexList.addAll(freeRegexList);
+        publicRegexList.addAll(splitAndAddToList(getPublicOnlyRegex()));
+        publicAvailabilityQuery = createCorpusQuery(publicRegexList);
+        
+        publicLicensePattern = compilePattern(
+                getFreeOnlyRegex() + "|" + getPublicOnlyRegex());
 
-        setAllOnlyRegex(properties.getProperty("availability.regex.all", ""));
-        allRegexList = splitAndAddToList(getAllOnlyRegex());
+        allOnlyRegex = properties.getProperty("availability.regex.all", "")
+                .trim();
+        allRegexList = new ArrayList<>();
+        allRegexList.addAll(publicRegexList);
+        allRegexList.addAll(splitAndAddToList(getAllOnlyRegex()));
+        allAvailabilityQuery = createCorpusQuery(allRegexList);
+
+        allLicensePattern = compilePattern(getFreeOnlyRegex() + "|"
+                + getPublicOnlyRegex() + "|" + getAllOnlyRegex());
+        
     }
+    
+    private String createCorpusQuery (List<String> availabilitySet) {
+		String availabilityQuery = "";
+		for (String a : availabilitySet) {
+			availabilityQuery += "availability=/" + a + "/|";
+		}
+		return availabilityQuery.substring(0, availabilityQuery.length() - 1);
+	}
 
     private List<String> splitAndAddToList (String regex) {
         List<String> list;
         if (regex.contains("|")) {
             String[] regexes = regex.split("\\|");
-            list = new ArrayList<>(regexes.length);
-            for (String s : regexes) {
-                list.add(s.trim());
-            }
+            list = Arrays.asList(regexes);
         }
         else {
-            list = new ArrayList<>(1);
-            list.add(regex);
+            list = Arrays.asList(regex);
         }
         return list;
     }
@@ -270,7 +288,31 @@ public class FullConfiguration extends KustvaktConfiguration {
         this.allOnlyRegex = allOnlyRegex;
     }
 
-    public EncryptionIface.Encryption getSecureHashAlgorithm () {
+    public String getFreeAvailabilityQuery () {
+		return freeAvailabilityQuery;
+	}
+
+	public void setFreeAvailabilityQuery (String freeAvailabilityQuery) {
+		this.freeAvailabilityQuery = freeAvailabilityQuery;
+	}
+
+	public String getPublicAvailabilityQuery () {
+		return publicAvailabilityQuery;
+	}
+
+	public void setPublicAvailabilityQuery (String publicAvailabilityQuery) {
+		this.publicAvailabilityQuery = publicAvailabilityQuery;
+	}
+
+	public String getAllAvailabilityQuery () {
+		return allAvailabilityQuery;
+	}
+
+	public void setAllAvailabilityQuery (String allAvailabilityQuery) {
+		this.allAvailabilityQuery = allAvailabilityQuery;
+	}
+
+	public EncryptionIface.Encryption getSecureHashAlgorithm () {
         return secureHashAlgorithm;
     }
 

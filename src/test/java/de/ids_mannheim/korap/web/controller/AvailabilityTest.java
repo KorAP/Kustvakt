@@ -25,102 +25,83 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Autowired
     public FullConfiguration config;    
 
-    private void checkAndFree (String json) throws KustvaktException {
-        JsonNode node = JsonUtils.readTree(json);
-        assertEquals(node.at("/collection/operands/0/key").asText(),
-                "availability");
-        assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC.*");
-        assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:injection");
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(FREE)");
-    }
+	private void checkAndFree (String json, JsonNode source)
+			throws KustvaktException {
+		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		assertEquals("availability", node.at("/operands/0/key").asText());
+		assertEquals("CC.*", node.at("/operands/0/value").asText());
+		assertEquals("operation:override",
+				node.at("/rewrites/0/operation").asText());
+		assertEquals(source, node.at("/rewrites/0/source"));
+		//        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
+		//                "availability(FREE)");
+	}
 
-    private void checkAndPublic (String json) throws KustvaktException {
-        JsonNode node = JsonUtils.readTree(json);
-        assertNotNull(node);
-        assertEquals(node.at("/collection/operation").asText(),
-                "operation:and");
-        assertEquals(
-                node.at("/collection/operands/0/operands/0/match").asText(),
-                "match:eq");
-        assertEquals(node.at("/collection/operands/0/operands/0/type").asText(),
-                "type:regex");
-        assertEquals(node.at("/collection/operands/0/operands/0/key").asText(),
-                "availability");
-        assertEquals(
-                node.at("/collection/operands/0/operands/0/value").asText(),
-                "CC.*");
-        assertEquals(
-                node.at("/collection/operands/0/operands/1/operands/0/match")
-                        .asText(),
-                "match:eq");
-        assertEquals(
-                node.at("/collection/operands/0/operands/1/operands/0/value")
-                        .asText(),
-                "ACA.*");
-        assertEquals(
-                node.at("/collection/operands/0/operands/1/operands/1/match")
-                        .asText(),
-                "match:eq");
-        assertEquals(
-                node.at("/collection/operands/0/operands/1/operands/1/value")
-                        .asText(),
-                "QAO-NC");
-        assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:injection");
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(PUB)");
-    }
+	private void checkAndPublic (String json) throws KustvaktException {
+		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		assertNotNull(node);
+		assertEquals("operation:and", node.at("/operation").asText());
+		assertEquals("operation:override",
+				node.at("/rewrites/0/operation").asText());
+		node = node.at("/operands/0");
+		assertEquals("match:eq", node.at("/operands/0/match").asText());
+		assertEquals("type:regex", node.at("/operands/0/type").asText());
+		assertEquals("availability", node.at("/operands/0/key").asText());
+		assertEquals("CC.*", node.at("/operands/0/value").asText());
+		assertEquals("match:eq",
+				node.at("/operands/1/operands/0/match").asText());
+		assertEquals("ACA.*", node.at("/operands/1/operands/0/value").asText());
+		assertEquals("match:eq",
+				node.at("/operands/1/operands/1/match").asText());
+		assertEquals("QAO-NC",
+				node.at("/operands/1/operands/1/value").asText());
+		
+		//        assertEquals(node.at("/rewrites/0/scope").asText(),
+		//                "availability(PUB)");
+	}
 
     private void checkAndPublicWithACA (String json) throws KustvaktException {
-        JsonNode node = JsonUtils.readTree(json);
+        JsonNode node = JsonUtils.readTree(json).at("/collection");
         assertNotNull(node);
-        assertEquals(node.at("/collection/operation").asText(),
-                "operation:and");
-        assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:injection");
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(PUB)");
-        assertEquals(node.at("/collection/operands/1/match").asText(),
-                "match:eq");
-        assertEquals(node.at("/collection/operands/1/type").asText(),
-                "type:regex");
-        assertEquals(node.at("/collection/operands/1/key").asText(),
-                "availability");
-        assertEquals(node.at("/collection/operands/1/value").asText(), "ACA.*");
-        node = node.at("/collection/operands/0");
-        assertEquals(node.at("/operands/0/match").asText(), "match:eq");
-        assertEquals(node.at("/operands/0/type").asText(), "type:regex");
-        assertEquals(node.at("/operands/0/key").asText(), "availability");
-        assertEquals(node.at("/operands/0/value").asText(), "CC.*");
-        assertEquals(node.at("/operands/1/operands/0/match").asText(),
-                "match:eq");
-        assertEquals(node.at("/operands/1/operands/0/type").asText(),
-                "type:regex");
-        assertEquals(node.at("/operands/1/operands/0/key").asText(),
-                "availability");
-        assertEquals(node.at("/operands/1/operands/0/value").asText(), "ACA.*");
+		assertEquals(node.at("/operation").asText(),
+				"operation:and");
+		assertEquals(node.at("/rewrites/0/operation").asText(),
+				"operation:override");
+		//        assertEquals(node.at("/rewrites/0/scope").asText(),
+		//                "availability(PUB)");
+		assertEquals(node.at("/operands/1/match").asText(),
+				"match:eq");
+		assertEquals(node.at("/operands/1/type").asText(),
+				"type:regex");
+		assertEquals(node.at("/operands/1/key").asText(),
+				"availability");
+		assertEquals(node.at("/operands/1/value").asText(), "ACA.*");
+		node = node.at("/operands/0");
+		assertEquals(node.at("/operands/0/match").asText(), "match:eq");
+		assertEquals(node.at("/operands/0/type").asText(), "type:regex");
+		assertEquals(node.at("/operands/0/key").asText(), "availability");
+		assertEquals(node.at("/operands/0/value").asText(), "CC.*");
+		assertEquals(node.at("/operands/1/operands/0/match").asText(),
+				"match:eq");
+		assertEquals(node.at("/operands/1/operands/0/type").asText(),
+				"type:regex");
+		assertEquals(node.at("/operands/1/operands/0/key").asText(),
+				"availability");
+		assertEquals(node.at("/operands/1/operands/0/value").asText(), "ACA.*");
     }
 
     private void checkAndAllWithACA (String json) throws KustvaktException {
-        JsonNode node = JsonUtils.readTree(json);
-        System.out.println(node.toPrettyString());
-        assertEquals("operation:and",
-                node.at("/collection/operation").asText());
-        assertEquals("operation:injection",
-                node.at("/collection/rewrites/0/operation").asText());
-        assertEquals("availability(ALL)",
-                node.at("/collection/rewrites/0/scope").asText());
-        assertEquals("match:eq",
-                node.at("/collection/operands/1/match").asText());
-        assertEquals("type:regex",
-                node.at("/collection/operands/1/type").asText());
-        assertEquals("availability",
-                node.at("/collection/operands/1/key").asText());
-        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
-        node = node.at("/collection/operands/0");
+		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		assertEquals("operation:and", node.at("/operation").asText());
+		assertEquals("operation:override",
+				node.at("/rewrites/0/operation").asText());
+		//        assertEquals("availability(ALL)",
+		//                node.at("/rewrites/0/scope").asText());
+		assertEquals("match:eq", node.at("/operands/1/match").asText());
+		assertEquals("type:regex", node.at("/operands/1/type").asText());
+		assertEquals("availability", node.at("/operands/1/key").asText());
+        assertEquals("ACA.*", node.at("/operands/1/value").asText());
+        node = node.at("/operands/0");
         assertEquals("match:eq", node.at("/operands/0/match").asText());
         assertEquals("type:regex", node.at("/operands/0/type").asText());
         assertEquals("availability", node.at("/operands/0/key").asText());
@@ -147,45 +128,195 @@ public class AvailabilityTest extends SpringJerseyTest {
         return target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("cq", collectionQuery).request()
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue("kustvakt",
-                                        "kustvakt2015"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+						.createBasicAuthorizationHeaderValue("user", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, ip).get();
     }
 
+    
     @Test
-    public void testAvailabilityFreeAuthorized () throws KustvaktException {
-        Response response = searchQuery("availability = CC-BY-SA");
+    public void testFreeWithoutCorpusQuery () throws KustvaktException {
+		Response response = target().path(API_VERSION).path("search")
+				.queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+				.request().get();
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+		
+		String json = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		assertEquals("availability", node.at("/key").asText());
+		assertEquals("CC.*", node.at("/value").asText());
+		assertEquals("operation:injection",
+				node.at("/rewrites/0/operation").asText());
+    }
+    
+    @Test
+	public void testPublicWithoutCorpusQuery () throws KustvaktException {
+		Response response = target().path(API_VERSION).path("search")
+				.queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+				.request()
+				.header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+						.createBasicAuthorizationHeaderValue("user", "pass"))
+				.header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+		
+		String json = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		
+		String expected = """
+			{
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "type" : "type:regex",
+                "value" : "CC.*",
+                "key" : "availability"
+              }, {
+                "operands" : [ {
+                  "@type" : "koral:doc",
+                  "match" : "match:eq",
+                  "type" : "type:regex",
+                  "value" : "ACA.*",
+                  "key" : "availability"
+                }, {
+                  "@type" : "koral:doc",
+                  "match" : "match:eq",
+                  "type" : "type:regex",
+                  "value" : "QAO-NC",
+                  "key" : "availability"
+                } ],
+                "@type" : "koral:docGroup",
+                "operation" : "operation:or"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:or",
+              "rewrites" : [ {
+                "@type" : "koral:rewrite",
+                "src" : "Kustvakt",
+                "origin" : "Kustvakt",
+                "operation" : "operation:injection",
+                "scope" : "availability(PUB)"
+              } ]
+            }
+			""";
+		
+		assertEquals(JsonUtils.readTree(expected), node);
+    }
+    
+    
+    @Test
+   	public void testAllWithoutCorpusQuery () throws KustvaktException {
+   		Response response = target().path(API_VERSION).path("search")
+   				.queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+   				.request()
+   				.header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+   						.createBasicAuthorizationHeaderValue("user", "pass"))
+   				.header(HttpHeaders.X_FORWARDED_FOR, "10.0.10.132").get();
+   		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+   		
+   		String json = response.readEntity(String.class);
+   		JsonNode node = JsonUtils.readTree(json).at("/collection");
+   		String expected = """
+   			{
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "type" : "type:regex",
+                "value" : "CC.*",
+                "key" : "availability"
+              }, {
+                "operands" : [ {
+                  "@type" : "koral:doc",
+                  "match" : "match:eq",
+                  "type" : "type:regex",
+                  "value" : "ACA.*",
+                  "key" : "availability"
+                }, {
+                  "operands" : [ {
+                    "@type" : "koral:doc",
+                    "match" : "match:eq",
+                    "type" : "type:regex",
+                    "value" : "QAO-NC",
+                    "key" : "availability"
+                  }, {
+                    "@type" : "koral:doc",
+                    "match" : "match:eq",
+                    "type" : "type:regex",
+                    "value" : "QAO-NC-LOC:ids.*",
+                    "key" : "availability"
+                  } ],
+                  "@type" : "koral:docGroup",
+                  "operation" : "operation:or"
+                } ],
+                "@type" : "koral:docGroup",
+                "operation" : "operation:or"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:or",
+              "rewrites" : [ {
+                "@type" : "koral:rewrite",
+                "src" : "Kustvakt",
+                "origin" : "Kustvakt",
+                "operation" : "operation:injection",
+                "scope" : "availability(ALL)"
+              } ]
+            }
+   			""";
+   		assertEquals(JsonUtils.readTree(expected), node);
+    }
+    
+    @Test
+    public void testFreeWithoutAvailabilityOr () throws KustvaktException {
+        Response response = searchQuery("corpusSigle=GOE | textClass=politik");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+            {
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "GOE",
+                "key" : "corpusSigle"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "politik",
+                "key" : "textClass"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:or"
+            }	
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
 
     @Test
-    public void testAvailabilityRegexFreeAuthorized ()
-            throws KustvaktException {
-        Response response = searchQuery("availability = /.*BY.*/");
+    public void testFreeWithoutAvailability () throws KustvaktException {
+        Response response = searchQuery("corpusSigle=GOE");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+            {
+              "@type" : "koral:doc",
+              "match" : "match:eq",
+              "value" : "GOE",
+              "key" : "corpusSigle"
+            }	
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
 
+    
     @Test
-    public void testAvailabilityFreeUnauthorized () throws KustvaktException {
-        Response response = searchQuery("availability = ACA-NC");
+    public void testFreeAvailabilityNoRewrite () throws KustvaktException {
+        Response response = searchQuery("availability = /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String json = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(json);
+        assertTrue(node.at("/collection/rewrite").isMissingNode());
     }
-
+    
     @Test
-    public void testAvailabilityRegexFreeUnauthorized ()
-            throws KustvaktException {
-        Response response = searchQuery("availability = /ACA.*/");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testAvailabilityRegexNoRewrite () throws KustvaktException {
+    public void testFreeAvailabilityNoRewriteAnd () throws KustvaktException {
         Response response = searchQuery(
                 "availability = /CC.*/ & availability = /ACA.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -206,148 +337,301 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/operands/1/value").asText(), "ACA.*");
     }
 
+    
     @Test
-    public void testAvailabilityRegexFreeUnauthorized3 ()
+    public void testFreeAvailabilityAuthorized () throws KustvaktException {
+        Response response = searchQuery("availability = CC-BY-SA");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        String source = """
+        	{
+              "@type" : "koral:doc",
+              "match" : "match:eq",
+              "value" : "CC-BY-SA",
+              "key" : "availability"
+            }
+        	""";
+        
+		checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
+    }
+    
+    @Test
+    public void testFreeAvailabilityUnauthorized () throws KustvaktException {
+        Response response = searchQuery("availability = ACA-NC");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+        	{
+              "@type" : "koral:doc",
+              "match" : "match:eq",
+              "value" : "ACA-NC",
+              "key" : "availability"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
+    }
+
+    @Test
+    public void testFreeAvailabilityRegexAuthorized ()
+            throws KustvaktException {
+        Response response = searchQuery("availability = /.*BY.*/");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+        	{
+              "@type" : "koral:doc",
+              "match" : "match:eq",
+              "type" : "type:regex",
+              "value" : ".*BY.*",
+              "key" : "availability"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
+    }
+
+    
+    @Test
+    public void testFreeAvailabilityRegexUnauthorized ()
+            throws KustvaktException {
+        Response response = searchQuery("availability = /ACA.*/");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+        	{
+              "@type" : "koral:doc",
+              "match" : "match:eq",
+              "type" : "type:regex",
+              "value" : "ACA.*",
+              "key" : "availability"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
+    }
+    
+    @Test
+    public void testFreeAvailabilityRegexUnauthorized2 ()
             throws KustvaktException {
         Response response = searchQuery("availability = /.*NC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        // System.out.println(response.readEntity(String.class));
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+        	{
+              "@type" : "koral:doc",
+              "match" : "match:eq",
+              "type" : "type:regex",
+              "value" : ".*NC.*",
+              "key" : "availability"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
+    }
+    
+    @Test
+    public void testFreeAvailabilityOr () throws KustvaktException {
+        Response response = searchQuery(
+                "availability=/CC.*/ | availability=/ACA.*/");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+        	{
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "type" : "type:regex",
+                "value" : "CC.*",
+                "key" : "availability"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "type" : "type:regex",
+                "value" : "ACA.*",
+                "key" : "availability"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:or"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
+    }
+    @Test
+    public void testFreeAvailabilityOrCorpusSigle () throws KustvaktException {
+        Response response = searchQuery(
+                "availability=/CC.*/ | corpusSigle=GOE");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+            {
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "type" : "type:regex",
+                "value" : "CC.*",
+                "key" : "availability"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "GOE",
+                "key" : "corpusSigle"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:or"
+            }	
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
 
+    
     @Test
-    public void testNegationAvailabilityFreeUnauthorized ()
+    public void testFreeAvailabilityNegationUnauthorized ()
             throws KustvaktException {
         Response response = searchQuery("availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+        	{
+              "@type" : "koral:doc",
+              "match" : "match:ne",
+              "type" : "type:regex",
+              "value" : "CC.*",
+              "key" : "availability"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
 
     @Test
-    public void testNegationAvailabilityFreeUnauthorized2 ()
+    public void testFreeAvailabilityNegationUnauthorized2 ()
             throws KustvaktException {
         Response response = searchQuery("availability != /.*BY.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+        	{
+              "@type" : "koral:doc",
+              "match" : "match:ne",
+              "type" : "type:regex",
+              "value" : ".*BY.*",
+              "key" : "availability"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
 
     @Test
-    public void testNegationAvailabilityWithOperationOrUnauthorized ()
+    public void testFreeAvailabilityNegationOrUnauthorized ()
             throws KustvaktException {
         Response response = searchQuery(
                 "availability = /CC.*/ | availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+        	{
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "type" : "type:regex",
+                "value" : "CC.*",
+                "key" : "availability"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:ne",
+                "type" : "type:regex",
+                "value" : "CC.*",
+                "key" : "availability"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:or"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
 
     @Test
-    public void testComplexNegationAvailabilityFreeUnauthorized ()
+    public void testFreeAvailabilityNegationAndUnauthorized ()
             throws KustvaktException {
         Response response = searchQuery(
                 "textClass=politik & availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+        	{
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "politik",
+                "key" : "textClass"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:ne",
+                "type" : "type:regex",
+                "value" : "CC.*",
+                "key" : "availability"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:and"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
 
     @Test
-    public void testComplexAvailabilityFreeUnauthorized ()
+    public void testFreeAvailabilityAndUnauthorized ()
             throws KustvaktException {
         Response response = searchQuery(
                 "textClass=politik & availability=ACA-NC");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+        	{
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "politik",
+                "key" : "textClass"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "ACA-NC",
+                "key" : "availability"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:and"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
 
     @Test
-    public void testComplexAvailabilityFreeUnauthorized3 ()
+    public void testFreeAvailabilityAndUnauthorized2 ()
             throws KustvaktException {
         Response response = searchQuery(
                 "textClass=politik & availability=/.*NC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+        	{
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "politik",
+                "key" : "textClass"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "type" : "type:regex",
+                "value" : ".*NC.*",
+                "key" : "availability"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:and"
+            }
+        	""";
+        checkAndFree(response.readEntity(String.class),
+				JsonUtils.readTree(source));
     }
-
+    
     @Test
-    public void testAvailabilityPublicAuthorized () throws KustvaktException {
-        Response response = searchQueryWithIP("availability=ACA-NC",
-                "149.27.0.32");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndPublic(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testAvailabilityPublicUnauthorized () throws KustvaktException {
-        Response response = searchQueryWithIP("availability=QAO-NC-LOC:ids",
-                "149.27.0.32");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndPublic(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testAvailabilityRegexPublicAuthorized ()
-            throws KustvaktException {
-        Response response = searchQueryWithIP("availability= /ACA.*/",
-                "149.27.0.32");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndPublicWithACA(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testNegationAvailabilityPublicUnauthorized ()
-            throws KustvaktException {
-        Response response = searchQueryWithIP("availability != ACA-NC",
-                "149.27.0.32");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndPublic(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testNegationAvailabilityRegexPublicUnauthorized ()
-            throws KustvaktException {
-        Response response = searchQueryWithIP("availability != /ACA.*/",
-                "149.27.0.32");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndPublic(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testComplexAvailabilityPublicUnauthorized ()
-            throws KustvaktException {
-        Response response = searchQueryWithIP(
-                "textClass=politik & availability=QAO-NC-LOC:ids",
-                "149.27.0.32");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndPublic(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testNegationComplexAvailabilityPublicUnauthorized ()
-            throws KustvaktException {
-        Response response = searchQueryWithIP(
-                "textClass=politik & availability!=QAO-NC-LOC:ids",
-                "149.27.0.32");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndPublic(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testAvailabilityRegexAllAuthorized () throws KustvaktException {
-        Response response = searchQueryWithIP("availability= /ACA.*/",
-                "10.27.0.32");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndAllWithACA(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testAvailabilityOr () throws KustvaktException {
-        Response response = searchQuery(
-                "availability=/CC.*/ | availability=/ACA.*/");
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
-    }
-
-    @Test
-    public void testRedundancyOrPub () throws KustvaktException {
+    public void testPublicAvailabilityNoRewrite () throws KustvaktException {
         Response response = searchQueryWithIP(
                 "availability=/CC.*/ | availability=/ACA.*/ | availability=/QAO-NC/",
                 "149.27.0.32");
@@ -359,24 +643,168 @@ public class AvailabilityTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testAvailabilityOrCorpusSigle () throws KustvaktException {
-        Response response = searchQuery(
-                "availability=/CC.*/ | corpusSigle=GOE");
+    public void testPublicAvailabilityAuthorized () throws KustvaktException {
+        Response response = searchQueryWithIP("availability=ACA-NC",
+                "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+        	{
+                "@type" : "koral:rewrite",
+                "src" : "Kustvakt",
+                "origin" : "Kustvakt",
+                "operation" : "operation:override",
+                "source" : {
+                  "@type" : "koral:doc",
+                  "match" : "match:eq",
+                  "value" : "ACA-NC",
+                  "key" : "availability"
+                }
+              }
+        	""";
+        checkAndPublic(response.readEntity(String.class));
     }
 
     @Test
-    public void testOrWithoutAvailability () throws KustvaktException {
-        Response response = searchQuery("corpusSigle=GOE | textClass=politik");
+    public void testPublicAvailabilityUnauthorized () throws KustvaktException {
+        Response response = searchQueryWithIP("availability=QAO-NC-LOC:ids",
+                "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        
+        String source = """
+        	{
+            "@type" : "koral:rewrite",
+            "src" : "Kustvakt",
+            "origin" : "Kustvakt",
+            "operation" : "operation:override",
+            "source" : {
+              "@type" : "koral:doc",
+              "match" : "match:eq",
+              "value" : "QAO-NC-LOC:ids",
+              "key" : "availability"
+            }
+        	""";
+        checkAndPublic(response.readEntity(String.class));
     }
 
     @Test
-    public void testWithoutAvailability () throws KustvaktException {
-        Response response = searchQuery("corpusSigle=GOE");
+    public void testPublicAvailabilityRegexAuthorized ()
+            throws KustvaktException {
+        Response response = searchQueryWithIP("availability= /ACA.*/",
+                "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        checkAndFree(response.readEntity(String.class));
+        String source = """
+            	
+            	""";
+        checkAndPublicWithACA(response.readEntity(String.class));
+    }
+
+    @Test
+    public void testPublicAvailabilityNegationUnauthorized ()
+            throws KustvaktException {
+        Response response = searchQueryWithIP("availability != ACA-NC",
+                "149.27.0.32");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+            {
+                "@type" : "koral:rewrite",
+                "src" : "Kustvakt",
+                "origin" : "Kustvakt",
+                "operation" : "operation:override",
+                "source" : {
+                  "@type" : "koral:doc",
+                  "match" : "match:ne",
+                  "value" : "ACA-NC",
+                  "key" : "availability"
+                }	
+        	""";
+        checkAndPublic(response.readEntity(String.class));
+    }
+
+    @Test
+    public void testPublicAvailabilityNegationRegexUnauthorized ()
+            throws KustvaktException {
+        Response response = searchQueryWithIP("availability != /ACA.*/",
+                "149.27.0.32");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+            {
+            "@type" : "koral:rewrite",
+            "src" : "Kustvakt",
+            "origin" : "Kustvakt",
+            "operation" : "operation:override",
+            "source" : {
+              "@type" : "koral:doc",
+              "match" : "match:ne",
+              "type" : "type:regex",
+              "value" : "ACA.*",
+              "key" : "availability"
+            }	
+        	""";
+        checkAndPublic(response.readEntity(String.class));
+    }
+
+    @Test
+    public void testPublicAvailabilityAndUnauthorized ()
+            throws KustvaktException {
+        Response response = searchQueryWithIP(
+                "textClass=politik & availability=QAO-NC-LOC:ids",
+                "149.27.0.32");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+            {
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "politik",
+                "key" : "textClass"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "QAO-NC-LOC:ids",
+                "key" : "availability"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:and"
+            }	
+        	""";
+        checkAndPublic(response.readEntity(String.class));
+    }
+
+    @Test
+    public void testPublicAvailabilityNegationAndUnauthorized ()
+            throws KustvaktException {
+        Response response = searchQueryWithIP(
+                "textClass=politik & availability!=QAO-NC-LOC:ids",
+                "149.27.0.32");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+            {
+              "operands" : [ {
+                "@type" : "koral:doc",
+                "match" : "match:eq",
+                "value" : "politik",
+                "key" : "textClass"
+              }, {
+                "@type" : "koral:doc",
+                "match" : "match:ne",
+                "value" : "QAO-NC-LOC:ids",
+                "key" : "availability"
+              } ],
+              "@type" : "koral:docGroup",
+              "operation" : "operation:and"
+            }	
+        	""";
+        checkAndPublic(response.readEntity(String.class));
+    }
+
+    @Test
+    public void testAllAvailabilityRegexAuthorized () throws KustvaktException {
+        Response response = searchQueryWithIP("availability= /ACA.*/",
+                "10.27.0.32");
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String source = """
+            	
+        	""";
+        checkAndAllWithACA(response.readEntity(String.class));
     }
 }

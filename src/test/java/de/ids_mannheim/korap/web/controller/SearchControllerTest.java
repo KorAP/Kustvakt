@@ -329,10 +329,10 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertNotNull(node);
-        assertEquals("operation:injection",
+        assertEquals("operation:override",
                 node.at("/collection/rewrites/0/operation").asText());
-        assertEquals("availability(FREE)",
-                node.at("/collection/rewrites/0/scope").asText());
+//        assertEquals("availability(FREE)",
+//                node.at("/collection/rewrites/0/scope").asText());
         // EM: double AND operations
         assertEquals("availability",
                 node.at("/collection/operands/0/key").asText());
