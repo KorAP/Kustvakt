@@ -16,6 +16,52 @@
       "message": "Hi Nils, could you please review the rewrite? It is updated mainly with operation:override instead of operation injection, as described in the GH issue. I haven\u0027t added hint/purpose property.",
       "revId": "068def564bb1d35549813b1e24064b92379de78c",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4939ef8_525e87f5",
+        "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-01-10T12:46:51Z",
+      "side": 1,
+      "message": "Just for clarification: src and scope are deprecated now in favour of origin and source, right?",
+      "range": {
+        "startLine": 193,
+        "startChar": 16,
+        "endLine": 197,
+        "endChar": 45
+      },
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d2c256a_1b493e65",
+        "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-01-10T12:46:51Z",
+      "side": 1,
+      "message": "Can you explain these tests?",
+      "range": {
+        "startLine": 646,
+        "startChar": 4,
+        "endLine": 664,
+        "endChar": 58
+      },
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
