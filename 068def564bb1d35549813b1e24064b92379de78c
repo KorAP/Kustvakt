@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cac9419b_922a391e",
+        "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-01-20T14:24:52Z",
+      "side": 1,
+      "message": "src is deprecated, scope is not deprecated. It signifies the exact location of the rewrite, if the whole node is not replaced.",
+      "parentUuid": "e4939ef8_525e87f5",
+      "range": {
+        "startLine": 193,
+        "startChar": 16,
+        "endLine": 197,
+        "endChar": 45
+      },
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d2c256a_1b493e65",
         "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
         "patchSetId": 1
@@ -54,6 +78,54 @@
       "writtenOn": "2025-01-10T12:46:51Z",
       "side": 1,
       "message": "Can you explain these tests?",
+      "range": {
+        "startLine": 646,
+        "startChar": 4,
+        "endLine": 664,
+        "endChar": 58
+      },
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53bc4712_9a4abd03",
+        "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-01-20T14:24:52Z",
+      "side": 1,
+      "message": "I need to update the tests to also check the source.",
+      "parentUuid": "1d2c256a_1b493e65",
+      "range": {
+        "startLine": 646,
+        "startChar": 4,
+        "endLine": 664,
+        "endChar": 58
+      },
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4364377d_d1f69c33",
+        "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-01-20T14:24:52Z",
+      "side": 1,
+      "message": "The tests check\n1. no redundancy in KoralQuery when the same availability is specified as corpus query.\n2.",
+      "parentUuid": "1d2c256a_1b493e65",
       "range": {
         "startLine": 646,
         "startChar": 4,
