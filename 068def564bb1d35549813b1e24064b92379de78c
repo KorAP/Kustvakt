@@ -134,6 +134,30 @@
       },
       "revId": "068def564bb1d35549813b1e24064b92379de78c",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20dea6bd_7cf8cef0",
+        "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-01-21T08:12:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53bc4712_9a4abd03",
+      "range": {
+        "startLine": 646,
+        "startChar": 4,
+        "endLine": 664,
+        "endChar": 58
+      },
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }

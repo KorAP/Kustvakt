@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "731bfce9_1c2029e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-01-21T08:12:54Z",
+      "side": 1,
+      "message": "I have added source check to the tests. Thanks for the hint.",
+      "revId": "d9e43ec96cf755fd4c2d640c28437618c4f48036",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
