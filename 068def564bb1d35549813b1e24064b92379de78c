@@ -67,6 +67,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cbb34279_ff74f3e6",
+        "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-01-21T08:16:58Z",
+      "side": 1,
+      "message": "For instance, for foundry rewrite, \"scope\" \u003d \"foundry\" makes sense, but not for availability since the rewrite deals with a node, instead of a specific property. \n\nI still leave scope with availability as a reminder to replace the hint with another property.",
+      "parentUuid": "cac9419b_922a391e",
+      "range": {
+        "startLine": 193,
+        "startChar": 16,
+        "endLine": 197,
+        "endChar": 45
+      },
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d2c256a_1b493e65",
         "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
         "patchSetId": 1
