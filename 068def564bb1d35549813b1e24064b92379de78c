@@ -113,6 +113,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16485b27_80dc3d57",
+        "filename": "src/test/java/de/ids_mannheim/korap/web/controller/AvailabilityTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-01-22T08:46:18Z",
+      "side": 1,
+      "message": "We will discuss about this further in the Github issue and Slack.",
+      "parentUuid": "0b8a6594_84049c5f",
+      "range": {
+        "startLine": 193,
+        "startChar": 16,
+        "endLine": 197,
+        "endChar": 45
+      },
+      "revId": "068def564bb1d35549813b1e24064b92379de78c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d2c256a_1b493e65",
