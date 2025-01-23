@@ -13,6 +13,7 @@
   determine required access of stored VC)
 - Rename CollectionRewrite to AvailabilityRewrite  
 - Improve AvailabilityRewrite and implement operation:override (#781) 
+- Disabled mysql connector Java due to CVE-2023-22102
   
 
 # version 0.75
