@@ -480,12 +480,14 @@
 			<version>3.45.0.0</version>
 		</dependency>
 		
+		
 		<!-- MySql -->
+		<!-- EM: disabled due to high security risk, see CVE-2023-22102 
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.30</version>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
