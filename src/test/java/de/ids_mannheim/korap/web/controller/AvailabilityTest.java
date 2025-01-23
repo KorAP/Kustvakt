@@ -41,7 +41,6 @@ public class AvailabilityTest extends SpringJerseyTest {
 			throws KustvaktException {
 		JsonNode node = JsonUtils.readTree(json).at("/collection");
 		assertNotNull(node);
-		System.out.println(node.at("/rewrites/0").toPrettyString());
 		assertEquals("operation:and", node.at("/operation").asText());
 		assertEquals("koral:rewrite", node.at("/rewrites/0/@type").asText());
 		assertEquals("Kustvakt", node.at("/rewrites/0/origin").asText());
