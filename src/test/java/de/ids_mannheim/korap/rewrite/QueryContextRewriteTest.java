@@ -69,7 +69,7 @@ public class QueryContextRewriteTest extends SpringJerseyTest {
         assertEquals(40, context.at("/right/1").asInt());
         
         assertEquals("koral:rewrite", context.at("/rewrites/0/@type").asText());
-        assertEquals("Kustvakt", context.at("/rewrites/0/origin").asText());
+        assertEquals("Kustvakt", context.at("/rewrites/0/editor").asText());
         assertEquals("operation:override", context.at("/rewrites/0/operation").asText());
         assertEquals("left", context.at("/rewrites/0/scope").asText());
         assertEquals("token", context.at("/rewrites/0/source/0").asText());

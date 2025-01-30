@@ -284,7 +284,7 @@ public class KoralNode {
             this.map = new LinkedHashMap<>();
             this.map.put("@type", "koral:rewrite");
             this.map.put("src", "Kustvakt");
-            this.map.put("origin", "Kustvakt");
+            this.map.put("editor", "Kustvakt");
         }
 
         public void setOperation (String op) {

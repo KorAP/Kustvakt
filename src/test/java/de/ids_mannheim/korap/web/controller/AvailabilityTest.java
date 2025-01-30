@@ -43,7 +43,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertNotNull(node);
 		assertEquals("operation:and", node.at("/operation").asText());
 		assertEquals("koral:rewrite", node.at("/rewrites/0/@type").asText());
-		assertEquals("Kustvakt", node.at("/rewrites/0/origin").asText());
+		assertEquals("Kustvakt", node.at("/rewrites/0/editor").asText());
 		assertEquals("operation:override", node.at("/rewrites/0/operation").asText());
 		assertEquals(source, node.at("/rewrites/0/source"));
 		
@@ -68,7 +68,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals("operation:and", node.at("/operation").asText());
 		assertEquals("operation:and", node.at("/operation").asText());
 		assertEquals("koral:rewrite", node.at("/rewrites/0/@type").asText());
-		assertEquals("Kustvakt", node.at("/rewrites/0/origin").asText());
+		assertEquals("Kustvakt", node.at("/rewrites/0/editor").asText());
 		assertEquals("operation:override", node.at("/rewrites/0/operation").asText());
 		assertEquals(source, node.at("/rewrites/0/source"));
 
@@ -167,7 +167,7 @@ public class AvailabilityTest extends SpringJerseyTest {
               "rewrites" : [ {
                 "@type" : "koral:rewrite",
                 "src" : "Kustvakt",
-                "origin" : "Kustvakt",
+                "editor" : "Kustvakt",
                 "operation" : "operation:injection",
                 "scope" : "availability(PUB)"
               } ]
@@ -230,7 +230,7 @@ public class AvailabilityTest extends SpringJerseyTest {
               "rewrites" : [ {
                 "@type" : "koral:rewrite",
                 "src" : "Kustvakt",
-                "origin" : "Kustvakt",
+                "editor" : "Kustvakt",
                 "operation" : "operation:injection",
                 "scope" : "availability(ALL)"
               } ]
