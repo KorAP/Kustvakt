@@ -40,7 +40,7 @@ public class QueryReferenceRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/query/operands/1/rewrites");
         assertEquals(1, node.size());
-        assertEquals("Kustvakt", node.at("/0/origin").asText());
+        assertEquals("Kustvakt", node.at("/0/editor").asText());
         assertEquals("operation:override", node.at("/0/operation").asText());
         assertEquals("koral:queryRef", node.at("/0/source/@type").asText());
         assertEquals("system-q", node.at("/0/source/ref").asText());
@@ -63,7 +63,7 @@ public class QueryReferenceRewriteTest extends SpringJerseyTest {
 
         node = node.at("/query/operands/1/rewrites");
         assertEquals(1, node.size());
-        assertEquals("Kustvakt", node.at("/0/origin").asText());
+        assertEquals("Kustvakt", node.at("/0/editor").asText());
         assertEquals("operation:override", node.at("/0/operation").asText());
         assertEquals("koral:queryRef", node.at("/0/source/@type").asText());
         assertEquals("dory/dory-q", node.at("/0/source/ref").asText());

@@ -72,7 +72,7 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
         
         assertEquals(1, node.size());
         assertEquals("koral:rewrite", node.at("/0/@type").asText());
-        assertEquals("Kustvakt", node.at("/0/origin").asText());
+        assertEquals("Kustvakt", node.at("/0/editor").asText());
         assertEquals("operation:override", node.at("/0/operation").asText());
         assertEquals("ref", node.at("/0/scope").asText());
         assertEquals("system/named-vc1", node.at("/0/source").asText());
