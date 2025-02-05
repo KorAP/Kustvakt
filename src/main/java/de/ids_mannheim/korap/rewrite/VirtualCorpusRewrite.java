@@ -9,7 +9,6 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.util.StatusCodes;
@@ -99,7 +98,9 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         JsonNode jsonNode = koralNode.rawNode();
         String ref = jsonNode.at("/ref").asText();
         String newRef = ref.substring(vcOwner.length() + 1, ref.length());
-        koralNode.replace("ref", newRef, new RewriteIdentifier("ref", "", ref));
+        koralNode.replace("ref", newRef, new RewriteIdentifier("ref", ref, 
+        		"Ref has been replaced. The original value is described at "
+        		+ "the source property."));
     }
 
     protected void rewriteVC (QueryDO vc, KoralNode koralNode)
@@ -110,8 +111,9 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         String source = koralNode.rawNode().toString();
         JsonNode sourceNode = JsonUtils.readTree(source);
         
-        koralNode.replace(newKoralQuery, new RewriteIdentifier(
-                null, "", sourceNode));
+		koralNode.replace(newKoralQuery, new RewriteIdentifier(null, sourceNode,
+				"This node has been replaced. The original node is described at "
+						+ "the source property."));
         
         // rewrite
 //        koralNode.remove("@type", new RewriteIdentifier("@type", "",

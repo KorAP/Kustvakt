@@ -33,8 +33,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals("operation:override",
 				node.at("/rewrites/0/operation").asText());
 		assertEquals(source, node.at("/rewrites/0/source"));
-		//        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-		//                "availability(FREE)");
+		assertEquals(freeCorpusAccess,
+				node.at("/rewrites/0/_comment").asText());
 	}
 
 	private void checkAndPublic (String json, JsonNode source)
@@ -46,6 +46,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals("Kustvakt", node.at("/rewrites/0/editor").asText());
 		assertEquals("operation:override", node.at("/rewrites/0/operation").asText());
 		assertEquals(source, node.at("/rewrites/0/source"));
+		assertEquals(publicCorpusAccess,
+				node.at("/rewrites/0/_comment").asText());
 		
 		node = node.at("/operands/0");
 		assertEquals("match:eq", node.at("/operands/0/match").asText());
@@ -71,6 +73,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals("Kustvakt", node.at("/rewrites/0/editor").asText());
 		assertEquals("operation:override", node.at("/rewrites/0/operation").asText());
 		assertEquals(source, node.at("/rewrites/0/source"));
+		assertEquals(allCorpusAccess,
+				node.at("/rewrites/0/_comment").asText());
 
 		assertEquals("match:eq", node.at("/operands/1/match").asText());
 		assertEquals("type:regex", node.at("/operands/1/type").asText());
@@ -122,6 +126,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals("CC.*", node.at("/value").asText());
 		assertEquals("operation:injection",
 				node.at("/rewrites/0/operation").asText());
+		assertEquals("Free corpus access policy has been added.",
+				node.at("/rewrites/0/_comment").asText());
     }
     
     @Test
@@ -169,7 +175,7 @@ public class AvailabilityTest extends SpringJerseyTest {
                 "src" : "Kustvakt",
                 "editor" : "Kustvakt",
                 "operation" : "operation:injection",
-                "scope" : "availability(PUB)"
+                "_comment" : "Public corpus access policy has been added."
               } ]
             }
 			""";
@@ -232,7 +238,7 @@ public class AvailabilityTest extends SpringJerseyTest {
                 "src" : "Kustvakt",
                 "editor" : "Kustvakt",
                 "operation" : "operation:injection",
-                "scope" : "availability(ALL)"
+                "_comment" : "All corpus access policy has been added."
               } ]
             }
    			""";

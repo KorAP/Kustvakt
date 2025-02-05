@@ -15,6 +15,7 @@
 - Improve AvailabilityRewrite and implement operation:override (#781) 
 - Disabled mysql connector Java due to CVE-2023-22102
 - Replace origin with editor in rewrites (#782)
+- Update scope and add _comment as discussed in #782
   
 
 # version 0.75

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserSettingProcessor;
 
@@ -20,35 +19,40 @@ public class FoundryInject implements RewriteTask.IterableRewritePath {
     protected LayerMapper mapper;
 
     @Override
-    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode koralNode, KustvaktConfiguration config,
             User user) throws KustvaktException {
 
-        if (node.get("@type").equals("koral:span")) {
-            if (!node.isMissingNode("/wrap")) {
-                node = node.at("/wrap");
-                JsonNode term = rewriteQuery(node, config, user).rawNode();
-                node.replaceAt("/wrap", term,
-                        new RewriteIdentifier("koral:term", "replace"));
+    	// EM: I don't know the purpose of the following code and it is not 
+    	// tested
+        if (koralNode.get("@type").equals("koral:span")) {
+            if (!koralNode.isMissingNode("/wrap")) {
+                koralNode = koralNode.at("/wrap");
+                JsonNode term = rewriteQuery(koralNode, config, user).rawNode();
+                koralNode.replaceAt("/wrap", term,
+                        new RewriteIdentifier("koral:term", "replace", ""));
             }
         }
-        else if (node.get("@type").equals("koral:term")
-                && !node.has("foundry")) {
+        else if (koralNode.get("@type").equals("koral:term")
+                && !koralNode.has("foundry")) {
             String layer;
-            if (node.has("layer")) {
-                layer = node.get("layer");
+            if (koralNode.has("layer")) {
+                layer = koralNode.get("layer");
             }
             else {
-                layer = node.get("key");
+                layer = koralNode.get("key");
             }
             UserSettingProcessor settingProcessor = null;
             if (user != null) {
                 settingProcessor = user.getUserSettingProcessor();
             }
             String foundry = mapper.findFoundry(layer, settingProcessor);
-            if (foundry != null)
-                node.put("foundry", foundry);
+			if (foundry != null) {
+				RewriteIdentifier ri = new RewriteIdentifier("foundry", null,
+						"Default foundry has been added.");
+				koralNode.set("foundry", foundry, ri);
+			}
         }
-        return node;
+        return koralNode;
     }
 
     @Override

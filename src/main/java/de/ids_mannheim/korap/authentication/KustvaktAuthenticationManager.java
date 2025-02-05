@@ -210,7 +210,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
             if (DEBUG) {
                 jlog.debug("setAccessAndLocation: DemoUser: location="
                         + user.locationtoString() + " access="
-                        + user.accesstoString());
+                        + user.getCorpusAccess());
             }
             return;
         }

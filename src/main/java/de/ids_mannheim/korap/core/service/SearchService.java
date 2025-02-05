@@ -120,7 +120,7 @@ public class SearchService extends BasicService {
         if (DEBUG) {
             if (user != null) {
                 jlog.debug("Debug: user location=" + user.locationtoString()
-                        + ", access=" + user.accesstoString());
+                        + ", access=" + user.getCorpusAccess());
             }
         }
         return user;

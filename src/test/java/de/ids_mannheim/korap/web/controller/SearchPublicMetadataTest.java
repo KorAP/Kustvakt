@@ -1,16 +1,14 @@
 package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import jakarta.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -18,6 +16,9 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class SearchPublicMetadataTest extends SpringJerseyTest {
 
@@ -29,9 +30,11 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(ALL)");
-        assertTrue(node.at("/matches/0/snippet").isMissingNode());
+        assertTrue(node.at("/meta/snippet").isMissingNode());
+        assertEquals(allCorpusAccess,
+        		node.at("/collection/rewrites/0/_comment").asText());
+        assertFalse(node.at("/matches/0/snippet").asBoolean());
+        assertFalse(node.at("/matches/0/tokens").asBoolean());
     }
 
     @Test
@@ -43,8 +46,8 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(ALL)");
+        assertEquals("All corpus access policy has been added.",
+        		node.at("/collection/rewrites/0/_comment").asText());
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
     }
 
@@ -58,8 +61,8 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(ALL)");
+		assertEquals(allCorpusAccess,
+				node.at("/collection/rewrites/0/_comment").asText());
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
         assertEquals(node.at("/matches/0/author").asText(),
                 "Goethe, Johann Wolfgang von");
@@ -101,8 +104,8 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(ALL)");
+        assertEquals(allCorpusAccess,
+        		node.at("/collection/rewrites/0/_comment").asText());
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
     }
 

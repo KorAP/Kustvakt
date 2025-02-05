@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -45,8 +44,10 @@ public class QueryContextRewrite implements RewriteTask.RewriteQuery {
                         .readTree(contextPosition.toString());
                 ArrayNode arrayNode = (ArrayNode) contextPosition.rawNode();
                 arrayNode.set(1, maxContextLength);
-                context.replace(position, arrayNode, new RewriteIdentifier(
-                        position, null, sourceNode));
+				context.replace(position, arrayNode,
+						new RewriteIdentifier(position, sourceNode, position
+								+ " has been replaced. The original value is "
+								+ "described in the source property."));
                 return true;
             }
         }
