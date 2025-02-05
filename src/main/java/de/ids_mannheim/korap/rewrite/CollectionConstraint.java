@@ -24,8 +24,8 @@ public class CollectionConstraint implements RewriteTask.IterableRewritePath {
                 // EM: MH checks if user has access to corpus
                 //                KustvaktResource corpus = check(id, user);
                 //                if (corpus == null)
-                node.removeNode(new KoralNode.RewriteIdentifier(
-                        Attributes.CORPUS_SIGLE, id));
+                node.removeNode(new RewriteIdentifier(
+                        Attributes.CORPUS_SIGLE, id, "corpus sigle"));
             }
         }
         return node;

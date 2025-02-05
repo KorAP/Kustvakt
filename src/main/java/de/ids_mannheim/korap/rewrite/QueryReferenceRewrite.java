@@ -4,14 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -93,7 +91,9 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
             throws KustvaktException {
         String source = koralNode.rawNode().toString();
         JsonNode sourceNode = JsonUtils.readTree(source);
-        koralNode.replace(qref, new RewriteIdentifier(null, "", sourceNode));
+		koralNode.replace(qref, new RewriteIdentifier(null, sourceNode,
+				"This node has been replaced. The original node is described in "
+				+ "the source property."));
         
 //        koralNode.remove("@type",
 //                new RewriteIdentifier("@type", "", jsonNode.at("/@type").asText()));

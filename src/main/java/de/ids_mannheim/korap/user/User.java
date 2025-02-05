@@ -169,11 +169,11 @@ public abstract class User implements Serializable {
 
     {
         if (this.corpusAccess == CorpusAccess.ALL)
-            return "ALL";
+            return "All";
         else if (this.corpusAccess == CorpusAccess.PUB)
-            return "PUB";
+            return "Public";
         else if (this.corpusAccess == CorpusAccess.FREE)
-            return "FREE";
+            return "Free";
         else
             return "???";
     }

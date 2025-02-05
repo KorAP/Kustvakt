@@ -119,8 +119,8 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("koral:doc", node.at("/collection/@type").asText());
         assertEquals("availability", node.at("/collection/key").asText());
         assertEquals("CC.*", node.at("/collection/value").asText());
-        assertEquals("availability(FREE)",
-                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals(freeCorpusAccess,
+                node.at("/collection/rewrites/0/_comment").asText());
         assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
@@ -182,8 +182,8 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("koral:doc", node.at("/collection/@type").asText());
         assertEquals("availability", node.at("/collection/key").asText());
         assertEquals("CC.*", node.at("/collection/value").asText());
-        assertEquals("availability(FREE)",
-                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals(freeCorpusAccess,
+                node.at("/collection/rewrites/0/_comment").asText());
         assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
@@ -202,8 +202,8 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("koral:doc", node.at("/collection/@type").asText());
         assertEquals("availability", node.at("/collection/key").asText());
         assertEquals("CC.*", node.at("/collection/value").asText());
-        assertEquals("availability(FREE)",
-                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals(freeCorpusAccess,
+                node.at("/collection/rewrites/0/_comment").asText());
         assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
@@ -231,8 +231,8 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("QAO-NC",
                 node.at("/collection/operands/1/operands/1/value").asText());
         assertEquals("operation:or", node.at("/collection/operation").asText());
-        assertEquals("availability(PUB)",
-                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals(publicCorpusAccess,
+                node.at("/collection/rewrites/0/_comment").asText());
         assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
@@ -264,8 +264,8 @@ public class SearchControllerTest extends SpringJerseyTest {
                 node.at("/collection/operands/1/operands/1/operands/1/value")
                         .asText());
         assertEquals("operation:or", node.at("/collection/operation").asText());
-        assertEquals("availability(ALL)",
-                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals(allCorpusAccess,
+                node.at("/collection/rewrites/0/_comment").asText());
         assertEquals("operation:injection",
                 node.at("/collection/rewrites/0/operation").asText());
     }
@@ -363,7 +363,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("CC.*", node.at("/collection/operands/0/value").asText());
         assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
         assertEquals("operation:or", node.at("/collection/operation").asText());
-        assertEquals("availability(PUB)",
+        assertEquals(publicCorpusAccess,
                 node.at("/collection/rewrites/0/scope").asText());
     }
 
@@ -420,7 +420,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        assertEquals("availability(FREE)",
+        assertEquals(freeCorpusAccess,
                 node.at("/collection/rewrites/0/scope").asText());
     }
 
@@ -440,7 +440,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        assertEquals("availability(ALL)",
+        assertEquals(allCorpusAccess,
                 node.at("/collection/rewrites/0/scope").asText());
     }
 
@@ -460,7 +460,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        assertEquals("availability(PUB)",
+        assertEquals(publicCorpusAccess,
                 node.at("/collection/rewrites/0/scope").asText());
     }
 }

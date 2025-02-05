@@ -183,9 +183,8 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         assertEquals(node.at("/collection/value").asText(), "CC.*");
         assertEquals(node.at("/collection/rewrites/0/@type").asText(),
                 "koral:rewrite");
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
-                "availability(FREE)");
-        // todo:
+        assertEquals(freeCorpusAccess,
+        		node.at("/collection/rewrites/0/_comment").asText());
     }
 
     @Test
