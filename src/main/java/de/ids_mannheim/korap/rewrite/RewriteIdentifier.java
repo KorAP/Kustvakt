@@ -3,17 +3,17 @@ package de.ids_mannheim.korap.rewrite;
 public class RewriteIdentifier {
 
     private String scope,comment = "";
-    private Object source;
+    private Object original;
 
     public RewriteIdentifier (String scope, String value, String comment) {
         this.scope = scope;
-        this.source = value;
+        this.original = value;
         this.comment = comment;
     }
     
 	public RewriteIdentifier (String scope, Object source, String comment) {
 		this.scope = scope;
-		this.source = source;
+		this.original = source;
 		this.comment = comment;
 	}
     
@@ -21,8 +21,8 @@ public class RewriteIdentifier {
         return scope;
     }
     
-    public Object getSource () {
-        return source;
+    public Object getOriginal () {
+        return original;
     }
     
     public String getComment () {

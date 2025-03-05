@@ -75,7 +75,7 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
         assertEquals("Kustvakt", node.at("/0/editor").asText());
         assertEquals("operation:override", node.at("/0/operation").asText());
         assertEquals("ref", node.at("/0/scope").asText());
-        assertEquals("system/named-vc1", node.at("/0/source").asText());
+        assertEquals("system/named-vc1", node.at("/0/original").asText());
     }
 
     @Test
@@ -100,8 +100,8 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
         
         node = node.at("/operands/1/rewrites/0");
         assertEquals("operation:override", node.at("/operation").asText());
-        assertEquals("koral:docGroupRef", node.at("/source/@type").asText());
-        assertEquals("system-vc", node.at("/source/ref").asText());    
+        assertEquals("koral:docGroupRef", node.at("/original/@type").asText());
+        assertEquals("system-vc", node.at("/original/ref").asText());    
     }
 
     @Test
@@ -136,8 +136,8 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
         
         node = node.at("/operands/1/rewrites/0");
         assertEquals("operation:override", node.at("/operation").asText());
-        assertEquals("koral:docGroupRef", node.at("/source/@type").asText());
-        assertEquals("system/system-vc", node.at("/source/ref").asText());
+        assertEquals("koral:docGroupRef", node.at("/original/@type").asText());
+        assertEquals("system/system-vc", node.at("/original/ref").asText());
     }
 
     @Test
@@ -162,8 +162,8 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
         
         node = node.at("/operands/1/rewrites/0");
         assertEquals("operation:override", node.at("/operation").asText());
-        assertEquals("koral:docGroupRef", node.at("/source/@type").asText());
-        assertEquals("dory/dory-vc", node.at("/source/ref").asText());
+        assertEquals("koral:docGroupRef", node.at("/original/@type").asText());
+        assertEquals("dory/dory-vc", node.at("/original/ref").asText());
         
     }
 }

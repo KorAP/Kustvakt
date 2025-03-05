@@ -25,19 +25,19 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Autowired
     public FullConfiguration config;    
 
-	private void checkAndFree (String json, JsonNode source)
+	private void checkAndFree (String json, JsonNode original)
 			throws KustvaktException {
 		JsonNode node = JsonUtils.readTree(json).at("/collection");
 		assertEquals("availability", node.at("/operands/0/key").asText());
 		assertEquals("CC.*", node.at("/operands/0/value").asText());
 		assertEquals("operation:override",
 				node.at("/rewrites/0/operation").asText());
-		assertEquals(source, node.at("/rewrites/0/source"));
+		assertEquals(original, node.at("/rewrites/0/original"));
 		assertEquals(freeCorpusAccess,
 				node.at("/rewrites/0/_comment").asText());
 	}
 
-	private void checkAndPublic (String json, JsonNode source)
+	private void checkAndPublic (String json, JsonNode original)
 			throws KustvaktException {
 		JsonNode node = JsonUtils.readTree(json).at("/collection");
 		assertNotNull(node);
@@ -45,7 +45,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals("koral:rewrite", node.at("/rewrites/0/@type").asText());
 		assertEquals("Kustvakt", node.at("/rewrites/0/editor").asText());
 		assertEquals("operation:override", node.at("/rewrites/0/operation").asText());
-		assertEquals(source, node.at("/rewrites/0/source"));
+		assertEquals(original, node.at("/rewrites/0/original"));
 		assertEquals(publicCorpusAccess,
 				node.at("/rewrites/0/_comment").asText());
 		
@@ -64,7 +64,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 		
 	}
 
-    private void checkAndAllWithACA (String json, JsonNode source)
+    private void checkAndAllWithACA (String json, JsonNode original)
 			throws KustvaktException {
 		JsonNode node = JsonUtils.readTree(json).at("/collection");
 		assertEquals("operation:and", node.at("/operation").asText());
@@ -72,7 +72,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals("koral:rewrite", node.at("/rewrites/0/@type").asText());
 		assertEquals("Kustvakt", node.at("/rewrites/0/editor").asText());
 		assertEquals("operation:override", node.at("/rewrites/0/operation").asText());
-		assertEquals(source, node.at("/rewrites/0/source"));
+		assertEquals(original, node.at("/rewrites/0/original"));
 		assertEquals(allCorpusAccess,
 				node.at("/rewrites/0/_comment").asText());
 
@@ -249,7 +249,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     public void testFreeWithoutAvailabilityOr () throws KustvaktException {
         Response response = searchQuery("corpusSigle=GOE | textClass=politik");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
             {
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -267,14 +267,14 @@ public class AvailabilityTest extends SpringJerseyTest {
             }	
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
     public void testFreeWithoutAvailability () throws KustvaktException {
         Response response = searchQuery("corpusSigle=GOE");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
             {
               "@type" : "koral:doc",
               "match" : "match:eq",
@@ -283,7 +283,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }	
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     
@@ -324,7 +324,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQuery("availability = CC-BY-SA");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         
-        String source = """
+        String original = """
         	{
               "@type" : "koral:doc",
               "match" : "match:eq",
@@ -334,14 +334,14 @@ public class AvailabilityTest extends SpringJerseyTest {
         	""";
         
 		checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
     
     @Test
     public void testFreeAvailabilityUnauthorized () throws KustvaktException {
         Response response = searchQuery("availability = ACA-NC");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "@type" : "koral:doc",
               "match" : "match:eq",
@@ -350,7 +350,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -358,7 +358,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             throws KustvaktException {
         Response response = searchQuery("availability = /.*BY.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "@type" : "koral:doc",
               "match" : "match:eq",
@@ -368,7 +368,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     
@@ -377,7 +377,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             throws KustvaktException {
         Response response = searchQuery("availability = /ACA.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "@type" : "koral:doc",
               "match" : "match:eq",
@@ -387,7 +387,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
     
     @Test
@@ -395,7 +395,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             throws KustvaktException {
         Response response = searchQuery("availability = /.*NC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "@type" : "koral:doc",
               "match" : "match:eq",
@@ -405,7 +405,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
     
     @Test
@@ -413,7 +413,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQuery(
                 "availability=/CC.*/ | availability=/ACA.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -433,14 +433,14 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
     @Test
     public void testFreeAvailabilityOrCorpusSigle () throws KustvaktException {
         Response response = searchQuery(
                 "availability=/CC.*/ | corpusSigle=GOE");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
             {
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -459,7 +459,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }	
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     
@@ -468,7 +468,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             throws KustvaktException {
         Response response = searchQuery("availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "@type" : "koral:doc",
               "match" : "match:ne",
@@ -478,7 +478,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -486,7 +486,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             throws KustvaktException {
         Response response = searchQuery("availability != /.*BY.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "@type" : "koral:doc",
               "match" : "match:ne",
@@ -496,7 +496,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -505,7 +505,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQuery(
                 "availability = /CC.*/ | availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -525,7 +525,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -534,7 +534,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQuery(
                 "textClass=politik & availability != /CC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -553,7 +553,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -562,7 +562,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQuery(
                 "textClass=politik & availability=ACA-NC");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -580,7 +580,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -589,7 +589,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQuery(
                 "textClass=politik & availability=/.*NC.*/");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -608,7 +608,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndFree(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
     
     @Test
@@ -628,7 +628,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQueryWithIP("availability=ACA-NC",
                 "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
                 "@type" : "koral:doc",
                 "match" : "match:eq",
@@ -638,7 +638,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         	""";
         
 		checkAndPublic(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -647,7 +647,7 @@ public class AvailabilityTest extends SpringJerseyTest {
                 "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         
-        String source = """
+        String original = """
         	{
                   "@type" : "koral:doc",
                   "match" : "match:eq",
@@ -656,7 +656,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
 		checkAndPublic(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -665,7 +665,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQueryWithIP("availability= /ACA.*/",
                 "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
                 "@type" : "koral:doc",
                 "match" : "match:eq",
@@ -675,7 +675,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
             	""";
 		checkAndPublic(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -684,7 +684,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQueryWithIP("availability != ACA-NC",
                 "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
                 {
                   "@type" : "koral:doc",
                   "match" : "match:ne",
@@ -693,7 +693,7 @@ public class AvailabilityTest extends SpringJerseyTest {
                 }	
         	""";
 		checkAndPublic(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -702,7 +702,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQueryWithIP("availability != /ACA.*/",
                 "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
             {
               "@type" : "koral:doc",
               "match" : "match:ne",
@@ -712,7 +712,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }	
         	""";
 		checkAndPublic(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -722,7 +722,7 @@ public class AvailabilityTest extends SpringJerseyTest {
                 "textClass=politik & availability=QAO-NC-LOC:ids",
                 "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
             {
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -740,7 +740,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }	
         	""";
 		checkAndPublic(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -750,7 +750,7 @@ public class AvailabilityTest extends SpringJerseyTest {
                 "textClass=politik & availability!=QAO-NC-LOC:ids",
                 "149.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
             {
               "operands" : [ {
                 "@type" : "koral:doc",
@@ -768,7 +768,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             }	
         	""";
 		checkAndPublic(response.readEntity(String.class),
-				JsonUtils.readTree(source));
+				JsonUtils.readTree(original));
     }
 
     @Test
@@ -776,7 +776,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         Response response = searchQueryWithIP("availability= /ACA.*/",
                 "10.27.0.32");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String source = """
+        String original = """
         	{
                 "@type" : "koral:doc",
                 "match" : "match:eq",
@@ -787,6 +787,6 @@ public class AvailabilityTest extends SpringJerseyTest {
             }
         	""";
         checkAndAllWithACA(response.readEntity(String.class),
-        		JsonUtils.readTree(source));
+        		JsonUtils.readTree(original));
     }
 }

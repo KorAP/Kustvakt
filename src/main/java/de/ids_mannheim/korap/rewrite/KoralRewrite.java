@@ -24,8 +24,8 @@ public class KoralRewrite {
         this.map.put("scope", scope);
     }
     
-    public void setSource(Object source) {
-        this.map.put("source", source);
+    public void setOriginal(Object original) {
+        this.map.put("original", original);
     }
     
     public void setComment(String comment) {

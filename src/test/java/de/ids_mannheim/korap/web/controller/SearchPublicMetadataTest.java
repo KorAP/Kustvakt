@@ -129,8 +129,8 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         assertEquals(node.at("/rewrites/0/operation").asText(),
                 "operation:override");
         assertEquals("koral:docGroupRef",
-                node.at("/rewrites/0/source/@type").asText());
-        assertEquals("system-vc", node.at("/rewrites/0/source/ref").asText());
+                node.at("/rewrites/0/original/@type").asText());
+        assertEquals("system-vc", node.at("/rewrites/0/original/ref").asText());
     }
 
     @Test

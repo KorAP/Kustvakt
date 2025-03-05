@@ -42,8 +42,8 @@ public class QueryReferenceRewriteTest extends SpringJerseyTest {
         assertEquals(1, node.size());
         assertEquals("Kustvakt", node.at("/0/editor").asText());
         assertEquals("operation:override", node.at("/0/operation").asText());
-        assertEquals("koral:queryRef", node.at("/0/source/@type").asText());
-        assertEquals("system-q", node.at("/0/source/ref").asText());
+        assertEquals("koral:queryRef", node.at("/0/original/@type").asText());
+        assertEquals("system-q", node.at("/0/original/ref").asText());
         assertTrue(node.at("/0/scope").isMissingNode());
     }
 
@@ -65,8 +65,8 @@ public class QueryReferenceRewriteTest extends SpringJerseyTest {
         assertEquals(1, node.size());
         assertEquals("Kustvakt", node.at("/0/editor").asText());
         assertEquals("operation:override", node.at("/0/operation").asText());
-        assertEquals("koral:queryRef", node.at("/0/source/@type").asText());
-        assertEquals("dory/dory-q", node.at("/0/source/ref").asText());
+        assertEquals("koral:queryRef", node.at("/0/original/@type").asText());
+        assertEquals("dory/dory-q", node.at("/0/original/ref").asText());
         assertTrue(node.at("/0/scope").isMissingNode());
     }
 }
