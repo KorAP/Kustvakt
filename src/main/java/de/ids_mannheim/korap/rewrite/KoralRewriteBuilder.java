@@ -35,8 +35,8 @@ public class KoralRewriteBuilder {
 		if (ri.getScope() != null) {
 			rewrite.setScope(ri.getScope());
 		}
-		if (ri.getSource() != null) {
-			rewrite.setSource(ri.getSource());
+		if (ri.getOriginal() != null) {
+			rewrite.setOriginal(ri.getOriginal());
 		}
 		if (ri.getComment() != null) {
 			rewrite.setComment(ri.getComment());

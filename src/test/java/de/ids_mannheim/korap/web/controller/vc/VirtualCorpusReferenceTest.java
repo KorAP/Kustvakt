@@ -192,9 +192,9 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         assertEquals(node.at("/rewrites/0/operation").asText(),
                 "operation:override");
         assertEquals("koral:docGroupRef",
-                node.at("/rewrites/0/source/@type").asText());
+                node.at("/rewrites/0/original/@type").asText());
         assertEquals("marlin/published-vc",
-                node.at("/rewrites/0/source/ref").asText());
+                node.at("/rewrites/0/original/ref").asText());
     }
 
     @Test
