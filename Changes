@@ -1,4 +1,4 @@
-# version 0.76-SNAPSHOT
+# version 0.76
 
 - Add institution & landingPage to the resource web-service (#777)
 - Make URL mandatory for plugin registration (#573)
