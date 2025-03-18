@@ -17,6 +17,7 @@
 - Replace origin with editor in rewrites (#782)
 - Update scope and add _comment as discussed in #782
 - Changed source to original #782
+- Change JsonInclude to non default to hide VC statistics when not computed
   
 
 # version 0.75

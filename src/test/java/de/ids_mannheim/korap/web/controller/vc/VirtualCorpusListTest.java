@@ -1,20 +1,16 @@
 package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
-import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class VirtualCorpusListTest extends VirtualCorpusTestBase {
 
@@ -36,6 +32,17 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
         assertEquals(0, node.size());
         node = listVC("pearl");
         assertEquals(1, node.size());
+        node = node.get(0);
+		assertEquals("system-vc", node.at("/name").asText());
+		assertEquals("system", node.at("/type").asText());
+		assertEquals("experimental", node.at("/status").asText());
+		assertEquals(CorpusAccess.ALL.name(),
+				node.at("/requiredAccess").asText());
+		assertEquals("system", node.at("/createdBy").asText());
+        assertTrue(node.at("/numberOfDoc").isMissingNode());
+        assertTrue(node.at("/numberOfParagraphs").isMissingNode());
+        assertTrue(node.at("/numberOfSentences").isMissingNode());
+        assertTrue(node.at("/numberOfTokens").isMissingNode());
     }
 
     @Test
