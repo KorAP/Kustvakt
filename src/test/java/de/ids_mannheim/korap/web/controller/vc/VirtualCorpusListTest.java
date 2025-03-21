@@ -1,14 +1,21 @@
 package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
+import de.ids_mannheim.korap.util.QueryException;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
 
@@ -27,7 +34,7 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
 
     @Test
     public void testListVCPearl ()
-            throws ProcessingException, KustvaktException {
+            throws ProcessingException, KustvaktException, IOException, QueryException {
         JsonNode node = testListOwnerVC("pearl");
         assertEquals(0, node.size());
         node = listVC("pearl");
@@ -35,14 +42,13 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
         node = node.get(0);
 		assertEquals("system-vc", node.at("/name").asText());
 		assertEquals("system", node.at("/type").asText());
-		assertEquals("experimental", node.at("/status").asText());
 		assertEquals(CorpusAccess.ALL.name(),
 				node.at("/requiredAccess").asText());
 		assertEquals("system", node.at("/createdBy").asText());
-        assertTrue(node.at("/numberOfDoc").isMissingNode());
-        assertTrue(node.at("/numberOfParagraphs").isMissingNode());
-        assertTrue(node.at("/numberOfSentences").isMissingNode());
-        assertTrue(node.at("/numberOfTokens").isMissingNode());
+        assertEquals(11,node.at("/numberOfDoc").asInt());
+        assertEquals(772,node.at("/numberOfParagraphs").asInt());
+        assertEquals(25074,node.at("/numberOfSentences").asInt());
+        assertEquals(665842,node.at("/numberOfTokens").asInt());
     }
 
     @Test

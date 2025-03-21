@@ -22,26 +22,34 @@ public class StatisticService extends BasicService {
     @Autowired
     private KustvaktConfiguration config;
 
-    public String retrieveStatisticsForCorpusQuery (List<String> cqList) throws KustvaktException {
+	public String retrieveStatisticsForCorpusQuery (List<String> cqList)
+			throws KustvaktException {
 
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        String cq = combineMultipleCorpusQuery(cqList);
-        String json = null;
-        if (cq != null && !cq.isEmpty()) {
-            builder.with(cq);
-            json = builder.toJSON();
-        }
+		String json = buildKoralQueryFromCorpusQuery(cqList);
+		String stats = searchKrill.getStatistics(json);
 
-        if (json != null) {
-            checkVC(json);
-        }
-        String stats = searchKrill.getStatistics(json);
+		if (stats.contains("-1")) {
+			throw new KustvaktException(StatusCodes.NO_RESULT_FOUND);
+		}
+		return stats;
+	}
 
-        if (stats.contains("-1")) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND);
-        }
-        return stats;
-    }
+	public String buildKoralQueryFromCorpusQuery (List<String> cqList)
+			throws KustvaktException {
+		KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+		String cq = combineMultipleCorpusQuery(cqList);
+		String json = null;
+		if (cq != null && !cq.isEmpty()) {
+			builder.with(cq);
+			json = builder.toJSON();
+		}
+
+		if (json != null) {
+			checkVC(json);
+		}
+		return json;
+	}
+    
 
     private void checkVC (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);

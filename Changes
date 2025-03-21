@@ -1,3 +1,8 @@
+# version 0.77-SNAPSHOT
+
+- Update statistics in VC info and list web-services to use VC cache (referTo) 
+  instead of the original KoralQuery definitions (#791).
+
 # version 0.76
 
 - Add institution & landingPage to the resource web-service (#777)

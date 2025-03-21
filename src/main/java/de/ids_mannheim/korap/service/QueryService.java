@@ -23,6 +23,7 @@ import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
+import de.ids_mannheim.korap.core.service.StatisticService;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.dao.RoleDao;
@@ -90,6 +91,9 @@ public class QueryService {
     @Autowired
     private UserGroupService userGroupService;
     @Autowired
+    private StatisticService statisticService;
+    
+    @Autowired
     private SearchKrill krill;
     @Autowired
     private FullConfiguration config;
@@ -144,15 +148,24 @@ public class QueryService {
         Iterator<QueryDO> i = queryList.iterator();
         while (i.hasNext()) {
             query = i.next();
-            // String json = query.getKoralQuery();
+            String json = "";
             String statistics = null;
-            // if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
-            // statistics = krill.getStatistics(json);
-            // }
-            QueryDto dto = converter.createQueryDto(query, statistics);
-            dtos.add(dto);
-        }
-        return dtos;
+			if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
+				if (query.isCached()) {
+					List<String> cqList = new ArrayList<>(1);
+					cqList.add("referTo " + query.getName());
+					json = statisticService
+							.buildKoralQueryFromCorpusQuery(cqList);
+				}
+				else {
+					json = query.getKoralQuery();
+				}
+				statistics = krill.getStatistics(json);
+			}
+			QueryDto dto = converter.createQueryDto(query, statistics);
+			dtos.add(dto);
+		}
+		return dtos;
     }
 
     public void deleteQueryByName (String deletedBy, String queryName,
@@ -675,24 +688,30 @@ public class QueryService {
         return query;
     }
 
-    public QueryDto retrieveQueryByName (String username, String queryName,
+	public QueryDto retrieveQueryByName (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {
         QueryDO query = searchQueryByName(username, queryName, createdBy,
                 queryType);
 
         String statistics = null;
-        // long start,end;
-        // start = System.currentTimeMillis();
-         if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
-              String json = query.getKoralQuery();
-              statistics = krill.getStatistics(json);
-         }
-        // end = System.currentTimeMillis();
-        // jlog.debug("{} statistics duration: {}", queryName, (end -
-        // start));
+        String json = "";
+		if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+			if (query.isCached()) {
+				List<String> cqList = new ArrayList<>(1);
+				cqList.add("referTo " + query.getName());
+				json = statisticService
+						.buildKoralQueryFromCorpusQuery(cqList);
+			}
+			else { 
+				json = query.getKoralQuery();
+			}
+			statistics = krill.getStatistics(json);
+		}
         return converter.createQueryDto(query, statistics);
     }
 
+    //EM: unused
+	@Deprecated
     public QueryDto searchQueryById (String username, int queryId)
             throws KustvaktException {
 
