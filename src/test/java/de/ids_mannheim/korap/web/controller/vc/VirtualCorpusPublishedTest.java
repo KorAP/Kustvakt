@@ -95,7 +95,8 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     
     @Test
     public void testMarlinPublishedVC () throws KustvaktException {
-        
+        createDoryVC();
+    	
         JsonNode node = testListOwnerVC("marlin");
         assertEquals(2, node.size());
         node = listVC("marlin");
@@ -123,6 +124,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         assertEquals(0, node.size());
         
         deleteGroupByName(marlinGroupName, "marlin");
+        deleteVC("dory-vc", "dory", "dory");
     }
     
     private String testSharePublishedVC (String vcName) throws KustvaktException {
@@ -187,7 +189,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         
         // check VC type
         node = testListOwnerVC("dory");
-        JsonNode n = node.get(1);
+        JsonNode n = node.get(0);
         assertEquals(ResourceType.PUBLISHED.displayName(),
                 n.get("type").asText());
         
@@ -205,7 +207,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         editVC("dory", "dory", vcName, json);
         node = testListOwnerVC("dory");
         assertEquals(ResourceType.PROJECT.displayName(),
-                node.get(1).get("type").asText());
+                node.get(0).get("type").asText());
         
         testHiddenGroupNotFound(hiddenGroupName);
     }

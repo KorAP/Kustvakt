@@ -61,10 +61,10 @@
 
 		
 -- virtual corpora
-INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
-	VALUES ("dory-vc", "PRIVATE", "VIRTUAL_CORPUS", "FREE", "dory", "test vc", "experimental",
-	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:geq", "type": "type:date", "value": "1820" } ], "operation": "operation:and" }}');
-	
+--INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
+--	VALUES ("dory-vc", "PRIVATE", "VIRTUAL_CORPUS", "FREE", "dory", "test vc", "experimental",
+--	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:geq", "type": "type:date", "value": "1820" } ], "operation": "operation:and" }}');
+
 INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
 	VALUES ("group-vc", "PROJECT", "VIRTUAL_CORPUS", "PUB", "dory", "test vc", "experimental",
 	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:leq", "type": "type:date", "value": "1810" } ], "operation": "operation:and" }}');

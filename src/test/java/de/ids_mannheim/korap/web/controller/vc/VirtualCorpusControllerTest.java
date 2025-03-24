@@ -42,10 +42,12 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testDeleteVC_unauthorized () throws KustvaktException {
+    	createDoryVC();
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
                 .header(Attributes.AUTHORIZATION, authHeader).delete();
         testResponseUnauthorized(response, testUser);
+        deleteVC("dory-vc", "dory", "dory");
     }
     
     private void testDeleteSystemVC (String vcName) throws KustvaktException {
@@ -405,6 +407,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testEditVC () throws KustvaktException {
+    	createDoryVC();
         // 1st edit
         String json = "{\"description\": \"edited vc\"}";
         editVC("dory", "dory", "dory-vc", json);
@@ -417,6 +420,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         // check VC
         node = retrieveVCInfo("dory", "dory", "dory-vc");
         assertEquals(node.at("/description").asText(), "test vc");
+        deleteVC("dory-vc", "dory", "dory");
     }
 
     @Test
@@ -438,6 +442,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testEditCorpusQuery ()
             throws ProcessingException, KustvaktException {
+    	createDoryVC();
         JsonNode node = testRetrieveKoralQuery("dory", "dory-vc");
         assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
         assertEquals(node.at("/collection/operation").asText(),
@@ -463,6 +468,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(node.at("/collection/operands/1/key").asText(),
                 "creationDate");
         assertEquals(node.at("/collection/operands/1/value").asText(), "1820");
+        
+        deleteVC("dory-vc", "dory", "dory");
     }
 
     private JsonNode testRetrieveKoralQuery (String username, String vcName)

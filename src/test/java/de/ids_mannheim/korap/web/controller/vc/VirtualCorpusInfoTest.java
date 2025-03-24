@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.mozilla.javascript.Node;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -57,23 +56,27 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     @Test
     public void testRetrievePrivateVC ()
             throws KustvaktException {
+    	createDoryVC();
         JsonNode node = retrieveVCInfo("dory", "dory", "dory-vc");
         assertEquals(node.at("/name").asText(), "dory-vc");
         assertEquals(ResourceType.PRIVATE.displayName(),
                 node.at("/type").asText());
         
         testStatistics(node);
+        deleteVC("dory-vc", "dory", "dory");
     }
 
     @Test
     public void testRetrievePrivateVC_unauthorized ()
             throws KustvaktException {
+    	createDoryVC();
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .get();
         testResponseUnauthorized(response, testUser);
+        deleteVC("dory-vc", "dory", "dory");
     }
 
     @Test
@@ -124,6 +127,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     @Test
     public void testRetrievePrivateVC_admin ()
             throws KustvaktException {
+    	createDoryVC();
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -132,8 +136,8 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(1, node.at("/id").asInt());
         assertEquals(node.at("/name").asText(), "dory-vc");
+        deleteVC("dory-vc", "dory", "dory");
     }
 
     @Test

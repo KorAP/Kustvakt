@@ -16,11 +16,12 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.controller.vc.VirtualCorpusTestBase;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-public class SearchPublicMetadataTest extends SpringJerseyTest {
+public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
 
     @Test
     public void testSearchPublicMetadata () throws KustvaktException {
@@ -138,6 +139,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
     @Test
     public void testSearchPublicMetadataWithPrivateVC ()
             throws KustvaktException {
+    	createDoryVC();
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"")
@@ -147,5 +149,6 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals(node.at("/errors/0/2").asText(), "guest");
+        deleteVC("dory-vc", "dory", "dory");
     }
 }

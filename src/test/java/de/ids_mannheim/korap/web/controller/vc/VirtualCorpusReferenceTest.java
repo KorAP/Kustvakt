@@ -161,6 +161,7 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRefNotAuthorized () throws KustvaktException {
+    	createDoryVC();
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"").request().get();
@@ -169,6 +170,7 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals(node.at("/errors/0/2").asText(), "guest");
+        deleteVC("dory-vc", "dory", "dory");
     }
 
     @Test
