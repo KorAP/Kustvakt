@@ -11,7 +11,6 @@ import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -96,7 +95,8 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     @Test
     public void testMarlinPublishedVC () throws KustvaktException {
         createDoryVC();
-    	
+    	createDoryGroupVC();
+        
         JsonNode node = testListOwnerVC("marlin");
         assertEquals(2, node.size());
         node = listVC("marlin");
@@ -125,6 +125,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         
         deleteGroupByName(marlinGroupName, "marlin");
         deleteVC("dory-vc", "dory", "dory");
+        deleteVC("group-vc", "dory", "dory");
     }
     
     private String testSharePublishedVC (String vcName) throws KustvaktException {
@@ -178,6 +179,8 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     
     @Test
     public void testPublishProjectVC () throws KustvaktException {
+    	createDoryGroupVC();
+    	
         String vcName = "group-vc";
         JsonNode node = retrieveVCInfo("dory", "dory", vcName);
         assertEquals(ResourceType.PROJECT.displayName(),
@@ -210,5 +213,7 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
                 node.get(0).get("type").asText());
         
         testHiddenGroupNotFound(hiddenGroupName);
+        
+        deleteVC("group-vc", "dory", "dory");
     }
 }
