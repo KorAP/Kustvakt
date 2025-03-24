@@ -9,7 +9,8 @@
   for testing 
 - Setup creating group-vc in VirtualCorpusTestBase instead of using SQL 
   for testing 
-
+- Setup creating marlin-vc and published-vc in VirtualCorpusTestBase 
+  instead of using SQL for testing 
 
 # version 0.76
 

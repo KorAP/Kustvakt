@@ -78,6 +78,15 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
 				+ "1810\"}";
 		createVC(authHeader, "dory", "group-vc", vcJson);
 	}
+	
+	protected void createMarlinVC() throws KustvaktException {
+    	createVC("marlin", "marlin-vc", ResourceType.PRIVATE);
+    };
+    
+    protected void createMarlinPublishedVC() throws KustvaktException {
+    	createVC("marlin", "published-vc", ResourceType.PUBLISHED);
+    };
+    
     
     protected void createVC (String authHeader, String username, String vcName,
             String vcJson) throws KustvaktException {
@@ -87,7 +96,6 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(Entity.json(vcJson));
 
-        System.out.println(response.readEntity(String.class));
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     }
     

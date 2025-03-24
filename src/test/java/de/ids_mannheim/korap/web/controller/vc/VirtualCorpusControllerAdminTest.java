@@ -166,6 +166,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     @Test
     public void testShareVC () throws ProcessingException, KustvaktException {
         createMarlinGroup();
+        createMarlinVC();
         
         String vcCreator = "marlin";
         String vcName = "marlin-vc";
@@ -197,5 +198,6 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(0, node2.size());
         
         deleteGroupByName(marlinGroupName, "marlin");
+        deleteVC("marlin-vc", "marlin", "marlin");
     }
 }

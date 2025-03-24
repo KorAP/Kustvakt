@@ -51,10 +51,16 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
     @Test
     public void testListVCMarlin ()
             throws ProcessingException, KustvaktException {
+    	createMarlinVC();
+    	createMarlinPublishedVC();
+    	
         JsonNode node = testListOwnerVC("marlin");
         assertEquals(2, node.size());
         node = listVC("marlin");
         assertEquals(3, node.size());
+        
+        deleteVC("marlin-vc", "marlin", "marlin");
+        deleteVC("published-vc", "marlin", "marlin");
     }
 
     
