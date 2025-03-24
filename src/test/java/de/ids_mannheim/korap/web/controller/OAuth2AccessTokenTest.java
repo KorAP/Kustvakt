@@ -18,10 +18,11 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.controller.usergroup.UserGroupTestBase;
+import de.ids_mannheim.korap.web.controller.vc.VirtualCorpusTestBase;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-public class OAuth2AccessTokenTest extends UserGroupTestBase {
+public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
 
     private String userAuthHeader;
 
@@ -61,6 +62,8 @@ public class OAuth2AccessTokenTest extends UserGroupTestBase {
 
     @Test
     public void testCustomScope () throws KustvaktException {
+    	createDoryVC();
+    	
         Response response = requestAuthorizationCode("code",
                 confidentialClientId, "", OAuth2Scope.VC_INFO.toString(), "",
                 userAuthHeader);
@@ -84,6 +87,8 @@ public class OAuth2AccessTokenTest extends UserGroupTestBase {
                 ACCESS_TOKEN_TYPE);
         revokeToken(refreshToken, confidentialClientId, clientSecret,
                 REFRESH_TOKEN_TYPE);
+        
+        deleteVC("dory-vc", "dory", "dory");
     }
 
     @Test

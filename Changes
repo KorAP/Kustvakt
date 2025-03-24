@@ -5,6 +5,9 @@
 - Setup system-vc in Initializator instead of using SQL for testing
 - Setup creating nemo-vc in VirtualCorpusTestBase instead of using SQL 
   for testing 
+- Setup creating dory-vc in VirtualCorpusTestBase instead of using SQL 
+  for testing 
+
 
 # version 0.76
 

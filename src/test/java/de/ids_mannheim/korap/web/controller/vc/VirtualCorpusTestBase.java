@@ -55,6 +55,18 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
     	createVC(authHeader, "nemo", "nemo-vc", vcJson);
     };
     
+	protected void createDoryVC () throws KustvaktException {
+		String authHeader = HttpAuthorizationHandler
+				.createBasicAuthorizationHeaderValue("dory", "pass");
+
+		String vcJson = "{\"type\": \"PRIVATE\""
+				+ ",\"queryType\": \"VIRTUAL_CORPUS\""
+				+ ",\"status\":\"experimental\""
+				+ ",\"corpusQuery\": \"corpusSigle=GOE AND creationDate since "
+				+ "1820\"}";
+		createVC(authHeader, "dory", "dory-vc", vcJson);
+	};
+    
     
     protected void createVC (String authHeader, String username, String vcName,
             String vcJson) throws KustvaktException {

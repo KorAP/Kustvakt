@@ -61,10 +61,12 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
     @Test
     public void testListVCDory ()
             throws ProcessingException, KustvaktException {
+    	createDoryVC();
         JsonNode node = testListOwnerVC("dory");
         assertEquals(2, node.size());
         node = listVC("dory");
         assertEquals(3, node.size());
+        deleteVC("dory-vc", "dory", "dory");
     }
 
     @Test

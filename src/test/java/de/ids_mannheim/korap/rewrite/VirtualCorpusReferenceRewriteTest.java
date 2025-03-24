@@ -22,12 +22,13 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.init.NamedVCLoader;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.controller.vc.VirtualCorpusTestBase;
 import jakarta.ws.rs.core.Response;
 
 /**
  * @author margaretha
  */
-public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
+public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
 
     @Autowired
     private NamedVCLoader vcLoader;
@@ -101,7 +102,6 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
 //        assertEquals("match:eq", node.at("/operands/1/match").asText());
 //        assertEquals("corpusSigle", node.at("/operands/1/key").asText());
 //        
-        System.out.println(node.toPrettyString());
         node = node.at("/rewrites/0");
         assertEquals("operation:override", node.at("/operation").asText());
         assertEquals("koral:docGroupRef", node.at("/original/@type").asText());
@@ -151,6 +151,8 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
     @Test
     public void testRewriteWithDoryVCRef ()
             throws KustvaktException, IOException, QueryException {
+    	createDoryVC();
+    	
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Fisch").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"").request()
@@ -173,5 +175,6 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
         assertEquals("koral:docGroupRef", node.at("/original/@type").asText());
         assertEquals("dory/dory-vc", node.at("/original/ref").asText());
         
+        deleteVC("dory-vc", "dory", "dory");
     }
 }
