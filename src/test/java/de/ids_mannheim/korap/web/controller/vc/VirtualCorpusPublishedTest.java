@@ -96,6 +96,8 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     public void testMarlinPublishedVC () throws KustvaktException {
         createDoryVC();
     	createDoryGroupVC();
+    	createMarlinVC();
+    	createMarlinPublishedVC();
         
         JsonNode node = testListOwnerVC("marlin");
         assertEquals(2, node.size());
@@ -126,6 +128,8 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
         deleteGroupByName(marlinGroupName, "marlin");
         deleteVC("dory-vc", "dory", "dory");
         deleteVC("group-vc", "dory", "dory");
+        deleteVC("marlin-vc", "marlin", "marlin");
+        deleteVC("published-vc", "marlin", "marlin");
     }
     
     private String testSharePublishedVC (String vcName) throws KustvaktException {

@@ -45,6 +45,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
 
     @Test
     public void testShareVC_Unauthorized () throws KustvaktException {
+    	createMarlinVC();
         Response response = target().path(API_VERSION).path("vc")
                 .path("~marlin").path("marlin-vc").path("share")
                 .path("@marlin group").request()
@@ -52,6 +53,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .post(Entity.form(new Form()));
         testResponseUnauthorized(response, "dory");
+        deleteVC("marlin-vc", "marlin", "marlin");
     }
 
     @Test

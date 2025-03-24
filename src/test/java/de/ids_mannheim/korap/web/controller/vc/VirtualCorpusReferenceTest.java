@@ -175,6 +175,7 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
 
     @Test
     public void testSearchWithRefPublishedVcGuest () throws KustvaktException {
+    	createMarlinPublishedVC();
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"marlin/published-vc\"").request()
@@ -197,6 +198,7 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
                 node.at("/rewrites/0/original/@type").asText());
         assertEquals("marlin/published-vc",
                 node.at("/rewrites/0/original/ref").asText());
+        deleteVC("published-vc", "marlin", "marlin");
     }
 
     @Test

@@ -26,16 +26,17 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
     @Test
     public void testListVCByType () throws KustvaktException {
     	createDoryVC();
+    	createMarlinPublishedVC();
     	
         List<QueryDO> vcList = dao.retrieveQueryByType(ResourceType.PUBLISHED,
                 null, QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vcList.size());
         QueryDO vc = vcList.get(0);
-        assertEquals(1, vc.getId());
         assertEquals("published-vc", vc.getName());
         assertEquals("marlin", vc.getCreatedBy());
         
         deleteVC("dory-vc", "dory", "dory");
+        deleteVC("published-vc", "marlin", "marlin");
     }
 
     @Test
@@ -134,13 +135,19 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
      */
     @Test
     public void retrieveVCByUserMarlin () throws KustvaktException {
+    	createMarlinVC();
+    	createMarlinPublishedVC();
+    	
         List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("marlin",
                 QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
         Iterator<QueryDO> i = virtualCorpora.iterator();
-        assertEquals("published-vc",i.next().getName());
-        assertEquals("marlin-vc",i.next().getName());
         assertEquals("system-vc",i.next().getName());
+        assertEquals("marlin-vc",i.next().getName());
+        assertEquals("published-vc",i.next().getName());
+        
+        deleteVC("marlin-vc", "marlin", "marlin");
+        deleteVC("published-vc", "marlin", "marlin");
     }
 
     /**
