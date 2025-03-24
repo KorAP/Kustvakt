@@ -2,6 +2,7 @@
 
 - Update statistics in VC info and list web-services to use VC cache (referTo) 
   instead of the original KoralQuery definitions (#791).
+- Setup system-vc in Initializator instead of using SQL for testing 
 
 # version 0.76
 

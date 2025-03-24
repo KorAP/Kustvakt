@@ -73,7 +73,8 @@ public class QueryDO implements Comparable<QueryDO> {
         return "id=" + id + ", name= " + name + ", type= " + type + ", status= "
                 + status + ", description=" + description + ", requiredAccess="
                 + requiredAccess + ", koralQuery= " + koralQuery
-                + ", definition= " + definition + ", createdBy= " + createdBy;
+                + ", definition= " + definition + ", createdBy= " + createdBy 
+                + ", isCached ="+isCached;
     }
 
     @Override

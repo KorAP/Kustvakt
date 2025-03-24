@@ -30,9 +30,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
                 null, QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vcList.size());
         QueryDO vc = vcList.get(0);
-        assertEquals(4, vc.getId());
-        assertEquals(vc.getName(), "published-vc");
-        assertEquals(vc.getCreatedBy(), "marlin");
+        assertEquals(3, vc.getId());
+        assertEquals("published-vc", vc.getName());
+        assertEquals("marlin", vc.getCreatedBy());
     }
 
     @Test
@@ -93,9 +93,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
         assertEquals(3, virtualCorpora.size());
         // ordered by id
         Iterator<QueryDO> i = virtualCorpora.iterator();
-        assertEquals(i.next().getName(), "dory-vc");
-        assertEquals(i.next().getName(), "group-vc");
-        assertEquals(i.next().getName(), "system-vc");
+        assertEquals("dory-vc", i.next().getName());
+        assertEquals("group-vc", i.next().getName());
+        assertEquals("system-vc", i.next().getName());
     }
 
     /**
@@ -110,8 +110,8 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
                 QueryType.VIRTUAL_CORPUS);
         assertEquals(2, virtualCorpora.size());
         Iterator<QueryDO> i = virtualCorpora.iterator();
-        assertEquals(i.next().getName(), "system-vc");
-        assertEquals(i.next().getName(), "nemo-vc");
+        assertEquals("nemo-vc",i.next().getName());
+        assertEquals("system-vc",i.next().getName());
     }
 
     /**
@@ -126,9 +126,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
                 QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
         Iterator<QueryDO> i = virtualCorpora.iterator();
-        assertEquals(i.next().getName(), "system-vc");
-        assertEquals(i.next().getName(), "published-vc");
-        assertEquals(i.next().getName(), "marlin-vc");
+        assertEquals("published-vc",i.next().getName());
+        assertEquals("marlin-vc",i.next().getName());
+        assertEquals("system-vc",i.next().getName());
     }
 
     /**
@@ -143,6 +143,6 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
                 QueryType.VIRTUAL_CORPUS);
         assertEquals(1, virtualCorpora.size());
         Iterator<QueryDO> i = virtualCorpora.iterator();
-        assertEquals(i.next().getName(), "system-vc");
+        assertEquals("system-vc",i.next().getName());
     }
 }

@@ -52,14 +52,16 @@ public class Initializator {
         t.start();
     }
 
-    public void initTest () throws IOException, KustvaktException {
-        VirtualCorpusCache.CACHE_LOCATION = KustvaktConfiguration.DATA_FOLDER
-                + "/vc-cache";
-        setInitialAccessScope();
-        if (config.createInitialSuperClient()) {
-            clientService.createInitialTestSuperClient();
-        }
-    }
+	public void initTest ()
+			throws IOException, KustvaktException, QueryException {
+		VirtualCorpusCache.CACHE_LOCATION = KustvaktConfiguration.DATA_FOLDER
+				+ "/vc-cache";
+		setInitialAccessScope();
+		if (config.createInitialSuperClient()) {
+			clientService.createInitialTestSuperClient();
+		}
+		vcLoader.loadVCToCache("system-vc", "/vc/system-vc.jsonld");
+	}
 
     public void initResourceTest () throws IOException, KustvaktException {
         setInitialAccessScope();

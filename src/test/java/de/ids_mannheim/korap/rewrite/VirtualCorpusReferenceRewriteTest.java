@@ -93,12 +93,16 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
         assertEquals("koral:doc", node.at("/operands/0/@type").asText());
         assertEquals("CC.*", node.at("/operands/0/value").asText());
         
-        assertEquals("koral:doc", node.at("/operands/1/@type").asText());
-        assertEquals("GOE", node.at("/operands/1/value").asText());
-        assertEquals("match:eq", node.at("/operands/1/match").asText());
-        assertEquals("corpusSigle", node.at("/operands/1/key").asText());
-        
-        node = node.at("/operands/1/rewrites/0");
+        assertEquals("koral:docGroupRef", node.at("/operands/1/@type").asText());
+        assertEquals("system-vc", node.at("/operands/1/ref").asText());
+//      
+//        assertEquals("koral:doc", node.at("/operands/1/@type").asText());
+//        assertEquals("GOE", node.at("/operands/1/value").asText());
+//        assertEquals("match:eq", node.at("/operands/1/match").asText());
+//        assertEquals("corpusSigle", node.at("/operands/1/key").asText());
+//        
+        System.out.println(node.toPrettyString());
+        node = node.at("/rewrites/0");
         assertEquals("operation:override", node.at("/operation").asText());
         assertEquals("koral:docGroupRef", node.at("/original/@type").asText());
         assertEquals("system-vc", node.at("/original/ref").asText());    
@@ -129,12 +133,16 @@ public class VirtualCorpusReferenceRewriteTest extends SpringJerseyTest {
         assertEquals("ACA.*", availability.at("/1/operands/0/value").asText());
         assertEquals("QAO-NC", availability.at("/1/operands/1/value").asText());
         
-        assertEquals("koral:doc", node.at("/operands/1/@type").asText());
-        assertEquals("GOE", node.at("/operands/1/value").asText());
-        assertEquals("match:eq", node.at("/operands/1/match").asText());
-        assertEquals("corpusSigle", node.at("/operands/1/key").asText());
+		assertEquals("koral:docGroupRef",
+				node.at("/operands/1/@type").asText());
+		assertEquals("system-vc", node.at("/operands/1/ref").asText());
+//      
+//        assertEquals("koral:doc", node.at("/operands/1/@type").asText());
+//        assertEquals("GOE", node.at("/operands/1/value").asText());
+//        assertEquals("match:eq", node.at("/operands/1/match").asText());
+//        assertEquals("corpusSigle", node.at("/operands/1/key").asText());
         
-        node = node.at("/operands/1/rewrites/0");
+        node = node.at("/rewrites/0");
         assertEquals("operation:override", node.at("/operation").asText());
         assertEquals("koral:docGroupRef", node.at("/original/@type").asText());
         assertEquals("system/system-vc", node.at("/original/ref").asText());

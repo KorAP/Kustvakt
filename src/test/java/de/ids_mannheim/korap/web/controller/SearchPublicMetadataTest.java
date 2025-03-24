@@ -118,19 +118,21 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
                 .queryParam("access-rewrite-disabled", "true").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(node.at("/collection/operation").asText(),
-                "operation:and");
-        node = node.at("/collection/operands/1");
-        assertEquals(node.at("/@type").asText(), "koral:doc");
-        assertEquals(node.at("/value").asText(), "GOE");
-        assertEquals(node.at("/match").asText(), "match:eq");
-        assertEquals(node.at("/key").asText(), "corpusSigle");
-        assertEquals(node.at("/rewrites/0/operation").asText(),
-                "operation:override");
+        JsonNode node = JsonUtils.readTree(entity).at("/collection");
+        assertEquals("operation:and",node.at("/operation").asText());
+        
+        assertEquals("operation:override", node.at("/rewrites/0/operation").asText());
         assertEquals("koral:docGroupRef",
                 node.at("/rewrites/0/original/@type").asText());
         assertEquals("system-vc", node.at("/rewrites/0/original/ref").asText());
+        
+        node = node.at("/operands/1");
+        assertEquals("koral:docGroupRef", node.at("/@type").asText());
+        assertEquals("system-vc", node.at("/ref").asText());
+//        assertEquals(node.at("/value").asText(), "GOE");
+//        assertEquals(node.at("/match").asText(), "match:eq");
+//        assertEquals(node.at("/key").asText(), "corpusSigle");
+        
     }
 
     @Test
