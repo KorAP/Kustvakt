@@ -82,7 +82,8 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     @Test
     public void testRetrieveProjectVC_member ()
             throws KustvaktException {
-        createDoryGroup();
+    	createDoryGroupVC();
+    	createDoryGroup();
         addMember(doryGroupName, "nemo", "dory");
         
         createAccess("dory", "group-vc", doryGroupName, "dory");
@@ -100,28 +101,33 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
                 node.at("/type").asText());
         
         deleteGroupByName(doryGroupName, "dory");
+        deleteVC("group-vc", "dory", "dory");
     }
 
     @Test
     public void testRetrieveProjectVC_unauthorized ()
             throws KustvaktException {
+    	createDoryGroupVC();
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .get();
         testResponseUnauthorized(response, testUser);
+        deleteVC("group-vc", "dory", "dory");
     }
 
     @Test
     public void testRetrieveProjectVC_nonActiveMember ()
             throws KustvaktException {
+    	createDoryGroupVC();
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .get();
         testResponseUnauthorized(response, "marlin");
+        deleteVC("group-vc", "dory", "dory");
     }
 
     @Test
@@ -143,6 +149,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     @Test
     public void testRetrieveProjectVC_admin ()
             throws KustvaktException {
+    	createDoryGroupVC();
         Response response = target().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -154,5 +161,6 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         assertEquals(node.at("/name").asText(), "group-vc");
         assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
+        deleteVC("group-vc", "dory", "dory");
     }
 }

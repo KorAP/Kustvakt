@@ -31,7 +31,7 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
                 null, QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vcList.size());
         QueryDO vc = vcList.get(0);
-        assertEquals(2, vc.getId());
+        assertEquals(1, vc.getId());
         assertEquals("published-vc", vc.getName());
         assertEquals("marlin", vc.getCreatedBy());
         
@@ -92,17 +92,18 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
     @Test
     public void retrieveVCByUserDory () throws KustvaktException {
     	createDoryVC();
-    	
+    	createDoryGroupVC();
         List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("dory",
                 QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
         // ordered by id
         Iterator<QueryDO> i = virtualCorpora.iterator();
-        assertEquals("group-vc", i.next().getName());
         assertEquals("system-vc", i.next().getName());
         assertEquals("dory-vc", i.next().getName());
+        assertEquals("group-vc", i.next().getName());
         
         deleteVC("dory-vc", "dory", "dory");
+        deleteVC("group-vc", "dory", "dory");
     }
 
     /**

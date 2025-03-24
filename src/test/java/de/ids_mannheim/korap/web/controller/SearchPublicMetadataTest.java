@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 
-import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
@@ -140,6 +139,7 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
     public void testSearchPublicMetadataWithPrivateVC ()
             throws KustvaktException {
     	createDoryVC();
+    	createDoryGroupVC();
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"")
@@ -150,5 +150,6 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
                 node.at("/errors/0/0").asInt());
         assertEquals(node.at("/errors/0/2").asText(), "guest");
         deleteVC("dory-vc", "dory", "dory");
+        deleteVC("group-vc", "dory", "dory");
     }
 }

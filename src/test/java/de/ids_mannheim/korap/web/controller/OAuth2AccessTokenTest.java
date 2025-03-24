@@ -17,7 +17,6 @@ import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.controller.usergroup.UserGroupTestBase;
 import de.ids_mannheim.korap.web.controller.vc.VirtualCorpusTestBase;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -81,7 +80,7 @@ public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
                 .header(Attributes.AUTHORIZATION, "Bearer " + token).get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(3, node.size());
+        assertEquals(2, node.size());
         
         revokeToken(token, confidentialClientId, clientSecret,
                 ACCESS_TOKEN_TYPE);
