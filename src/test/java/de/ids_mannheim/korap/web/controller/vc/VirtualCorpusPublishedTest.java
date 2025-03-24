@@ -160,12 +160,12 @@ public class VirtualCorpusPublishedTest extends VirtualCorpusTestBase{
     private void testAddMemberAfterSharingPublishedVC (String hiddenGroupName)
             throws KustvaktException {
         JsonNode node = listVC("nemo");
-        assertEquals(2, node.size());
+        assertEquals(1, node.size());
 
         addMember(marlinGroupName, "nemo", "marlin");
 
         node = listVC("nemo");
-        assertEquals(3, node.size());
+        assertEquals(2, node.size());
 
         node = listRolesByGroup("admin", marlinGroupName);
         assertEquals(3, node.at("/0/members").size());

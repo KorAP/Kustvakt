@@ -62,6 +62,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         JsonNode node = listRolesByGroup("marlin", marlinGroupName);
         assertEquals(0, node.size());
 
+        createNemoVC();
         // share by member unauthorized
         Response response = shareVCByCreator("nemo", "nemo-vc",
                 marlinGroupName);
@@ -77,6 +78,7 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         node = listRolesByGroup("marlin", marlinGroupName);
         assertEquals(1, node.size());
         deleteGroupByName(marlinGroupName, "marlin");
+        deleteVC("nemo-vc", "nemo", "nemo");
     }
 
     private void testShareVC_redundant (String vcCreator, String vcName,

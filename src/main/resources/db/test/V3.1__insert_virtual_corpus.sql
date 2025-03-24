@@ -81,9 +81,9 @@ INSERT INTO query(name, type, query_type, required_access, created_by, descripti
 	VALUES ("marlin-vc", "PRIVATE", "VIRTUAL_CORPUS", "FREE", "marlin", "marlin test share vc", "experimental",
 	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:geq", "type": "type:date", "value": "1820" } ], "operation": "operation:and" }}');
 
-INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
-	VALUES ("nemo-vc", "PRIVATE", "VIRTUAL_CORPUS", "ALL", "nemo", "nemo test vc", "experimental",
-	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');	
+--INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
+--	VALUES ("nemo-vc", "PRIVATE", "VIRTUAL_CORPUS", "ALL", "nemo", "nemo test vc", "experimental",
+--	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');	
 	
 -- virtual corpus access
 --INSERT INTO query_access(query_id, user_group_id, status, created_by) 

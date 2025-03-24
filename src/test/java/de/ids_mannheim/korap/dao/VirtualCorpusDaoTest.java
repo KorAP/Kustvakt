@@ -6,20 +6,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Iterator;
 import java.util.List;
 
-import jakarta.persistence.PersistenceException;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.web.controller.vc.VirtualCorpusTestBase;
+import jakarta.persistence.PersistenceException;
 
-public class VirtualCorpusDaoTest extends SpringJerseyTest {
+public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
 
     @Autowired
     private QueryDao dao;
@@ -106,12 +105,16 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      */
     @Test
     public void retrieveVCByUserNemo () throws KustvaktException {
+    	createNemoVC();
+    	
         List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("nemo",
                 QueryType.VIRTUAL_CORPUS);
         assertEquals(2, virtualCorpora.size());
         Iterator<QueryDO> i = virtualCorpora.iterator();
-        assertEquals("nemo-vc",i.next().getName());
         assertEquals("system-vc",i.next().getName());
+        assertEquals("nemo-vc",i.next().getName());
+        
+        deleteVC("nemo-vc", "nemo", "nemo");
     }
 
     /**

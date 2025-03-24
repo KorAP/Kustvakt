@@ -1,18 +1,13 @@
 package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.util.QueryException;
@@ -24,12 +19,14 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
     @Test
     public void testListVCNemo ()
             throws ProcessingException, KustvaktException {
+    	createNemoVC();
         JsonNode node = testListOwnerVC("nemo");
         assertEquals(1, node.size());
         node = listSystemVC("nemo");
         assertEquals(1, node.size());
         node = listVC("nemo");
         assertEquals(2, node.size());
+        deleteVC("nemo-vc", "nemo", "nemo");
     }
 
     @Test
