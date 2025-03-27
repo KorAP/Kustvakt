@@ -249,4 +249,22 @@ public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
         
         revokeTokenViaSuperClient(userAuthToken, userAuthHeader);
     }
+    
+	@Test
+	public void testRequestAuthorizationWithPassword ()
+			throws KustvaktException {
+		Response response = requestTokenWithPassword(superClientId,
+				clientSecret, "username", "pass}");
+		String entity = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(entity);
+		String accessToken = node.at("/access_token").asText();
+		assertNotNull(accessToken);
+		String refreshToken = node.at("/refresh_token").asText();
+		assertNotNull(refreshToken);
+		assertEquals(OAuth2Scope.ALL.name().toLowerCase(),
+				node.at("/scope").asText());
+		assertEquals(TokenType.BEARER.displayName(),
+				node.at("/token_type").asText());
+		assertNotNull(node.at("/expires_in").asText());
+	}
 }
