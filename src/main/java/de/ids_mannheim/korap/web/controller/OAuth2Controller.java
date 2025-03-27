@@ -266,9 +266,6 @@ public class OAuth2Controller {
             URI requestURI;
             UriBuilder builder = UriBuilder
                     .fromPath(request.getRequestURL().toString());
-            for (String key : form.keySet()) {
-                builder.queryParam(key, form.get(key).toArray());
-            }
             requestURI = builder.build();
 
             try {
