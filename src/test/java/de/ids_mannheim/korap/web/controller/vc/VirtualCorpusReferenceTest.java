@@ -1,8 +1,6 @@
 package de.ids_mannheim.korap.web.controller.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -16,8 +14,6 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
-import de.ids_mannheim.korap.dao.QueryDao;
-import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.init.NamedVCLoader;
@@ -30,9 +26,6 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
 
     @Autowired
     private NamedVCLoader vcLoader;
-
-    @Autowired
-    private QueryDao dao;
 
     /**
      * VC data exists, but it has not been cached, so it is not found
@@ -64,19 +57,9 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         assertTrue(VirtualCorpusCache.contains("named-vc2"));
         node = testSearchWithRef_VC2();
         assertEquals(numOfMatches, node.at("/matches").size());
-        VirtualCorpusCache.delete("named-vc2");
-        assertFalse(VirtualCorpusCache.contains("named-vc2"));
-        QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
-        dao.deleteQuery(vc);
-        vc = dao.retrieveQueryByName("named-vc1", "system");
-        assertNull(vc);
-        vc = dao.retrieveQueryByName("named-vc2", "system");
-        dao.deleteQuery(vc);
-        vc = dao.retrieveQueryByName("named-vc2", "system");
-        assertNull(vc);
         
-        VirtualCorpusCache.delete("named-vc1");
-        assertFalse(VirtualCorpusCache.contains("named-vc1"));
+        testDeleteVC("named-vc1", "system", admin);
+        testDeleteVC("named-vc2", "system", admin);
     }
 
     private int testSearchWithoutRef_VC1 () throws KustvaktException {
@@ -122,16 +105,13 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         return JsonUtils.readTree(ent);
     }
 
-    @Test
-    public void testStatisticsWithRef () throws KustvaktException {
+    private void testStatisticsWithRef () throws KustvaktException {
         String corpusQuery = "availability = /CC.*/ & referTo named-vc1";
         Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("cq", corpusQuery).request().get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());
-        VirtualCorpusCache.delete("named-vc1");
-        assertFalse(VirtualCorpusCache.contains("named-vc1"));
     }
 
     @Test

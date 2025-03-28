@@ -1,23 +1,19 @@
 package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.dao.QueryDao;
-import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.init.NamedVCLoader;
 import de.ids_mannheim.korap.util.QueryException;
@@ -33,9 +29,6 @@ public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
     @Autowired
     private NamedVCLoader vcLoader;
 
-    @Autowired
-    private QueryDao dao;
-
     @Test
     public void testRefCachedVC ()
             throws KustvaktException, IOException, QueryException {
@@ -46,20 +39,14 @@ public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
                 .queryParam("cq", "referTo named-vc1").request().get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        node = node.at("/collection");
-        assertEquals("koral:docGroup", node.at("/@type").asText());
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertTrue(node.at("/operands/1/rewrites").isMissingNode());
         
         testRefCachedVCWithUsername();
-        QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
-        dao.deleteQuery(vc);
-        vc = dao.retrieveQueryByName("named-vc1", "system");
-        assertNull(vc);
-        VirtualCorpusCache.delete("named-vc1");
-        assertFalse(VirtualCorpusCache.contains("named-vc1"));
+        testDeleteVC("named-vc1","system",admin);
     }
 
-    private void testRefCachedVCWithUsername ()
+	private void testRefCachedVCWithUsername ()
             throws KustvaktException, IOException, QueryException {
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
@@ -67,8 +54,9 @@ public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
                 .get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
+        assertTrue(node.at("/matches").size()>0);
         node = node.at("/collection");
-        assertEquals(node.at("/@type").asText(), "koral:docGroup");
+        assertEquals("koral:docGroup", node.at("/@type").asText());
         node = node.at("/operands/1/rewrites");
         
         assertEquals(1, node.size());

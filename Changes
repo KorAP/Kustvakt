@@ -12,6 +12,7 @@
 - Setup creating marlin-vc and published-vc in VirtualCorpusTestBase 
   instead of using SQL for testing 
 - Fixed request URI at OAuth2 token request API.  
+- Improved delete VC tests.
 
 # version 0.76
 

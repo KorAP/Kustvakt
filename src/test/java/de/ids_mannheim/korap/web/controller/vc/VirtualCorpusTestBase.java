@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -244,6 +246,24 @@ public abstract class VirtualCorpusTestBase extends UserGroupTestBase {
 //        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         return response;
     }
+    
+	protected void testDeleteVC (String vcName, String vcCreator,
+			String deletedBy) throws KustvaktException {
+		deleteVC(vcName, vcCreator, deletedBy);
+		
+		Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo "+vcName).request().get();
+        
+        String ent = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+		assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+				node.at("/errors/0/0").asInt());
+		assertEquals("Virtual corpus "+vcCreator+"/"+vcName+" is not found.",
+				node.at("/errors/0/1").asText());
+        assertFalse(VirtualCorpusCache.contains(vcName));
+		
+	}
 
     protected void testResponseUnauthorized (Response response, String username)
             throws KustvaktException {
