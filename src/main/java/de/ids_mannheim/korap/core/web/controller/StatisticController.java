@@ -10,8 +10,10 @@ import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.core.service.StatisticService;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -20,6 +22,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
@@ -35,7 +38,7 @@ import jakarta.ws.rs.core.SecurityContext;
  */
 @Controller
 @Path("{version}/statistics/")
-@ResourceFilters({ APIVersionFilter.class})
+@ResourceFilters({ APIVersionFilter.class, DemoUserFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class StatisticController {
 
@@ -63,13 +66,18 @@ public class StatisticController {
      * @return statistics of the virtual corpus defined by the given
      *         corpusQuery parameter.
      */
-    @GET
-    public Response getStatistics (@Context SecurityContext context,
-            @Context Locale locale, @QueryParam("cq") List<String> cq) {
+	@GET
+	public Response getStatistics (@Context SecurityContext securityContext,
+			@Context Locale locale, @Context HttpHeaders headers,
+			@QueryParam("cq") List<String> cq) {
+
+		TokenContext context = (TokenContext) securityContext
+				.getUserPrincipal();
 
         String stats;
         try {
-            stats = service.retrieveStatisticsForCorpusQuery(cq);
+			stats = service.retrieveStatisticsForCorpusQuery(cq,
+					context.getUsername(), headers);
             if (DEBUG) {
                 jlog.debug("Stats: " + stats);
             }

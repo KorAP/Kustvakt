@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-//import de.ids_mannheim.de.init.VCLoader;
-import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -34,7 +32,6 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
-import de.ids_mannheim.korap.web.SearchKrill;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MultivaluedHashMap;
@@ -50,27 +47,19 @@ public class SearchService extends BasicService {
             super("total_results", "key:hashedKoralQuery");
         }
     }
-
     private static final boolean DEBUG = false;
 
     private static Logger jlog = LogManager.getLogger(SearchService.class);
 
-    @Autowired
-    private KustvaktConfiguration config;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private RewriteHandler rewriteHandler;
-
-    @Autowired
-    private SearchKrill searchKrill;
     @Autowired
     private SearchNetworkEndpoint searchNetwork;
 
     private ClientsHandler graphDBhandler;
 
     private TotalResultCache totalResultCache;
+    
+    @Autowired
+	protected RewriteHandler rewriteHandler;
 
     @PostConstruct
     private void doPostConstruct () {
@@ -111,19 +100,6 @@ public class SearchService extends BasicService {
         String query = ss.toJSON();
         query = rewriteHandler.processQuery(ss.toJSON(), null);
         return query;
-    }
-
-    private User createUser (String username, HttpHeaders headers)
-            throws KustvaktException {
-        User user = authenticationManager.getUser(username);
-        authenticationManager.setAccessAndLocation(user, headers);
-        if (DEBUG) {
-            if (user != null) {
-                jlog.debug("Debug: user location=" + user.locationtoString()
-                        + ", access=" + user.getCorpusAccess());
-            }
-        }
-        return user;
     }
 
     public String search (String jsonld, String username, HttpHeaders headers)

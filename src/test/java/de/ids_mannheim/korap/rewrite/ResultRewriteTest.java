@@ -18,13 +18,13 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class ResultRewriteTest extends SpringJerseyTest {
 
     @Autowired
-    public RewriteHandler ha;
+    public RewriteHandler rewriteHandler;
 
     @Test
     public void testPostRewriteNothingToDo () throws KustvaktException {
-        assertEquals(true, ha.add(AvailabilityRewrite.class),
+        assertEquals(true, rewriteHandler.add(AvailabilityRewrite.class),
                 "Handler could not be added to rewrite handler instance!");
-        String v = ha.processResult(TestVariables.RESULT, null);
+        String v = rewriteHandler.processResult(TestVariables.RESULT, null);
         assertEquals(JsonUtils.readTree(TestVariables.RESULT),
                 JsonUtils.readTree(v), "results do not match");
     }

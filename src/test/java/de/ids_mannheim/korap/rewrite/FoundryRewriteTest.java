@@ -38,7 +38,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
     public KustvaktConfiguration config;
 
     @Autowired
-    public RewriteHandler handler;
+    public RewriteHandler rewriteHandler;
 
     @Autowired
     private LayerMapper m;
@@ -79,7 +79,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
         String username = "bubbles";
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[pos=ADJA]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(),
+        String result = rewriteHandler.processQuery(s.toJSON(),
                 new KorAPUser(username));
         JsonNode node = JsonUtils.readTree(result);
         assertEquals(node.at("/query/wrap/foundry").asText(), "corenlp");
@@ -93,7 +93,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
         String username = "bubbles";
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(),
+        String result = rewriteHandler.processQuery(s.toJSON(),
                 new KorAPUser(username));
         JsonNode node = JsonUtils.readTree(result);
         // EM: only for testing, in fact, opennlp lemma does not
@@ -117,7 +117,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
@@ -134,7 +134,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[pos=ADJA]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
@@ -151,7 +151,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=laufe/i & base!=Lauf]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertEquals(node.at("/query/wrap/@type").asText(), "koral:termGroup");
@@ -166,7 +166,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | tt/pos=VVFIN)]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertEquals(node.at("/query/wrap/@type").asText(), "koral:termGroup");
@@ -180,7 +180,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
     public void testFoundryBaseRewrite () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=laufen]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertEquals(node.at("/query/wrap/@type").asText(), "koral:term");
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());

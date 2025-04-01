@@ -193,17 +193,4 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         assertEquals(772, node.at("/paragraphs").asInt());
     }
     
-    @Test
-    public void testStatisticsWithNamedVC () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("statistics")
-                .queryParam("cq", "referTo unknownVC")
-                .request().method("GET");
-        String ent = response.readEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(0, node.at("/documents").asInt());
-        assertEquals(0, node.at("/tokens").asInt());
-        assertEquals(0, node.at("/sentences").asInt());
-        assertEquals(0, node.at("/paragraphs").asInt());
-    }
 }

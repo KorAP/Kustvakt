@@ -120,11 +120,41 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("cq", corpusQuery).request().get();
         String ent = response.readEntity(String.class);
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(ent);
+		assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+				node.at("/errors/0/0").asInt());
+        assertEquals("Virtual corpus system/unknown-vc is not found.", 
+        		node.at("/errors/0/1").asText());
+		assertEquals("system/unknown-vc", node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testStatisticsWithUserUnknownVC () throws KustvaktException {
+        String corpusQuery = "referTo \"nemo/unknown-vc\"";
+        Response response = target().path(API_VERSION).path("statistics")
+                .queryParam("cq", corpusQuery).request().get();
+        String ent = response.readEntity(String.class);
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+				node.at("/errors/0/0").asInt());
+        assertEquals("Virtual corpus nemo/unknown-vc is not found.", 
+        		node.at("/errors/0/1").asText());
+		assertEquals("nemo/unknown-vc", node.at("/errors/0/2").asText());
+    }
+    
+    private void testStatisticsWithUserVC (String vcName) throws KustvaktException {
+        String corpusQuery = "referTo \"marlin/"+vcName+"\"";
+        Response response = target().path(API_VERSION).path("statistics")
+                .queryParam("cq", corpusQuery).request().get();
+        String ent = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(0, node.at("/documents").asInt());
-        assertEquals(0, node.at("/tokens").asInt());
-        assertEquals(0, node.at("/sentences").asInt());
+        assertEquals(11, node.at("/documents").asInt());
+        assertEquals(665842, node.at("/tokens").asInt());
+        assertEquals(25074, node.at("/sentences").asInt());
+        assertEquals(772, node.at("/paragraphs").asInt());
     }
     
     @Test
@@ -155,10 +185,11 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
 
     @Test
     public void testSearchWithRefPublishedVcGuest () throws KustvaktException {
+    	String vcName = "published-vc";
     	createMarlinPublishedVC();
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("cq", "referTo \"marlin/published-vc\"").request()
+                .queryParam("cq", "referTo \"marlin/"+vcName+"\"").request()
                 .get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
@@ -178,14 +209,14 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
                 node.at("/rewrites/0/original/@type").asText());
         assertEquals("marlin/published-vc",
                 node.at("/rewrites/0/original/ref").asText());
+        
+        testStatisticsWithUserVC(vcName);
+        testSearchWithRefPublishedVc(vcName);
+        
         deleteVC("published-vc", "marlin", "marlin");
     }
 
-    @Test
-    public void testSearchWithRefPublishedVc () throws KustvaktException {
-        String vcName = "marlin-published-vc";
-        createPublishedVC("marlin", vcName);
-
+    private void testSearchWithRefPublishedVc (String vcName) throws KustvaktException {
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"marlin/" + vcName + "\"").request()
@@ -196,12 +227,17 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
 
+		node = node.at("/collection/rewrites/0");
+		assertEquals("operation:override", node.at("/operation").asText());
+		assertEquals("marlin/published-vc",
+				node.at("/original/ref").asText());
+		assertEquals("koral:docGroupRef", node.at("/original/@type").asText());
+        
         node = getHiddenGroup(vcName);
         assertEquals("system", node.at("/owner").asText());
         assertEquals(UserGroupStatus.HIDDEN.name(),
                 node.at("/status").asText());
         node = node.at("/members");
         assertEquals("squirt", node.at("/0/userId").asText());
-        deleteVC(vcName, "marlin", "marlin");
     }
 }

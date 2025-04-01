@@ -23,7 +23,7 @@ import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
-import de.ids_mannheim.korap.core.service.StatisticService;
+import de.ids_mannheim.korap.core.service.BasicService;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.dao.RoleDao;
@@ -68,7 +68,7 @@ import jakarta.ws.rs.core.Response.Status;
  *
  */
 @Service
-public class QueryService {
+public class QueryService extends BasicService {
 
     public static Logger jlog = LogManager.getLogger(QueryService.class);
 
@@ -90,8 +90,6 @@ public class QueryService {
     private AdminDao adminDao;
     @Autowired
     private UserGroupService userGroupService;
-    @Autowired
-    private StatisticService statisticService;
     
     @Autowired
     private SearchKrill krill;
@@ -154,8 +152,7 @@ public class QueryService {
 				if (query.isCached()) {
 					List<String> cqList = new ArrayList<>(1);
 					cqList.add("referTo " + query.getName());
-					json = statisticService
-							.buildKoralQueryFromCorpusQuery(cqList);
+					json = buildKoralQueryFromCorpusQuery(cqList);
 				}
 				else {
 					json = query.getKoralQuery();
@@ -699,8 +696,7 @@ public class QueryService {
 			if (query.isCached()) {
 				List<String> cqList = new ArrayList<>(1);
 				cqList.add("referTo " + query.getName());
-				json = statisticService
-						.buildKoralQueryFromCorpusQuery(cqList);
+				json = buildKoralQueryFromCorpusQuery(cqList);
 			}
 			else { 
 				json = query.getKoralQuery();
@@ -709,7 +705,7 @@ public class QueryService {
 		}
         return converter.createQueryDto(query, statistics);
     }
-
+	
     //EM: unused
 	@Deprecated
     public QueryDto searchQueryById (String username, int queryId)

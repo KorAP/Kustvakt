@@ -81,6 +81,30 @@
 		<property name="testConnectionOnCheckout" value="true" />
 	</bean>
 
+<!-- <bean id="sqliteDataSource"
+		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
+		lazy-init="true">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="connectionProperties">
+			<props>
+				<prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
+			</props>
+		</property>
+
+		Sqlite can only have a single connection
+		<property name="suppressClose">
+			<value>true</value>
+		</property>
+	</bean>
+ -->
+ 
+ <!-- <bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager' 
+		p:cacheManager-ref='ehcache' /> <bean id='ehcache' class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean' 
+		p:configLocation='classpath:ehcache.xml' p:shared='true' /> -->
+		
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
 	<bean id="flywayConfig"
 		class="org.flywaydb.core.api.configuration.ClassicConfiguration">
@@ -212,6 +236,18 @@
 	<bean id="rewriteHandler"
 		class="de.ids_mannheim.korap.rewrite.RewriteHandler">
 		<constructor-arg ref="rewriteTasks" />
+	</bean>
+	
+	<util:list id="statisticsRewriteTasks"
+		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
+		<ref bean="foundryRewrite" />
+		<ref bean="virtualCorpusRewrite" />
+		<ref bean="queryReferenceRewrite" />
+	</util:list>
+	
+	<bean id="statisticsRewriteHandler"
+		class="de.ids_mannheim.korap.rewrite.RewriteHandler">
+		<constructor-arg ref="statisticsRewriteTasks" />
 	</bean>
 
 	<bean id="kustvaktResponseHandler"
