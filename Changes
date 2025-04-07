@@ -14,6 +14,10 @@
 - Fixed request URI at OAuth2 token request API.  
 - Improved delete VC tests.
 - Add VC rewrite for statistics web-service (#796)
+- Updated other config files:
+  - Added statisticsRewriteHandler and queryContextRewrite, 
+  - changed file locations to the data folder, 
+  - removed unused beans (cacheManager, sqliteDataSource)
 
 # version 0.76
 

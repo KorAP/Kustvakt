@@ -39,17 +39,21 @@
 		<property name="locations">
 			<array>
 				<value>classpath:test-jdbc.properties</value>
-				<value>file:./jdbc.properties</value>
+				<value>file:./data/jdbc.properties</value>
 				<value>classpath:properties/hibernate.properties</value>
-				<value>file:./kustvakt-icc.conf</value>
 				<value>classpath:kustvakt-icc.conf</value>
+				<value>file:./data/kustvakt-icc.conf</value>				
 			</array>
 		</property>
 	</bean>
 
-	<!-- <bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager' 
-		p:cacheManager-ref='ehcache' /> <bean id='ehcache' class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean' 
-		p:configLocation='classpath:ehcache.xml' p:shared='true' /> -->
+
+	<!-- props are injected from default-config.xml -->
+	<bean id="kustvakt_config"
+		class="de.ids_mannheim.korap.config.FullConfiguration">
+		<constructor-arg name="properties" ref="props" />
+	</bean>
+
 	<bean id="dataSource"
 		class="org.apache.commons.dbcp2.BasicDataSource" lazy-init="true">
 		<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
@@ -61,26 +65,6 @@
 		<property name="minIdle" value="1" />
 		<property name="maxWaitMillis" value="15000" />
 		<!--<property name="poolPreparedStatements" value="true"/> -->
-	</bean>
-
-	<!-- use SingleConnection only for testing! -->
-	<bean id="sqliteDataSource"
-		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
-		lazy-init="true">
-		<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
-		<property name="password" value="${jdbc.password}" />
-		<property name="connectionProperties">
-			<props>
-				<prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
-			</props>
-		</property>
-
-		<!-- Sqlite can only have a single connection -->
-		<property name="suppressClose">
-			<value>true</value>
-		</property>
 	</bean>
 
 	<bean id="c3p0DataSource"
@@ -103,10 +87,10 @@
 		<property name="validateOnMigrate" value="true" />
 		<property name="cleanOnValidationError" value="true" />
 		<property name="baselineOnMigrate" value="false" />
+		<property name="cleanDisabled" value="false" />
 		<property name="locations"
 			value="#{'${jdbc.schemaPath}'.split(',')}" />
-		<property name="dataSource" ref="sqliteDataSource" />
-		<!-- <property name="dataSource" ref="dataSource" /> -->
+		<property name="dataSource" ref="dataSource" />
 		<property name="outOfOrder" value="true" />
 	</bean>
 
@@ -118,8 +102,7 @@
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<property name="dataSource" ref="sqliteDataSource" />
+		<property name="dataSource" ref="dataSource" />
 		<property name="packagesToScan">
 			<array>
 				<value>de.ids_mannheim.korap.core.entity</value>
@@ -176,16 +159,6 @@
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl" />
 
-
-	<!-- Controller -->
-
-
-	<!-- props are injected from default-config.xml -->
-	<bean id="kustvakt_config"
-		class="de.ids_mannheim.korap.config.FullConfiguration">
-		<constructor-arg name="properties" ref="props" />
-	</bean>
-
 	<bean id="initializator"
 		class="de.ids_mannheim.korap.init.Initializator"
 		init-method="initTest">
@@ -221,12 +194,16 @@
 		class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite" />
 	<bean id="queryReferenceRewrite"
 		class="de.ids_mannheim.korap.rewrite.QueryReferenceRewrite" />
+	<bean id="queryContextRewrite"
+		class="de.ids_mannheim.korap.rewrite.QueryContextRewrite" />
+		
 
 	<util:list id="rewriteTasks"
 		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
 		<ref bean="foundryRewrite" />
 		<ref bean="virtualCorpusRewrite" />
 		<ref bean="queryReferenceRewrite" />
+		<ref bean="queryContextRewrite" />
 	</util:list>
 
 	<bean id="rewriteHandler"
@@ -234,6 +211,18 @@
 		<constructor-arg ref="rewriteTasks" />
 	</bean>
 
+	<util:list id="statisticsRewriteTasks"
+		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
+		<ref bean="foundryRewrite" />
+		<ref bean="virtualCorpusRewrite" />
+		<ref bean="queryReferenceRewrite" />
+	</util:list>
+	
+	<bean id="statisticsRewriteHandler"
+		class="de.ids_mannheim.korap.rewrite.RewriteHandler">
+		<constructor-arg ref="statisticsRewriteTasks" />
+	</bean>
+	
 	<bean id="kustvaktResponseHandler"
 		class="de.ids_mannheim.korap.web.KustvaktResponseHandler">
 	</bean>
