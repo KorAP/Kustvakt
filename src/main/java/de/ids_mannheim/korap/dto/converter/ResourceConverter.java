@@ -48,7 +48,8 @@ public class ResourceConverter {
                 layers.put(annotationPair.getId(), code);
             }
             dto.setLayers(layers);
-            dto.setLandingPage("https://korap.ids-mannheim.de?" +r.getCorpusQuery());
+            dto.setLandingPage("https://korap.ids-mannheim.de?cq=" +
+            		r.getCorpusQuery());
             dto.setInstitution(r.getInstitution());
 
             resourceDtoList.add(dto);

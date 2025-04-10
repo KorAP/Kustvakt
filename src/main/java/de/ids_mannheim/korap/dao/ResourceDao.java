@@ -80,4 +80,19 @@ public class ResourceDao {
         entityManager.persist(r);
 
     }
+    
+    @Transactional
+    public void updateResource (String id, String germanTitle,
+            String englishTitle, String englishDescription,
+            Set<AnnotationLayer> layers, String institution, 
+            String corpusQuery) throws KustvaktException {
+        ParameterChecker.checkStringValue(id, "id");
+        ParameterChecker.checkStringValue(englishTitle, "en_title");
+        ParameterChecker.checkStringValue(germanTitle, "de_title");
+
+        Resource r = new Resource(id, germanTitle, englishTitle,
+                englishDescription, layers, institution, corpusQuery);
+        entityManager.merge(r);
+
+    }
 }
