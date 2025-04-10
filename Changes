@@ -18,6 +18,7 @@
   - Added statisticsRewriteHandler and queryContextRewrite, 
   - changed file locations to the data folder, 
   - removed unused beans (cacheManager, sqliteDataSource)
+- Fix landingPage in the free resource web-service.  
 
 # version 0.76
 

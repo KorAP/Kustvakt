@@ -67,6 +67,15 @@ public class FreeResourceParser {
                             resource.at("/institution").asText(),
                             resource.at("/corpus_query").asText());
                 }
+                else {
+                	resourceDao.updateResource(resource.at("/id").asText(),
+                            resource.at("/de_title").asText(),
+                            resource.at("/en_title").asText(),
+                            resource.at("/en_description").asText(), 
+                            layers,
+                            resource.at("/institution").asText(),
+                            resource.at("/corpus_query").asText());
+                }
             }
             catch (Exception e) {
                 log.warn("Failed creating resource: " + e.getMessage());

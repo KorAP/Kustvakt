@@ -31,7 +31,7 @@ public class FreeResourceControllerTest extends SpringJerseyTest {
         assertEquals(1, n.at("/languages").size());
         assertEquals(6, n.at("/layers").size());
         assertEquals("Wikimedia Foundation", n.at("/institution").asText());
-        assertEquals("https://korap.ids-mannheim.de?corpusSigle=WPD17", 
+        assertEquals("https://korap.ids-mannheim.de?cq=corpusSigle=WPD17", 
                 n.at("/landingPage").asText());
     }
 }
