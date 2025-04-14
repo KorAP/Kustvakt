@@ -1,5 +1,6 @@
 [{
     "id": "WPD17",
+    "pid": "http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1",
     "de_title" : "Deutsche Wikipedia Artikel 2017",
     "en_title" : "German Wikipedia Articles 2017",
     "en_description" : "A collection of articles of German Wikipedia from July 1st, 2017.",
@@ -12,10 +13,11 @@
         "tt/p"
     ],
     "corpus_query":"corpusSigle=WPD17",
-    "institution" : "Wikimedia Foundation"
+    "institution" : "IDS Mannheim"
 },
 {
     "id": "WDD17",
+    "pid" : "http://hdl.handle.net/10932/00-03B6-558F-5EA0-6301-B",
     "de_title" : "Deutsche Wikipedia-Diskussionskorpus 2017",
     "en_title" : "German Wikipedia talk corpus 2017",
     "en_description" : "A collection of talk pages of German Wikipedia from July 1st, 2017.",
@@ -28,10 +30,11 @@
         "tt/p"
     ],
     "corpus_query":"corpusSigle=WDD17",
-    "institution" : "Wikimedia Foundation"
+    "institution" : "IDS Mannheim"
 },
 {
     "id": "WUD17",
+    "pid": "http://hdl.handle.net/10932/00-03B6-558F-6EF0-6401-F",
     "de_title" : "Deutsche Wikipedia-Benutzerdiskussionskorpus 2017",
     "en_title" : "German Wikipedia user talk corpus 2017",
     "en_description" : "A collection of user talk pages of German Wikipedia from July 1st, 2017.",
@@ -44,6 +47,6 @@
         "tt/p"
     ],
     "corpus_query":"corpusSigle=WUD17",
-    "institution" : "Wikimedia Foundation"
+    "institution" : "IDS Mannheim"
 }
 ]

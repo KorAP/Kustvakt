@@ -27,9 +27,13 @@ import lombok.Setter;
 @Table(name = "resource")
 public class Resource {
 
+	// required
     @Id
     private String id;
+    
+    private String pid;
 
+    // one title is required
     @Column(name = "de_title")
     private String germanTitle;
 
@@ -39,21 +43,25 @@ public class Resource {
     @Column(name = "en_description")
     private String englishDescription;
     
+    // required
     @Column(name = "corpus_query")
     private String corpusQuery;
     
     private String institution;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "resource_layer", joinColumns = @JoinColumn(name = "resource_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "layer_id", referencedColumnName = "id"))
+    
+    // required
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "resource_layer", joinColumns = @JoinColumn(name = "resource_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "layer_id", referencedColumnName = "id"))
     private Set<AnnotationLayer> layers;
 
     public Resource () {}
 
-    public Resource (String id, String germanTitle, String englishTitle,
-                     String englishDescription, Set<AnnotationLayer> layers,
-                     String institution, String corpusQuery) {
+	public Resource (String id, String pid, String germanTitle,
+					 String englishTitle, String englishDescription,
+					 Set<AnnotationLayer> layers, String institution,
+					 String corpusQuery) {
         this.id = id;
+        this.pid = pid;
         this.germanTitle = germanTitle;
         this.englishTitle = englishTitle;
         this.englishDescription = englishDescription;
@@ -62,12 +70,12 @@ public class Resource {
         this.institution=institution;
     }
 
-    @Override
-    public String toString () {
-        return "id=" + id + ", germanTitle=" + germanTitle + ", englishTitle="
-                + englishTitle + ", description=" + englishDescription
-                + ", layers= " + layers + ", institution=" + institution
-                + ", corpusQuery=" + corpusQuery;
-    }
+	@Override
+	public String toString () {
+		return "id=" + id + "pid=" + pid + ", germanTitle=" + germanTitle
+				+ ", englishTitle=" + englishTitle + ", description="
+				+ englishDescription + ", layers= " + layers + ", institution="
+				+ institution + ", corpusQuery=" + corpusQuery;
+	}
 
 }

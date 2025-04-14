@@ -18,7 +18,10 @@
   - Added statisticsRewriteHandler and queryContextRewrite, 
   - changed file locations to the data folder, 
   - removed unused beans (cacheManager, sqliteDataSource)
-- Fix landingPage in the free resource web-service.  
+- Fix landingPage in the free resource web-service (#799) 
+- Add pid for resource and use it as resourceId when available #798
+- Changed institution to IDS Mannheim.
+
 
 # version 0.76
 

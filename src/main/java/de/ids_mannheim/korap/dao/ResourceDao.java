@@ -67,7 +67,7 @@ public class ResourceDao {
     }
 
     @Transactional
-    public void createResource (String id, String germanTitle,
+    public void createResource (String id, String pid, String germanTitle,
             String englishTitle, String englishDescription,
             Set<AnnotationLayer> layers, String institution, 
             String corpusQuery) throws KustvaktException {
@@ -75,23 +75,29 @@ public class ResourceDao {
         ParameterChecker.checkStringValue(englishTitle, "en_title");
         ParameterChecker.checkStringValue(germanTitle, "de_title");
 
-        Resource r = new Resource(id, germanTitle, englishTitle,
+        Resource r = new Resource(id, pid, germanTitle, englishTitle,
                 englishDescription, layers, institution, corpusQuery);
         entityManager.persist(r);
 
     }
     
     @Transactional
-    public void updateResource (String id, String germanTitle,
+    public void updateResource (Resource r, String pid, String germanTitle,
             String englishTitle, String englishDescription,
             Set<AnnotationLayer> layers, String institution, 
             String corpusQuery) throws KustvaktException {
-        ParameterChecker.checkStringValue(id, "id");
+        ParameterChecker.checkObjectValue(layers, "layers");
         ParameterChecker.checkStringValue(englishTitle, "en_title");
         ParameterChecker.checkStringValue(germanTitle, "de_title");
 
-        Resource r = new Resource(id, germanTitle, englishTitle,
-                englishDescription, layers, institution, corpusQuery);
+        r.setCorpusQuery(corpusQuery);
+        r.setEnglishDescription(englishDescription);
+        r.setEnglishTitle(englishTitle);
+        r.setGermanTitle(germanTitle);
+        r.setInstitution(institution);
+        r.setLayers(layers);
+        r.setPid(pid);
+        
         entityManager.merge(r);
 
     }

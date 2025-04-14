@@ -60,6 +60,7 @@ public class FreeResourceParser {
                 Resource r = resourceDao.retrieveResource(resourceId);
                 if (r == null) {
                     resourceDao.createResource(resource.at("/id").asText(),
+                    		resource.at("/pid").asText(),
                             resource.at("/de_title").asText(),
                             resource.at("/en_title").asText(),
                             resource.at("/en_description").asText(), 
@@ -68,7 +69,8 @@ public class FreeResourceParser {
                             resource.at("/corpus_query").asText());
                 }
                 else {
-                	resourceDao.updateResource(resource.at("/id").asText(),
+                	resourceDao.updateResource(r,
+                			resource.at("/pid").asText(),
                             resource.at("/de_title").asText(),
                             resource.at("/en_title").asText(),
                             resource.at("/en_description").asText(), 

@@ -31,7 +31,14 @@ public class ResourceConverter {
         for (Resource r : resources) {
             dto = new ResourceDto();
             dto.setDescription(r.getEnglishDescription());
-            dto.setResourceId(r.getId());
+            
+            String pid = r.getPid();
+            if (pid !=null && !pid.isEmpty()) {
+            	dto.setResourceId(pid);
+            }
+            else {
+            	dto.setResourceId(r.getId());
+            }
             dto.setLanguages(new String[] { "deu" });
 
             titles = new HashMap<String, String>();
