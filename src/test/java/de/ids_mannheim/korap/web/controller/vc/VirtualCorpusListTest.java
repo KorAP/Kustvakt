@@ -5,9 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.ids_mannheim.korap.dao.QueryDao;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.util.QueryException;
@@ -15,6 +18,8 @@ import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
 
 public class VirtualCorpusListTest extends VirtualCorpusTestBase {
+	@Autowired
+    private QueryDao dao;
 
     @Test
     public void testListVCNemo ()
@@ -32,6 +37,9 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
     @Test
     public void testListVCPearl ()
             throws ProcessingException, KustvaktException, IOException, QueryException {
+    	QueryDO queryByName = dao.retrieveQueryByName("system-vc", "system");
+    	System.out.println(queryByName);
+    	
         JsonNode node = testListOwnerVC("pearl");
         assertEquals(0, node.size());
         node = listVC("pearl");

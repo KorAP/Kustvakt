@@ -42,10 +42,10 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
     @Test
     public void testSystemVC () throws KustvaktException {
         // insert vc
-        int id = dao.createQuery("system-vc", ResourceType.SYSTEM,
+        int id = dao.createQuery("system-vc-2", ResourceType.SYSTEM,
                 QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
                 "corpusSigle=GOE", "definition", "description", "experimental",
-                false, "test class", null, null);
+                false, "system", null, null);
         // select vc
         List<QueryDO> vcList = dao.retrieveQueryByType(ResourceType.SYSTEM,
                 null, QueryType.VIRTUAL_CORPUS);
