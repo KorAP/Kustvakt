@@ -374,6 +374,7 @@ public class QueryService extends BasicService {
         if (DEBUG) {
             jlog.debug("Storing query: " + queryName + "in the database ");
         }
+        System.out.println(queryName +": "+requiredAccess.name());
 
         int queryId = 0;
         try {
