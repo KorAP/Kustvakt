@@ -19,13 +19,7 @@ authors:
   - given-names: Marc
     family-names: Kupietz
     orcid: 'https://orcid.org/0000-0001-8997-8256'
-    affiliation: Leibniz Institute for the German Language
-  - given-names: Micheal
-    family-names: Hanl
-  - given-names: Franck
-    family-names: Bodmer
-    email: bodmer@ids-mannheim.de
-    affiliation: Leibniz Institute for the German Language
+    affiliation: Leibniz Institute for the German Language  
 repository-code: 'https://github.com/KorAP/Kustvakt'
 url: 'https://korap.ids-mannheim.de'
 abstract: >-
