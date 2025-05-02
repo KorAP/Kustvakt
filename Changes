@@ -21,6 +21,7 @@
 - Fix landingPage in the free resource web-service (#799) 
 - Add pid for resource and use it as resourceId when available #798
 - Changed institution to IDS Mannheim.
+- Fix loading Spring XML config for DNB & ICC tests.
 
 
 # version 0.76

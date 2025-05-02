@@ -127,7 +127,10 @@ import jakarta.ws.rs.core.Response.Status;
  * @author elma
  * @see /src/main/resources/properties/jdbc.properties
  */
-@ContextConfiguration("classpath:test-config-icc.xml")
+@ContextConfiguration(
+	locations = "classpath:test-config-icc.xml", 
+	inheritLocations = false
+)
 public class ICCTest extends SpringJerseyTest {
 
     public final static String API_VERSION = "v1.0";

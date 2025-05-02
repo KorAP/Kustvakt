@@ -15,7 +15,10 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-@ContextConfiguration("classpath:test-config-dnb.xml")
+@ContextConfiguration(
+		locations = "classpath:test-config-dnb.xml", 
+		inheritLocations = false
+)		
 public class DNBTest extends SpringJerseyTest {
 
     public final static String API_VERSION = "v1.0";

@@ -159,11 +159,11 @@
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl" />
 
-	<bean id="initializator"
+	<!-- <bean id="initializator"
 		class="de.ids_mannheim.korap.init.Initializator"
-		init-method="initTest">
+		init-method="initTestWithoutAvailability">
 	</bean>
-
+ -->
 	<!-- Krill -->
 	<bean id="search_krill"
 		class="de.ids_mannheim.korap.web.SearchKrill">
