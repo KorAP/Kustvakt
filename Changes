@@ -1,4 +1,4 @@
-# version 0.77-SNAPSHOT
+# version 0.77
 
 - Update statistics in VC info and list web-services to use VC cache (referTo) 
   instead of the original KoralQuery definitions (#791).
