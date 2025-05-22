@@ -48,7 +48,7 @@ public class ResourceParser {
         }
         else {
             is = ResourceParser.class.getClassLoader()
-                    .getResourceAsStream("json/"+RESOURCE_FILE);
+                    .getResourceAsStream("data/"+RESOURCE_FILE);
         }
 
         JsonNode node = mapper.readTree(is);

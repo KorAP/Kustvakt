@@ -97,7 +97,7 @@ public class OAuth2InitClientService {
         }
         else {
             InputStream is = getClass().getClassLoader().getResourceAsStream(
-                    "json/" + OAUTH2_CLIENT_JSON_INPUT_FILE);
+                    "data/" + OAUTH2_CLIENT_JSON_INPUT_FILE);
             return JsonUtils.read(is, OAuth2ClientJson.class);
         }
 
