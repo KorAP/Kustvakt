@@ -40,7 +40,7 @@ src\main\resources\Kustvakt.conf
 /dereko-kq-formatter.sh
 /shutdownToken
 /adminToken
-/free-resources.json
+/resources.json
 /cache_store*
 /pipes
 /test-pipes

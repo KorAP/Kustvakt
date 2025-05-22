@@ -5,7 +5,7 @@ import java.util.EnumSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ids_mannheim.korap.annotation.FreeResourceParser;
+import de.ids_mannheim.korap.annotation.ResourceParser;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -29,7 +29,7 @@ public class Initializator {
     @Autowired
     private NamedVCLoader vcLoader;
     @Autowired
-    private FreeResourceParser resourceParser;
+    private ResourceParser resourceParser;
     @Autowired
     private FullConfiguration config;
     @Autowired

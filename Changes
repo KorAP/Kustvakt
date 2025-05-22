@@ -1,3 +1,7 @@
+# version 0.78
+
+- Renamed free resource to resource.
+
 # version 0.77
 
 - Update statistics in VC info and list web-services to use VC cache (referTo) 

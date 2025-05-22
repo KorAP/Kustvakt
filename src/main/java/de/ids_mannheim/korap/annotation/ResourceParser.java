@@ -22,33 +22,33 @@ import de.ids_mannheim.korap.entity.Resource;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
 /**
- * Parser for extracting data from free-resources.json containing
- * listing free (non-licensed) corpora.
+ * Parser for extracting data from resources.json listing virtual corpora 
+ * available through KorapSRU.
  * 
  * @author margaretha
  *
  */
 @Component
-public class FreeResourceParser {
-    private Logger log = LogManager.getLogger(FreeResourceParser.class);
+public class ResourceParser {
+    private Logger log = LogManager.getLogger(ResourceParser.class);
 
     @Autowired
     private ResourceDao resourceDao;
     @Autowired
     private AnnotationDao annotationDao;
 
-    public static String FREE_RESOURCE_FILE = "free-resources.json";
+    public static String RESOURCE_FILE = "resources.json";
     public static ObjectMapper mapper = new ObjectMapper();
 
     public void run () throws IOException, KustvaktException {
         InputStream is = null;
-        File f = new File("data/"+FREE_RESOURCE_FILE);
+        File f = new File("data/"+RESOURCE_FILE);
         if (f.exists()) {
             is = new FileInputStream(f);
         }
         else {
-            is = FreeResourceParser.class.getClassLoader()
-                    .getResourceAsStream("json/"+FREE_RESOURCE_FILE);
+            is = ResourceParser.class.getClassLoader()
+                    .getResourceAsStream("json/"+RESOURCE_FILE);
         }
 
         JsonNode node = mapper.readTree(is);
