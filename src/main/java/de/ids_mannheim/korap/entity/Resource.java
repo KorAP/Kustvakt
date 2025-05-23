@@ -47,6 +47,10 @@ public class Resource {
     @Column(name = "corpus_query")
     private String corpusQuery;
     
+    // default free
+    @Column(name = "required_access")
+    private String requiredAccess;
+    
     private String institution;
     
     // required
@@ -59,7 +63,7 @@ public class Resource {
 	public Resource (String id, String pid, String germanTitle,
 					 String englishTitle, String englishDescription,
 					 Set<AnnotationLayer> layers, String institution,
-					 String corpusQuery) {
+					 String corpusQuery, String requiredAccess) {
         this.id = id;
         this.pid = pid;
         this.germanTitle = germanTitle;
@@ -67,6 +71,7 @@ public class Resource {
         this.englishDescription = englishDescription;
         this.layers = layers;
         this.corpusQuery = corpusQuery;
+        this.requiredAccess = requiredAccess;
         this.institution=institution;
     }
 
@@ -75,7 +80,8 @@ public class Resource {
 		return "id=" + id + "pid=" + pid + ", germanTitle=" + germanTitle
 				+ ", englishTitle=" + englishTitle + ", description="
 				+ englishDescription + ", layers= " + layers + ", institution="
-				+ institution + ", corpusQuery=" + corpusQuery;
+				+ institution + ", corpusQuery=" + corpusQuery 
+				+", requiredAccess="+ requiredAccess;
 	}
 
 }

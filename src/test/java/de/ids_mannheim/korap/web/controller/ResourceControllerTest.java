@@ -12,7 +12,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 @ContextConfiguration("classpath:test-resource-config.xml")
-public class FreeResourceControllerTest extends SpringJerseyTest {
+public class ResourceControllerTest extends SpringJerseyTest {
 
 	@Test
 	public void testResource () throws KustvaktException {
@@ -34,5 +34,6 @@ public class FreeResourceControllerTest extends SpringJerseyTest {
 		assertEquals("IDS Mannheim", n.at("/institution").asText());
 		assertEquals("https://korap.ids-mannheim.de?cq=corpusSigle=WPD17",
 				n.at("/landingPage").asText());
+		assertEquals("free", n.at("/requiredAccess").asText());
 	}
 }

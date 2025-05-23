@@ -58,6 +58,7 @@ public class ResourceConverter {
             dto.setLandingPage("https://korap.ids-mannheim.de?cq=" +
             		r.getCorpusQuery());
             dto.setInstitution(r.getInstitution());
+            dto.setRequiredAccess(r.getRequiredAccess());
 
             resourceDtoList.add(dto);
         }

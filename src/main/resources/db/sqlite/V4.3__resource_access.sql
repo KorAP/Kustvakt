@@ -1,0 +1,2 @@
+ALTER TABLE resource 
+ADD COLUMN required_access VARCHAR(25) DEFAULT FREE;

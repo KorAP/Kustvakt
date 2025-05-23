@@ -54,6 +54,10 @@ public class ResourceParser {
         JsonNode node = mapper.readTree(is);
         for (JsonNode resource : node) {
             String resourceId = resource.at("/id").asText();
+            String requiredAccess = resource.at("/required_access").asText();
+            if (requiredAccess.isEmpty()){
+            	requiredAccess = "free";
+            }
             //            log.debug(resourceId);
             Set<AnnotationLayer> layers = parseLayers(resource.at("/layers"));
             try {
@@ -66,7 +70,8 @@ public class ResourceParser {
                             resource.at("/en_description").asText(), 
                             layers,
                             resource.at("/institution").asText(),
-                            resource.at("/corpus_query").asText());
+                            resource.at("/corpus_query").asText(),
+                            requiredAccess);
                 }
                 else {
                 	resourceDao.updateResource(r,
@@ -76,7 +81,8 @@ public class ResourceParser {
                             resource.at("/en_description").asText(), 
                             layers,
                             resource.at("/institution").asText(),
-                            resource.at("/corpus_query").asText());
+                            resource.at("/corpus_query").asText(),
+                            requiredAccess);
                 }
             }
             catch (Exception e) {
