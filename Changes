@@ -1,6 +1,9 @@
 # version 0.78
 
 - Renamed free resource to resource.
+- Add required access to resources.
+- Determine corpus access dynamically using koralQuery for resources without 
+  predefined required_access. 
 
 # version 0.77
 

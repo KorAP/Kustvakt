@@ -22,18 +22,32 @@ public class ResourceControllerTest extends SpringJerseyTest {
 		JsonNode n = JsonUtils.readTree(entity);
 		assertEquals(3, n.size());
 
-		n = n.get(0);
+		JsonNode n0 = n.get(0);
 		assertEquals("http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1",
-				n.at("/resourceId").asText());
-		assertEquals(n.at("/titles/de").asText(),
+				n0.at("/resourceId").asText());
+		assertEquals(n0.at("/titles/de").asText(),
 				"Deutsche Wikipedia Artikel 2017");
-		assertEquals(n.at("/titles/en").asText(),
+		assertEquals(n0.at("/titles/en").asText(),
 				"German Wikipedia Articles 2017");
-		assertEquals(1, n.at("/languages").size());
-		assertEquals(6, n.at("/layers").size());
-		assertEquals("IDS Mannheim", n.at("/institution").asText());
+		assertEquals(1, n0.at("/languages").size());
+		assertEquals(6, n0.at("/layers").size());
+		assertEquals("IDS Mannheim", n0.at("/institution").asText());
 		assertEquals("https://korap.ids-mannheim.de?cq=corpusSigle=WPD17",
-				n.at("/landingPage").asText());
-		assertEquals("free", n.at("/requiredAccess").asText());
+				n0.at("/landingPage").asText());
+		assertEquals("FREE", n0.at("/requiredAccess").asText());
+		
+		JsonNode n1 = n.get(1);
+		assertEquals("http://hdl.handle.net/10932/00-03B6-558F-5EA0-6301-B",
+				n1.at("/resourceId").asText());
+		assertEquals(n1.at("/titles/de").asText(),
+				"Deutsche Wikipedia-Diskussionskorpus 2017");
+		assertEquals(n1.at("/titles/en").asText(),
+				"German Wikipedia talk corpus 2017");
+		assertEquals(1, n1.at("/languages").size());
+		assertEquals(6, n1.at("/layers").size());
+		assertEquals("IDS Mannheim", n1.at("/institution").asText());
+		assertEquals("https://korap.ids-mannheim.de?cq=corpusSigle=WDD17",
+				n1.at("/landingPage").asText());
+		assertEquals("FREE", n1.at("/requiredAccess").asText());
 	}
 }

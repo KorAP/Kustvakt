@@ -407,7 +407,7 @@ public class QueryService extends BasicService {
         }
     }
 
-    private String serializeCorpusQuery (String corpusQuery)
+    public String serializeCorpusQuery (String corpusQuery)
             throws KustvaktException {
         QuerySerializer serializer = new QuerySerializer();
         serializer.setCollection(corpusQuery);

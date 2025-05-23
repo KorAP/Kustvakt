@@ -20,6 +20,8 @@ import de.ids_mannheim.korap.dao.ResourceDao;
 import de.ids_mannheim.korap.entity.AnnotationLayer;
 import de.ids_mannheim.korap.entity.Resource;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 
 /**
  * Parser for extracting data from resources.json listing virtual corpora 
@@ -36,6 +38,8 @@ public class ResourceParser {
     private ResourceDao resourceDao;
     @Autowired
     private AnnotationDao annotationDao;
+    @Autowired
+    private QueryService queryService;
 
     public static String RESOURCE_FILE = "resources.json";
     public static ObjectMapper mapper = new ObjectMapper();
@@ -54,36 +58,38 @@ public class ResourceParser {
         JsonNode node = mapper.readTree(is);
         for (JsonNode resource : node) {
             String resourceId = resource.at("/id").asText();
+            String pid = resource.at("/pid").asText();
+            String deTitle = resource.at("/de_title").asText();
+            String enTitle = resource.at("/en_title").asText();
+            String enDescription = resource.at("/en_description").asText(); 
+            String institution = resource.at("/institution").asText();
             String requiredAccess = resource.at("/required_access").asText();
+            String corpusQuery = resource.at("/corpus_query").asText();
+            
             if (requiredAccess.isEmpty()){
-            	requiredAccess = "free";
+				if (!corpusQuery.isEmpty()) {
+					String koralQuery = queryService
+							.serializeCorpusQuery(corpusQuery);
+					// assume all vc are not cached and use the given koralQuery
+					// for cached-vc, the koralQuery should contain referTo
+					CorpusAccess access = queryService.determineRequiredAccess(
+							false, resourceId, koralQuery);
+					requiredAccess = access.name();
+				}
             }
-            //            log.debug(resourceId);
             Set<AnnotationLayer> layers = parseLayers(resource.at("/layers"));
             try {
                 Resource r = resourceDao.retrieveResource(resourceId);
-                if (r == null) {
-                    resourceDao.createResource(resource.at("/id").asText(),
-                    		resource.at("/pid").asText(),
-                            resource.at("/de_title").asText(),
-                            resource.at("/en_title").asText(),
-                            resource.at("/en_description").asText(), 
-                            layers,
-                            resource.at("/institution").asText(),
-                            resource.at("/corpus_query").asText(),
-                            requiredAccess);
-                }
-                else {
-                	resourceDao.updateResource(r,
-                			resource.at("/pid").asText(),
-                            resource.at("/de_title").asText(),
-                            resource.at("/en_title").asText(),
-                            resource.at("/en_description").asText(), 
-                            layers,
-                            resource.at("/institution").asText(),
-                            resource.at("/corpus_query").asText(),
-                            requiredAccess);
-                }
+				if (r == null) {
+					resourceDao.createResource(resourceId, pid, deTitle,
+							enTitle, enDescription, layers, institution,
+							corpusQuery, requiredAccess);
+				}
+				else {
+					resourceDao.updateResource(r, pid, deTitle, enTitle,
+							enDescription, layers, institution, corpusQuery,
+							requiredAccess);
+				}
             }
             catch (Exception e) {
                 log.warn("Failed creating resource: " + e.getMessage());
