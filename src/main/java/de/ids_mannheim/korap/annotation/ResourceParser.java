@@ -92,8 +92,9 @@ public class ResourceParser {
 				}
             }
             catch (Exception e) {
-                log.warn("Failed creating resource: " + e.getMessage());
-            }
+				log.warn("Failed creating resource: " + resourceId + ". Cause: "
+						+ e.getMessage());
+			}
         }
     }
 
