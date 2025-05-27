@@ -20,7 +20,7 @@ public class ResourceControllerTest extends SpringJerseyTest {
 				.request().get();
 		String entity = response.readEntity(String.class);
 		JsonNode n = JsonUtils.readTree(entity);
-		assertEquals(3, n.size());
+		assertEquals(29, n.size());
 
 		JsonNode n0 = n.get(0);
 		assertEquals("http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1",
@@ -49,5 +49,20 @@ public class ResourceControllerTest extends SpringJerseyTest {
 		assertEquals("https://korap.ids-mannheim.de?cq=corpusSigle=WDD17",
 				n1.at("/landingPage").asText());
 		assertEquals("FREE", n1.at("/requiredAccess").asText());
+	
+		JsonNode n4 = n.get(4);
+		assertEquals("Literatur",
+				n4.at("/resourceId").asText());
+		assertEquals(n4.at("/titles/de").asText(),
+				"Literatur");
+		assertEquals(n4.at("/titles/en").asText(),
+				"Literature");
+		assertEquals(1, n4.at("/languages").size());
+		assertEquals(6, n4.at("/layers").size());
+		assertEquals("IDS Mannheim", n4.at("/institution").asText());
+		assertEquals("https://korap.ids-mannheim.de?cq=textType = /(.*[Rr]oman|"
+				+ "[Bb]iographie|[Dd]rama|[Ss]schauspiel)/",
+				n4.at("/landingPage").asText());
+		assertEquals("FREE", n4.at("/requiredAccess").asText());
 	}
 }

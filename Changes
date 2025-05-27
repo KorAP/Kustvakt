@@ -4,6 +4,7 @@
 - Add required access to resources.
 - Determine corpus access dynamically using koralQuery for resources without 
   predefined required_access. 
+- Added useful VC (https://korap.ids-mannheim.de/doc/corpus) to resources.json. 
 
 # version 0.77
 

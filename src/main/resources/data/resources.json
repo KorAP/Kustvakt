@@ -50,5 +50,422 @@
     ],
     "corpus_query":"corpusSigle=WUD17",
     "institution" : "IDS Mannheim"
-}
+},
+
+    {
+        "id": "Romane",
+        "pid": "Romane",
+        "de_title": "Romane",
+        "en_title": "Roman",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = /.*[Rr]oman/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Literatur",
+        "pid": "Literatur",
+        "de_title": "Literatur",
+        "en_title": "Literature",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = /(.*[Rr]oman|[Bb]iographie|[Dd]rama|[Ss]schauspiel)/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Usenet-News",
+        "pid": "Usenet-News",
+        "de_title": "Usenet-News",
+        "en_title": "Usenet-News",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "corpusSigle = /NG[A-Z]+/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Wikipedia-Diskussionsseiten",
+        "pid": "Wikipedia-Diskussionsseiten",
+        "de_title": "Wikipedia-Diskussionsseiten",
+        "en_title": "Wikipedia Talk Pages",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "corpusSigle = /W[UD]D[0-9]+/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Zeitungen",
+        "pid": "Zeitungen",
+        "de_title": "Zeitungen",
+        "en_title": "Newletters",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = /[^:]*[Zz]eitung.*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Zeitschriften",
+        "pid": "Zeitschriften",
+        "de_title": "Zeitschriften",
+        "en_title": "Magazines",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = /(Zeitschrift|Magazin).*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Zeitungen_und_Zeitschriften",
+        "pid": "Zeitungen_und_Zeitschriften",
+        "de_title": "Zeitungen und Zeitschriften",
+        "en_title": "Newsletters and Magazines",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = /([^:]*[Zz]eitung|Zeitschrift|Magazin).*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Agenturmeldungen",
+        "pid": "Agenturmeldungen",
+        "de_title": "Agenturmeldungen",
+        "en_title": "Agenturmeldungen",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = /Agenturmeldung.*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Plenarprotokolle",
+        "pid": "Plenarprotokolle",
+        "de_title": "Plenarprotokolle",
+        "en_title": "Plenarprotokolle",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textTypeRef = /Plenarprotokoll/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Publikumszeitschriften",
+        "pid": "Publikumszeitschriften",
+        "de_title": "Publikumszeitschriften",
+        "en_title": "Publikumszeitschriften",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = \"Zeitschrift: Publikumszeitschrift\"",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Fachzeitschriften",
+        "pid": "Fachzeitschriften",
+        "de_title": "Fachzeitschriften",
+        "en_title": "Fachzeitschriften",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = \"Zeitschrift: Fachzeitschrift\"",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "IT-Zeitschriften",
+        "pid": "IT-Zeitschriften",
+        "de_title": "IT-Zeitschriften",
+        "en_title": "IT-Zeitschriften",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textType = \"Zeitschrift: Fachzeitschrift: IT-Magazin\"",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Wirtschaftsressorts",
+        "pid": "Wirtschaftsressorts",
+        "de_title": "Wirtschaftsressorts",
+        "en_title": "Wirtschaftsressorts",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textDomain = \"Wirtschaft\"",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Kulturressorts",
+        "pid": "Kulturressorts",
+        "de_title": "Kulturressorts",
+        "en_title": "Kulturressorts",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textDomain = \"Kultur\"",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Sportressorts",
+        "pid": "Sportressorts",
+        "de_title": "Sportressorts",
+        "en_title": "Sportressorts",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textDomain = \"Sport\"",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Politikressorts",
+        "pid": "Politikressorts",
+        "de_title": "Politikressorts",
+        "en_title": "Politikressorts",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "textDomain = /Politik.*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Stuttgart-21-Dialoge",
+        "pid": "Stuttgart-21-Dialoge",
+        "de_title": "Stuttgart-21-Dialoge (Transkripte aus FOLK)",
+        "en_title": "Stuttgart-21-Dialoge (Transcripts from FOLK)",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "corpusSigle=FOLK",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Kinder-_und_Jugendliteratur",
+        "pid": "Kinder-_und_Jugendliteratur",
+        "de_title": "Kinder- und Jugendliteratur",
+        "en_title": "Kinder- und Jugendliteratur",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "corpusSigle=KJL",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Fußballlinguistik-Korpora",
+        "pid": "Fußballlinguistik-Korpora",
+        "de_title": "Fußballlinguistik-Korpora",
+        "en_title": "Fußballlinguistik-Korpora",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "title=Fußballlinguistik-Korpora",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Orthografisches_Kernkorpus_(OKK)",
+        "pid": "Orthografisches_Kernkorpus_(OKK)",
+        "de_title": "Orthografisches Kernkorpus (OKK)",
+        "en_title": "Orthografisches Kernkorpus (OKK)",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "referTo ratskorpus",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Gingko-Korpus",
+        "pid": "Gingko-Korpus",
+        "de_title": "Gingko-Korpus",
+        "en_title": "Gingko-Korpus",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "corpusSigle=/[AM]TZ.*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "DE_Presse",
+        "pid": "DE_Presse",
+        "de_title": "DE Presse",
+        "en_title": "DE Presse",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "pubPlaceKey=DE and textType = /([^:]*[Zz]eitung|Zeitschrift|Magazin).*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "AT_Presse",
+        "pid": "AT_Presse",
+        "de_title": "AT Presse",
+        "en_title": "AT Presse",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "pubPlaceKey=AT and textType = /([^:]*[Zz]eitung|Zeitschrift|Magazin).*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "CH_Presse",
+        "pid": "CH_Presse",
+        "de_title": "CH Presse",
+        "en_title": "CH Presse",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "pubPlaceKey=CH and textType = /([^:]*[Zz]eitung|Zeitschrift|Magazin).*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Fachzeitschriften_Ingenieur_und_Technik",
+        "pid": "Fachzeitschriften_Ingenieur_und_Technik",
+        "de_title": "Fachzeitschriften Ingenieur und Technik",
+        "en_title": "Fachzeitschriften Ingenieur und Technik",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "corpusSigle=/(ATZ|MTZ|KEM|CAV|MAV|ELI|TER|CHM|CHT|DNV|AUI|IEE|KE|EID|MET|EPP|TUE|ET|PRD|WWT|AUP|AUT|QE|VKU|AUE|EMA|FK|AIT|CHO|EMT).*/",
+        "institution": "IDS Mannheim"
+    },
+    {
+        "id": "Belletristik/Trivialliteratur",
+        "pid": "Belletristik/Trivialliteratur",
+        "de_title": "Belletristik/Trivialliteratur",
+        "en_title": "Belletristik/Trivialliteratur",
+        "layers": [
+            "corenlp/p",
+            "marmot/m",
+            "marmot/p",
+            "opennlp/p",
+            "tt/l",
+            "tt/p"
+        ],
+        "corpus_query": "corpusSigle=/(BIH|BIO|DIV|GOE|GR1|GRI|HES|KJL|LES|THM|WAM)/ or docSigle=/MK1\\/[LMTW].*/ or docSigle=/MK2\\/TRI/",
+        "institution": "IDS Mannheim"
+    }
 ]
