@@ -30,7 +30,10 @@ public class ResourceConverter {
         HashMap<Integer, String> layers;
         for (Resource r : resources) {
             dto = new ResourceDto();
-            dto.setDescription(r.getEnglishDescription());
+            String description = r.getEnglishDescription();
+            if (description != null && !description.isEmpty()) {
+            	dto.setDescription(description);
+            }
             
             String pid = r.getPid();
             if (pid !=null && !pid.isEmpty()) {

@@ -2,6 +2,9 @@ package de.ids_mannheim.korap.dto;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +17,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@JsonInclude(Include.NON_EMPTY)
 public class ResourceDto {
 
 	private String resourceId;
