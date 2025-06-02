@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.dto.converter;
 
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,8 +60,11 @@ public class ResourceConverter {
                 layers.put(annotationPair.getId(), code);
             }
             dto.setLayers(layers);
+            
+			String encodedCQ = URLEncoder.encode(r.getCorpusQuery(),
+					Charset.forName("utf-8"));
             dto.setLandingPage("https://korap.ids-mannheim.de?cq=" +
-            		r.getCorpusQuery());
+            		encodedCQ);
             dto.setInstitution(r.getInstitution());
             dto.setRequiredAccess(r.getRequiredAccess());
 

@@ -170,7 +170,7 @@ public abstract class KustvaktBaseServer {
 
         server.setConnectors(new Connector[] { connector });
         try {
-            log.info("Starting server on port" + kargs.port);
+            log.info("Starting server on port: " + kargs.port);
             server.start();
             server.join();
         }
