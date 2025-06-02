@@ -176,6 +176,11 @@
 		/> <bean id="searchController" class="de.ids_mannheim.korap.web.controller.SearchController" 
 		/> <bean id="statisticController" class="de.ids_mannheim.korap.web.controller.StatisticController" 
 		/> -->
+		
+	<!-- VC loader -->
+	<bean id="vcLoader"
+		class="de.ids_mannheim.korap.init.DummyNamedVCLoaderImpl" />
+	
 	<!-- Services -->
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.DummyOAuth2ScopeServiceImpl" />

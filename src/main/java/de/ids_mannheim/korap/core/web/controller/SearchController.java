@@ -63,6 +63,9 @@ public class SearchController {
 
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
+    
+    @Autowired
+    private Runnable vcLoader;
 
     @Autowired
     private SearchService searchService;
@@ -104,6 +107,8 @@ public class SearchController {
     public Response closeIndexReader () {
         try {
             searchService.closeIndexReader();
+            Thread t = new Thread(vcLoader);
+            t.start();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

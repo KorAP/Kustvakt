@@ -58,6 +58,9 @@ public class NamedVCLoader implements Runnable {
     @Override
     public void run () {
         try {
+        	VirtualCorpusCache.vcToCleanUp.clear();
+        	VirtualCorpusCache.map.clear();
+        	
             loadVCToCache();
         }
         catch (IOException | QueryException e) {
