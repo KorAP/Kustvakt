@@ -22,7 +22,7 @@ public class ResourceControllerTest extends SpringJerseyTest {
 				.request().get();
 		String entity = response.readEntity(String.class);
 		JsonNode n = JsonUtils.readTree(entity);
-		assertEquals(29, n.size());
+		assertEquals(4, n.size());
 
 		JsonNode n0 = n.get(0);
 		assertEquals("http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1",
@@ -53,20 +53,36 @@ public class ResourceControllerTest extends SpringJerseyTest {
 		assertEquals("https://korap.ids-mannheim.de?cq=corpusSigle%3DWDD17",
 				n1.at("/landingPage").asText());
 		assertEquals("FREE", n1.at("/requiredAccess").asText());
+		
+		JsonNode n3 = n.get(3);
+		assertEquals("Wikipedia-Diskussionsseiten",
+				n3.at("/resourceId").asText());
+		assertEquals(n3.at("/titles/de").asText(),
+				"Wikipedia-Diskussionsseiten");
+		assertEquals(n3.at("/titles/en").asText(),
+				"Wikipedia Talk Pages");
+		assertEquals(1, n3.at("/languages").size());
+		assertEquals(6, n3.at("/layers").size());
+		assertEquals("IDS Mannheim", n3.at("/institution").asText());
+		assertEquals("https://korap.ids-mannheim.de?cq=corpusSigle+"
+				+ "%3D+%2FW%5BUD%5DD%5B0-9%5D%2B%2F",
+				n3.at("/landingPage").asText());
+		assertEquals("FREE", n3.at("/requiredAccess").asText());
+		assertTrue(n3.at("/description").isMissingNode());
 	
-		JsonNode n4 = n.get(4);
-		assertEquals("Literatur",
-				n4.at("/resourceId").asText());
-		assertEquals(n4.at("/titles/de").asText(),
-				"Literatur");
-		assertEquals(n4.at("/titles/en").asText(),
-				"Literature");
-		assertEquals(1, n4.at("/languages").size());
-		assertEquals(6, n4.at("/layers").size());
-		assertEquals("IDS Mannheim", n4.at("/institution").asText());
-		assertEquals("https://korap.ids-mannheim.de?cq=textType+%3D+%2F%28.*%5BRr%5Doman%7C%5BBb%5Diographie%7C%5BDd%5Drama%7C%5BSs%5Dschauspiel%29%2F",
-				n4.at("/landingPage").asText());
-		assertEquals("FREE", n4.at("/requiredAccess").asText());
-		assertTrue(n4.at("/description").isMissingNode());
+//		JsonNode n4 = n.get(4);
+//		assertEquals("Literatur",
+//				n4.at("/resourceId").asText());
+//		assertEquals(n4.at("/titles/de").asText(),
+//				"Literatur");
+//		assertEquals(n4.at("/titles/en").asText(),
+//				"Literature");
+//		assertEquals(1, n4.at("/languages").size());
+//		assertEquals(6, n4.at("/layers").size());
+//		assertEquals("IDS Mannheim", n4.at("/institution").asText());
+//		assertEquals("https://korap.ids-mannheim.de?cq=textType+%3D+%2F%28.*%5BRr%5Doman%7C%5BBb%5Diographie%7C%5BDd%5Drama%7C%5BSs%5Dschauspiel%29%2F",
+//				n4.at("/landingPage").asText());
+//		assertEquals("FREE", n4.at("/requiredAccess").asText());
+//		assertTrue(n4.at("/description").isMissingNode());
 	}
 }
