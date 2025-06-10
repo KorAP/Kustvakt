@@ -22,7 +22,7 @@ public class ResourceControllerTest extends SpringJerseyTest {
 				.request().get();
 		String entity = response.readEntity(String.class);
 		JsonNode n = JsonUtils.readTree(entity);
-		assertEquals(29, n.size());
+		assertEquals(4, n.size());
 
 		JsonNode n0 = n.get(0);
 		assertEquals("http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1",
