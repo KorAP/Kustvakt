@@ -9,6 +9,7 @@
 - Omit empty resource description.  
 - Added URL-encoding for corpus query at in the resource service. 
 - Fixed recaching VC at closing index.
+- Removed useful vc from the sample resources.json.
 
 # version 0.77
 
