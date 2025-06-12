@@ -5,25 +5,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.ws.rs.core.Response;
 
-import de.ids_mannheim.korap.config.SpringJerseyTest;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * @author margaretha, diewald
  */
-public class StatisticsControllerTest extends SpringJerseyTest {
-
+public class StatisticsControllerTest extends OAuth2TestBase {
+	
     @Test
     public void testGetStatisticsNoResource ()
             throws IOException, KustvaktException {
@@ -38,6 +38,26 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         assertEquals(0,node.get("documents").asInt());
         assertEquals(0,node.get("tokens").asInt());
     }
+    
+    @Test
+    public void testGetStatisticsWithLogin () throws KustvaktException {
+    	Response response = requestTokenWithDoryPassword(superClientId,
+                clientSecret);
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
+        assertEquals(node.at("/scope").asText(), "all");
+        String accessToken = node.at("/access_token").asText();
+        
+    	String corpusQuery = "corpusSigle=GOE";
+        response = target().path(API_VERSION).path("statistics")
+                .queryParam("cq", corpusQuery).request()
+                .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
+                .get();
+        assert Status.OK.getStatusCode() == response.getStatus();
+        
+        String ent = response.readEntity(String.class);
+        node = JsonUtils.readTree(ent);
+        assertEquals(11,node.get("documents").asInt());
+	}
 
     @Test
     public void testStatisticsWithCq () throws KustvaktException {

@@ -1,3 +1,7 @@
+# version 0.78.1
+
+- Fix empty security context in statistics requests.
+
 # version 0.78
 
 - Renamed free resource to resource.

@@ -13,6 +13,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.ws.rs.Consumes;
@@ -38,7 +39,8 @@ import jakarta.ws.rs.core.SecurityContext;
  */
 @Controller
 @Path("{version}/statistics/")
-@ResourceFilters({ APIVersionFilter.class, DemoUserFilter.class })
+@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
+	DemoUserFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class StatisticController {
 
