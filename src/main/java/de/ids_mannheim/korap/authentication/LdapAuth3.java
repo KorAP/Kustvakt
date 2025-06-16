@@ -152,7 +152,8 @@ public class LdapAuth3 {
                 lc = new LDAPConnection(socketFactory);
             }
             catch (GeneralSecurityException e) {
-                System.err.printf(
+                //jlog.error(
+            	jlog.error(
                         "Error: login: Connecting to LDAPS Server: failed: '%s'!\n",
                         e);
                 ldapTerminate(null);
@@ -172,7 +173,7 @@ public class LdapAuth3 {
         catch (LDAPException e) {
             String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
                     .getFullStackTrace(e);
-            System.err.printf(
+            jlog.error(
                     "Error: login: Connecting to LDAP Server: failed: '%s'!\n",
                     fullStackTrace);
             ldapTerminate(lc);
@@ -192,7 +193,7 @@ public class LdapAuth3 {
                 System.out.print("Binding: OK.\n");
         }
         catch (LDAPException e) {
-//            System.err.printf("Error: login: Binding failed: '%s'!\n", e);
+//            jlog.error("Error: login: Binding failed: '%s'!\n", e);
             String error = String.format("Error: login: Binding failed: "
                     + "'%s'!\n", e);
             jlog.error(error);
@@ -221,7 +222,7 @@ public class LdapAuth3 {
                         srchRes.getEntryCount());
         }
         catch (LDAPSearchException e) {
-            System.err.printf("Error: Search for User failed: '%s'!\n", e);
+            jlog.error("Error: Search for User failed: '%s'!\n", e);
         }
 
         if (srchRes == null || srchRes.getEntryCount() == 0) {
@@ -249,7 +250,7 @@ public class LdapAuth3 {
                 }
             }
             catch (LDAPException e) {
-//                System.err.printf("Error: login: Binding failed: '%s'!\n", e);
+//                jlog.error("Error: login: Binding failed: '%s'!\n", e);
                 String error = String.format("Error: login: Binding failed: "
                         + "'%s'!\n", e);
                 jlog.error(error);
@@ -303,7 +304,7 @@ public class LdapAuth3 {
                         srchRes.getEntryCount());
         }
         catch (LDAPSearchException e) {
-            System.err.printf("Error: Search for User failed: '%s'!\n", e);
+            jlog.error("Error: Search for User failed: '%s'!\n", e);
         }
         return srchRes;
     }
