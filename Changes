@@ -1,5 +1,9 @@
 # version 0.79
 
+- Add pipe response rewriting (#794) limited to korap host by default. 
+  Configurable via kustvakt.conf.
+
+
 # version 0.78.1
 
 - Fix empty security context in statistics requests.

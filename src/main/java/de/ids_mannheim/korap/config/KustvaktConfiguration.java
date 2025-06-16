@@ -122,6 +122,10 @@ public class KustvaktConfiguration {
     // EM: Maybe needed when we support pipe registration
     @Deprecated
     public static Map<String, String> pipes = new HashMap<>();
+    
+    // EM: default host allowed for piping query and response 
+    // (temporary solution without pipe registration)
+    private String pipeHost; 
 
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);
@@ -230,6 +234,9 @@ public class KustvaktConfiguration {
 
         maxTokenContext = Integer.parseInt(properties.getProperty(
                 "max.token.context.size", "0"));
+        
+		pipeHost = properties.getProperty("pipe.host",
+				"https://korap.ids-mannheim.de");
     }
 
     @Deprecated
