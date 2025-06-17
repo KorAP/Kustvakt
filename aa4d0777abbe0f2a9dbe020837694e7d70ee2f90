@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a284b7a1_5c82f611",
+        "filename": "src/main/resources/kustvakt-lite.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-06-17T14:01:25Z",
+      "side": 1,
+      "message": "Maybe, to prevent mis-configurations, it\u0027s better to comment that out completely and only allow the pipe mechanism, when this value is set.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 28
+      },
+      "revId": "aa4d0777abbe0f2a9dbe020837694e7d70ee2f90",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
