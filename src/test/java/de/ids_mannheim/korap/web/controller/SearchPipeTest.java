@@ -41,7 +41,7 @@ public class SearchPipeTest extends SpringJerseyTest {
 
     private int port = 6071;
 
-    private String pipeJson, pipeWithParamJson;
+    private String pipeJson, pipeWithParamJson, pipeTimeout;
 
     private String glemmUri = "http://localhost:" + port + "/glemm";
 
@@ -50,6 +50,10 @@ public class SearchPipeTest extends SpringJerseyTest {
                 ClassLoader.getSystemResourceAsStream(
                         "pipe-output/test-pipes.jsonld"),
                 StandardCharsets.UTF_8);
+        pipeTimeout = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "pipe-output/test-timeout.jsonld"),
+                StandardCharsets.UTF_8);
         pipeWithParamJson = IOUtils.toString(
                 ClassLoader.getSystemResourceAsStream(
                         "pipe-output/with-param.jsonld"),
@@ -57,13 +61,13 @@ public class SearchPipeTest extends SpringJerseyTest {
     }
 
     @BeforeEach
-    public void startMockServer () {
+    public void startMockServer() {
         mockServer = startClientAndServer(port);
         mockClient = new MockServerClient("localhost", mockServer.getPort());
     }
 
     @AfterEach
-    public void stopMockServer () {
+    public void stopMockServer() {
         mockServer.stop();
     }
 
@@ -131,8 +135,8 @@ public class SearchPipeTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testSearchWithUrlEncodedPipes ()
-            throws IOException, KustvaktException {
+    public void testTimeoutWithPipes ()
+            throws IOException, KustvaktException, URISyntaxException {
         mockClient.reset()
                 .when(request().withMethod("POST").withPath("/glemm")
                         .withHeaders(
@@ -142,11 +146,21 @@ public class SearchPipeTest extends SpringJerseyTest {
                 .respond(response()
                         .withHeader(new Header("Content-Type",
                                 "application/json; charset=utf-8"))
-                        .withBody(pipeJson).withStatusCode(200));
-        glemmUri = URLEncoder.encode(glemmUri, "utf-8");
+                        .withBody(pipeTimeout).withStatusCode(200));
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", glemmUri).request().get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(10000, node.at("/meta/timeout").asInt());
+    }
+
+    @Test
+    public void testSearchWithUrlEncodedPipes() throws IOException, KustvaktException {
+        mockClient.reset().when(request().withMethod("POST").withPath("/glemm").withHeaders(new Header("Content-Type", "application/json; charset=utf-8"), new Header("Accept", "application/json"))).respond(response().withHeader(new Header("Content-Type", "application/json; charset=utf-8")).withBody(pipeJson).withStatusCode(200));
+        glemmUri = URLEncoder.encode(glemmUri, "utf-8");
+        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("pipes", glemmUri).request().get();
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.at("/query/wrap/key").size());
