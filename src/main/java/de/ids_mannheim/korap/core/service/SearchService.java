@@ -418,10 +418,10 @@ public class SearchService extends BasicService {
         // meta.addEntry("itemsPerResource", 1);
 
         if (corpusAccess.equals(CorpusAccess.FREE)) {
-            meta.addEntry("timeout", 10000);
+            meta.addEntry("timeout", config.getGuestTimeout());
         }
         else {
-            meta.addEntry("timeout", 90000);
+            meta.addEntry("timeout", config.getLoginTimeout());
         }
 
         if (fieldList != null && !fieldList.isEmpty()) {

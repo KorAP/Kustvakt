@@ -5,15 +5,15 @@ public class RewriteIdentifier {
     private String scope,comment = "";
     private Object original;
 
-    public RewriteIdentifier (String scope, String value, String comment) {
+    public RewriteIdentifier (String scope, String original, String comment) {
         this.scope = scope;
-        this.original = value;
+        this.original = original;
         this.comment = comment;
     }
     
-	public RewriteIdentifier (String scope, Object source, String comment) {
+	public RewriteIdentifier (String scope, Object original, String comment) {
 		this.scope = scope;
-		this.original = source;
+		this.original = original;
 		this.comment = comment;
 	}
     

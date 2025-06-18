@@ -93,7 +93,7 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
         JsonNode sourceNode = JsonUtils.readTree(source);
 		koralNode.replace(qref, new RewriteIdentifier(null, sourceNode,
 				"This node has been replaced. The original node is described in "
-				+ "the source property."));
+				+ "the original property."));
         
 //        koralNode.remove("@type",
 //                new RewriteIdentifier("@type", "", jsonNode.at("/@type").asText()));

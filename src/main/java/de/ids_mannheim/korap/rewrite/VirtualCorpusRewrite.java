@@ -100,7 +100,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         String newRef = ref.substring(vcOwner.length() + 1, ref.length());
         koralNode.replace("ref", newRef, new RewriteIdentifier("ref", ref, 
         		"Ref has been replaced. The original value is described at "
-        		+ "the source property."));
+        		+ "the original property."));
     }
 
     protected void rewriteVC (QueryDO vc, KoralNode koralNode)
@@ -113,7 +113,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         
 		koralNode.replace(newKoralQuery, new RewriteIdentifier(null, sourceNode,
 				"This node has been replaced. The original node is described at "
-						+ "the source property."));
+						+ "the original property."));
         
         // rewrite
 //        koralNode.remove("@type", new RewriteIdentifier("@type", "",

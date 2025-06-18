@@ -47,7 +47,7 @@ public class QueryContextRewrite implements RewriteTask.RewriteQuery {
 				context.replace(position, arrayNode,
 						new RewriteIdentifier(position, sourceNode, position
 								+ " has been replaced. The original value is "
-								+ "described in the source property."));
+								+ "described in the original property."));
                 return true;
             }
         }

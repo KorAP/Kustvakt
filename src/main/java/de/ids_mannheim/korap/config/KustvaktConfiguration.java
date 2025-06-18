@@ -118,6 +118,9 @@ public class KustvaktConfiguration {
     // another variable might be needed to define which metadata fields are restricted 
     private boolean isMetadataRestricted = false;
     private boolean totalResultCacheEnabled;
+    
+    private int guestTimeout;
+    private int loginTimeout;
 
     // EM: Maybe needed when we support pipe registration
     @Deprecated
@@ -230,6 +233,13 @@ public class KustvaktConfiguration {
 
         maxTokenContext = Integer.parseInt(properties.getProperty(
                 "max.token.context.size", "0"));
+        
+        // Timeout validity in milis
+        guestTimeout = Integer.parseInt(properties.getProperty(
+                "timeout.guest", "10000"));
+        loginTimeout = Integer.parseInt(properties.getProperty(
+                "timeout.login", "90000"));
+        
     }
 
     @Deprecated
