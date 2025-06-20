@@ -22,6 +22,30 @@
       },
       "revId": "aa4d0777abbe0f2a9dbe020837694e7d70ee2f90",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da264d4f_113a06c6",
+        "filename": "src/main/resources/kustvakt-lite.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-06-20T08:39:45Z",
+      "side": 1,
+      "message": "This is needed for the lite version, because the test suite uses the same configuration as the production. Otherwise we can make a copy.",
+      "parentUuid": "a284b7a1_5c82f611",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 28
+      },
+      "revId": "aa4d0777abbe0f2a9dbe020837694e7d70ee2f90",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
