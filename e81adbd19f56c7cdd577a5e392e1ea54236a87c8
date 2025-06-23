@@ -16,6 +16,23 @@
       "message": "Added Return Code for timeout during LDAP operations. I set timeout to 1ms for testing. Now I\u0027m trying to find a way to test the timeout with Junits.",
       "revId": "e81adbd19f56c7cdd577a5e392e1ea54236a87c8",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d6a0a9d_13c74f84",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-06-23T11:15:23Z",
+      "side": 1,
+      "message": "The test suite fails. There are some errors.\n\n[ERROR] Failures: \n[ERROR]   LdapAuth3Test.loginWithUsernameOverSSLWorks:147 expected: \u003c0\u003e but was: \u003c100\u003e\n[ERROR]   EmbeddedLdapServerTest.embeddedServerStartsAutomaticallyAndUsersCanLogin:33 expected: \u003c0\u003e but was: \u003c100\u003e\n[INFO] \n[ERROR] Tests run: 536, Failures: 2, Errors: 0, Skipped: 35",
+      "revId": "e81adbd19f56c7cdd577a5e392e1ea54236a87c8",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
