@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da6f8923_b9754c46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 28
+      },
+      "writtenOn": "2025-06-23T09:26:21Z",
+      "side": 1,
+      "message": "Added Return Code for timeout during LDAP operations. I set timeout to 1ms for testing. Now I\u0027m trying to find a way to test the timeout with Junits.",
+      "revId": "e81adbd19f56c7cdd577a5e392e1ea54236a87c8",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
