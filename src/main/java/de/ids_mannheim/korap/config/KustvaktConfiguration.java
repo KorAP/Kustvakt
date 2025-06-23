@@ -125,6 +125,10 @@ public class KustvaktConfiguration {
     // EM: Maybe needed when we support pipe registration
     @Deprecated
     public static Map<String, String> pipes = new HashMap<>();
+    
+    // EM: default host allowed for piping query and response 
+    // (temporary solution without pipe registration)
+    private String pipeHost; 
 
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);
@@ -240,6 +244,8 @@ public class KustvaktConfiguration {
         loginTimeout = Integer.parseInt(properties.getProperty(
                 "timeout.login", "90000"));
         
+		pipeHost = properties.getProperty("pipe.host",
+				"https://korap.ids-mannheim.de");
     }
 
     @Deprecated

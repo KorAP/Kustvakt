@@ -61,6 +61,9 @@ public class SearchService extends BasicService {
     @Autowired
 	protected RewriteHandler rewriteHandler;
 
+    @Autowired
+	protected KustvaktConfiguration config;
+    
     @PostConstruct
     private void doPostConstruct () {
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
@@ -122,20 +125,16 @@ public class SearchService extends BasicService {
     }
 
     @SuppressWarnings("unchecked")
-    public String search (String engine, String username, HttpHeaders headers,
-            String q, String ql, String v, List<String> cqList, String fields,
-            String pipes, Integer pageIndex, Integer pageInteger, String ctx,
-            Integer pageLength, Boolean cutoff, boolean accessRewriteDisabled,
-            boolean showTokens, boolean showSnippet) throws KustvaktException {
+	public String search (String engine, String username, HttpHeaders headers,
+			String q, String ql, String v, List<String> cqList, String fields,
+			String pipes, String responsePipes, Integer pageIndex,
+			Integer pageInteger, String ctx, Integer pageLength, Boolean cutoff,
+			boolean accessRewriteDisabled, boolean showTokens,
+			boolean showSnippet) throws KustvaktException {
 
         if (pageInteger != null && pageInteger < 1) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "page must start from 1", "page");
-        }
-
-        String[] pipeArray = null;
-        if (pipes != null && !pipes.isEmpty()) {
-            pipeArray = pipes.split(",");
         }
 
         User user = createUser(username, headers);
@@ -178,7 +177,8 @@ public class SearchService extends BasicService {
             query = addWarning(query, warning);
         }
 
-        query = runPipes(query, pipeArray);
+        // Query pipe rewrite
+        query = runPipes(query, pipes);
 
         query = this.rewriteHandler.processQuery(query, user);
         if (DEBUG) {
@@ -204,7 +204,7 @@ public class SearchService extends BasicService {
             result = searchKrill.search(query);
         }
         // jlog.debug("Query result: " + result);
-
+        
         if (config.isTotalResultCacheEnabled()) {
             result = afterCheckTotalResultCache(hashedKoralQuery, result);
         }
@@ -212,10 +212,13 @@ public class SearchService extends BasicService {
         if (!hasCutOff) {
             result = removeCutOff(result);
         }
+        
+        // Response pipe rewrite
+        result = runPipes(result, responsePipes);
         return result;
 
     }
-
+    
     private String removeCutOff (String result) throws KustvaktException {
         ObjectNode resultNode = (ObjectNode) JsonUtils.readTree(result);
         ObjectNode meta = (ObjectNode) resultNode.at("/meta");
@@ -291,58 +294,66 @@ public class SearchService extends BasicService {
      * 
      * @param query
      *            the original koral query
-     * @param pipeArray
+     * @param pipes
      *            the pipe service URLs
      * @param serializer
      *            the query serializer
      * @return a modified koral query
      * @throws KustvaktException
      */
-    private String runPipes (String query, String[] pipeArray)
+    private String runPipes (String query, String pipes)
             throws KustvaktException {
-        if (pipeArray != null) {
+    	if (pipes != null && !pipes.isEmpty()) {
+			String[] pipeArray = pipes.split(",");
+			
             for (int i = 0; i < pipeArray.length; i++) {
                 String pipeURL = pipeArray[i];
-                try {
-                    URL url = new URL(pipeURL);
-                    HttpURLConnection connection = (HttpURLConnection) url
-                            .openConnection();
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Content-Type",
-                            "application/json; charset=UTF-8");
-                    connection.setRequestProperty("Accept", "application/json");
-                    connection.setDoOutput(true);
-                    OutputStream os = connection.getOutputStream();
-                    byte[] input = query.getBytes("utf-8");
-                    os.write(input, 0, input.length);
-
-                    String entity = null;
-                    if (connection.getResponseCode() == HttpStatus.SC_OK) {
-                        BufferedReader br = new BufferedReader(
-                                new InputStreamReader(
-                                        connection.getInputStream(), "utf-8"));
-                        StringBuilder response = new StringBuilder();
-                        String responseLine = null;
-                        while ((responseLine = br.readLine()) != null) {
-                            response.append(responseLine.trim());
+                if (pipeURL.startsWith(config.getPipeHost())) {
+                    try {
+                        URL url = new URL(pipeURL);
+                        HttpURLConnection connection = (HttpURLConnection) url
+                                .openConnection();
+                        connection.setRequestMethod("POST");
+                        connection.setRequestProperty("Content-Type",
+                                "application/json; charset=UTF-8");
+                        connection.setRequestProperty("Accept", "application/json");
+                        connection.setDoOutput(true);
+                        OutputStream os = connection.getOutputStream();
+                        byte[] input = query.getBytes("utf-8");
+                        os.write(input, 0, input.length);
+    
+                        String entity = null;
+                        if (connection.getResponseCode() == HttpStatus.SC_OK) {
+                            BufferedReader br = new BufferedReader(
+                                    new InputStreamReader(
+                                            connection.getInputStream(), "utf-8"));
+                            StringBuilder response = new StringBuilder();
+                            String responseLine = null;
+                            while ((responseLine = br.readLine()) != null) {
+                                response.append(responseLine.trim());
+                            }
+                            entity = response.toString();
                         }
-                        entity = response.toString();
+    
+                        if (entity != null && !entity.isEmpty()) {
+                            query = entity;
+                        }
+                        else {
+                            query = handlePipeError(query, pipeURL,
+                                    connection.getResponseCode() + " "
+                                            + connection.getResponseMessage());
+                        }
                     }
-
-                    if (entity != null && !entity.isEmpty()) {
-                        query = entity;
-                    }
-                    else {
-                        query = handlePipeError(query, pipeURL,
-                                connection.getResponseCode() + " "
-                                        + connection.getResponseMessage());
+                    catch (Exception e) {
+                        query = handlePipeError(query, pipeURL, e.getMessage());
                     }
                 }
-                catch (Exception e) {
-                    query = handlePipeError(query, pipeURL, e.getMessage());
+                else {
+					query = handlePipeError(query, pipeURL,
+							"Unrecognized pipe URL");
                 }
             }
-        }
+    	}
         return query;
     }
 
@@ -361,8 +372,14 @@ public class SearchService extends BasicService {
 
     private String addWarning (String query, JsonNode warning)
             throws KustvaktException {
-
-        ObjectNode node = (ObjectNode) JsonUtils.readTree(query);
+    	ObjectNode node = null;
+		try {
+			node = (ObjectNode) JsonUtils.readTree(query);
+		}
+		catch (Exception e) {
+			throw new KustvaktException(StatusCodes.DESERIALIZATION_FAILED,
+					"Invalid JSON format");
+		}
         if (node.has("warnings")) {
             warning = warning.at("/warnings/0");
             ArrayNode arrayNode = (ArrayNode) node.get("warnings");

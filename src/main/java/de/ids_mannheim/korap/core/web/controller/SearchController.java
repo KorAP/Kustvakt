@@ -226,6 +226,7 @@ public class SearchController {
             @QueryParam("page") Integer pageInteger,
             @QueryParam("fields") String fields,
             @QueryParam("pipes") String pipes,
+            @QueryParam("response-pipes") String responsePipes,
             @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
             @QueryParam("show-tokens") boolean showTokens,
             @DefaultValue("true") @QueryParam("show-snippet") boolean showSnippet,
@@ -239,9 +240,9 @@ public class SearchController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.SEARCH);
             result = searchService.search(engine, context.getUsername(),
-                    headers, q, ql, v, cq, fields, pipes, pageIndex,
-                    pageInteger, ctx, pageLength, cutoff, accessRewriteDisabled,
-                    showTokens, showSnippet);
+                    headers, q, ql, v, cq, fields, pipes, responsePipes, 
+                    pageIndex, pageInteger, ctx, pageLength, cutoff, 
+                    accessRewriteDisabled, showTokens, showSnippet);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

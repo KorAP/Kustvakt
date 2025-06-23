@@ -124,14 +124,14 @@ public class SearchPipeTest extends SpringJerseyTest {
                 "operation:injection");
 		assertEquals(freeCorpusAccess,
 				node.at("/collection/rewrites/0/_comment").asText());
-        node = node.at("/query/wrap/rewrites");
-        assertEquals(2, node.size());
-        assertEquals(node.at("/0/src").asText(), "Glemm");
-        assertEquals(node.at("/0/operation").asText(), "operation:override");
-        assertEquals(node.at("/0/scope").asText(), "key");
-        assertEquals(node.at("/1/src").asText(), "Kustvakt");
-        assertEquals(node.at("/1/operation").asText(), "operation:injection");
-        assertEquals(node.at("/1/scope").asText(), "foundry");
+		node = node.at("/query/wrap/rewrites");
+		assertEquals(2, node.size());
+		assertEquals("Glemm", node.at("/0/src").asText());
+		assertEquals("operation:override", node.at("/0/operation").asText());
+		assertEquals("key", node.at("/0/scope").asText());
+		assertEquals("Kustvakt", node.at("/1/src").asText());
+		assertEquals("operation:injection", node.at("/1/operation").asText());
+		assertEquals("foundry", node.at("/1/scope").asText());
     }
 
     @Test
@@ -213,7 +213,7 @@ public class SearchPipeTest extends SpringJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/0/0").asInt());
-        assertEquals(node.at("/warnings/0/3").asText(), "404 Not Found");
+        assertEquals("404 Not Found", node.at("/warnings/0/3").asText());
     }
 
     @Test
@@ -225,7 +225,7 @@ public class SearchPipeTest extends SpringJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/0/0").asInt());
-        assertEquals(node.at("/warnings/0/3").asText(), "glemm");
+        assertEquals("Unrecognized pipe URL", node.at("/warnings/0/3").asText());
     }
 
     @Test
@@ -238,11 +238,11 @@ public class SearchPipeTest extends SpringJerseyTest {
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", pipeUri).request().get();
         String entity = response.readEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/0/0").asInt());
-        assertEquals(node.at("/warnings/0/3").asText(),
-                "415 Unsupported Media Type");
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+		JsonNode node = JsonUtils.readTree(entity);
+		assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/0/0").asInt());
+		assertEquals("415 Unsupported Media Type",
+				node.at("/warnings/0/3").asText()        );
     }
 
     @Test
@@ -259,10 +259,11 @@ public class SearchPipeTest extends SpringJerseyTest {
         assertEquals(2, node.at("/warnings").size());
         assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/0/0").asInt());
         assertEquals(url, node.at("/warnings/0/2").asText());
-        assertEquals(node.at("/warnings/0/3").asText(), "404 Not Found");
-        assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/1/0").asInt());
-        assertEquals(node.at("/warnings/1/2").asText(), "http://glemm");
-        assertEquals(node.at("/warnings/1/3").asText(), "glemm");
+		assertEquals("404 Not Found", node.at("/warnings/0/3").asText());
+		assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/1/0").asInt());
+		assertEquals("http://glemm", node.at("/warnings/1/2").asText());
+		assertEquals("Unrecognized pipe URL",
+				node.at("/warnings/1/3").asText());
     }
 
     @Test
