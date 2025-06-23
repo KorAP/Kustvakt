@@ -1,5 +1,8 @@
 # version 0.79
 
+- Add a test: changing timeout using a pipe
+- Implement timeout rewrite
+
 # version 0.78.2
 
 - Update LDAP logs using JLog to include timestamp and move it from system.out 
