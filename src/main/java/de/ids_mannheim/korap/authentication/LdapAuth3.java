@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -41,14 +43,23 @@ import de.ids_mannheim.korap.server.EmbeddedLdapServer;
  */
 public class LdapAuth3 {
 
-    public static final int LDAP_AUTH_ROK = 0;
-    public static final int LDAP_AUTH_RCONNECT = 1; // cannot connect to LDAP Server
-    public static final int LDAP_AUTH_RINTERR = 2; // internal error: cannot verify User+Pwd.
-    public static final int LDAP_AUTH_RUNKNOWN = 3; // User Account or Pwd unknown;
-    public static final int LDAP_AUTH_RLOCKED = 4; // User Account locked;
-    public static final int LDAP_AUTH_RNOTREG = 5; // User known, but has not registered to KorAP/C2 Service yet;
-    public static final int LDAP_AUTH_RNOEMAIL = 6; // cannot obtain email for sUserDN
-    public static final int LDAP_AUTH_RNAUTH = 7; // User Account or Pwd unknown, or not authorized
+	// return codes:
+    public static final int LDAP_AUTH_ROK 		= 0;
+    public static final int LDAP_AUTH_RCONNECT 	= 1; 	// cannot connect to LDAP Server
+    public static final int LDAP_AUTH_RINTERR 	= 2; 	// internal error: cannot verify User+Pwd.
+    public static final int LDAP_AUTH_RUNKNOWN 	= 3; 	// User Account or Pwd unknown;
+    public static final int LDAP_AUTH_RLOCKED 	= 4; 	// User Account locked;
+    public static final int LDAP_AUTH_RNOTREG 	= 5; 	// User known, but has not registered to KorAP/C2 Service yet;
+    public static final int LDAP_AUTH_RNOEMAIL 	= 6; 	// cannot obtain email for sUserDN
+    public static final int LDAP_AUTH_RNAUTH 	= 7; 	// User Account or Pwd unknown, or not authorized
+    public static final int LDAP_AUTH_RTIMEOUT 	= 100; 	// could not reach LDAP server due to timeout (connect, search).
+    
+    // other constants:
+    private static final String PATT_TIMEOUT_MESS  = "Unable to establish a connection.* within the configured timeout";
+    													// pattern of message returned by the Cause() of a LDAPException in case of a timeout.
+    private static final String PATT_TIMEOUT_MESS2 = "SocketTimeoutException";
+    													// another hint on a connection timeout.
+    
     final static Boolean DEBUGLOG = false;        // log debug output.
 
     private static Logger jlog = LogManager.getLogger(LdapAuth3.class);
@@ -76,8 +87,47 @@ public class LdapAuth3 {
         }
     }
 
+    /* LDAP Exception handling
+     * 
+     * isTimeout()
+     * - somehow a dirty implementation, but documentation about timeouts is not very explicit.
+     * - the INT value of TIMEOUT is currently 85.
+     * - timeout return codes encountered with unboundid LDAP are 85 and 91.
+     * Returns true in case of a timeout -> caller should return LDAP_AUTH_TIME.
+     * 18.06.25/FB
+     */
+    
+    private static boolean isTimeout(LDAPException e)
+    
+    {
+    	if( e.getResultCode() == e.getResultCode().TIMEOUT )
+	    	{
+	    	return true; // LDAP_AUTH_TIMEOUT;	
+	    	}
+    	else if( e.getResultCode().intValue() == 91 || e.getResultCode().intValue() == 85 )
+    		{
+	    	if( e.getCause() != null )
+	    		{
+	    		String
+	    			patterns = String.format("(%s|%s)",  PATT_TIMEOUT_MESS, PATT_TIMEOUT_MESS2);
+	    		Pattern 
+	    			pat = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
+	    		Matcher
+	    			mat = pat.matcher(e.getCause().toString());
+	    		
+	    		boolean matched = mat.find();
+	    		return matched;
+	    		}
+	    	}
+
+   		return false;
+    }
+    
+    // login
+    
     public static int login (String login, String password,
             String ldapConfigFilename) throws LDAPException {
+    	
         LDAPConfig ldapConfig = new LDAPConfig(ldapConfigFilename);
 
         login = Filter.encodeValue(login);
@@ -98,9 +148,11 @@ public class LdapAuth3 {
         SearchResult srchRes = ldapAuth3Result.getSearchResultValue();
 
         if (ldapAuth3Result.getErrorCode() != 0 || srchRes == null
-                || srchRes.getEntryCount() == 0) {
-            if (DEBUGLOG)
-                System.out.printf("Finding '%s': no entry found!\n", login);
+                || srchRes.getEntryCount() == 0) 
+        {
+            jlog.debug("Searching for '{}': ErrorCode={}, EntryCount={}, no entry found!\n", 
+            		login, ldapAuth3Result.getErrorCode(), srchRes != null ? srchRes.getEntryCount() : 0);
+            
             return ldapAuth3Result.getErrorCode();
         }
 
@@ -111,6 +163,7 @@ public class LdapAuth3 {
     public static LdapAuth3Result search (String login, String password,
             LDAPConfig ldapConfig, boolean bindWithFoundDN,
             boolean applyExtraFilters) {
+    	
         Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("login", login);
         valuesMap.put("password", password);
@@ -121,14 +174,6 @@ public class LdapAuth3 {
         valuesMap.put("login", login);
         sub = new StringSubstitutor(valuesMap);
         String insensitiveSearchFilter = sub.replace(ldapConfig.searchFilter);
-
-        if (DEBUGLOG) {
-            //System.out.printf("LDAP Version      = %d.\n", LDAPConnection.LDAP_V3);
-            System.out.printf("LDAP Host & Port  = '%s':%d.\n", ldapConfig.host,
-                    ldapConfig.port);
-            System.out.printf("Login User = '%s'\n", login);
-            System.out.println("LDAPS " + ldapConfig.useSSL);
-        }
 
         LDAPConnection lc;
 
@@ -153,9 +198,7 @@ public class LdapAuth3 {
             }
             catch (GeneralSecurityException e) {
                 //jlog.error(
-            	jlog.error(
-                        "Error: login: Connecting to LDAPS Server: failed: '%s'!\n",
-                        e);
+            	jlog.error("login user '{}': Connecting to LDAPS Server: failed: {}!", login, e.toString());
                 ldapTerminate(null);
                 return new LdapAuth3Result(null, LDAP_AUTH_RCONNECT);
             }
@@ -163,25 +206,23 @@ public class LdapAuth3 {
         else {
             lc = new LDAPConnection();
         }
+        
         try {
-            lc.connect(ldapConfig.host, ldapConfig.port);
-            if (DEBUGLOG && ldapConfig.useSSL)
-                System.out.println("LDAPS Connection = OK\n");
-            if (DEBUGLOG && !ldapConfig.useSSL)
-                System.out.println("LDAP Connection = OK\n");
-        }
+        	// timeout - 18.06.25/FB
+            lc.connect(ldapConfig.host, ldapConfig.port, ldapConfig.ldapTimeout);
+            
+            jlog.debug("{}: connect: successfull.", ldapConfig.useSSL ? "LDAPS" : "LDAP");
+            }
         catch (LDAPException e) {
             String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
                     .getFullStackTrace(e);
-            jlog.error(
-                    "Error: login: Connecting to LDAP Server: failed: '%s'!\n",
-                    fullStackTrace);
+            jlog.error("Connecting to LDAP Server: failed: '{}'!\n", fullStackTrace);
+            
             ldapTerminate(lc);
-            return new LdapAuth3Result(null, LDAP_AUTH_RCONNECT);
+            return new LdapAuth3Result(null, isTimeout(e) ? LDAP_AUTH_RTIMEOUT : LDAP_AUTH_RCONNECT);
         }
-        if (DEBUGLOG)
-            System.out.printf("Debug: isConnected=%d\n",
-                    lc.isConnected() ? 1 : 0);
+        
+        jlog.debug("isConnected={}.\n", lc.isConnected() ? "yes" : "no");
 
         try {
             // bind to server:
@@ -189,45 +230,43 @@ public class LdapAuth3 {
                 System.out.printf("Binding with '%s' ...\n",
                         ldapConfig.sLoginDN);
             lc.bind(ldapConfig.sLoginDN, ldapConfig.sPwd);
+            
             if (DEBUGLOG)
                 System.out.print("Binding: OK.\n");
         }
         catch (LDAPException e) {
-//            jlog.error("Error: login: Binding failed: '%s'!\n", e);
-            String error = String.format("Error: login: Binding failed: "
-                    + "'%s'!\n", e);
-            jlog.error(error);
+
+        	jlog.error("login user '{}': binding failed: {}.", login, e.toString());
             ldapTerminate(lc);
             return new LdapAuth3Result(null, LDAP_AUTH_RINTERR);
         }
 
-        if (DEBUGLOG)
-            System.out.printf("Debug: isConnected=%d\n",
-                    lc.isConnected() ? 1 : 0);
-
-        if (DEBUGLOG)
-            System.out.printf("Finding user '%s'...\n", login);
+        jlog.debug("login: isConnected={}.", lc.isConnected() ? "yes" : "no");
 
         SearchResult srchRes = null;
         try {
-            if (DEBUGLOG)
-                System.out.printf("Searching with searchFilter: '%s'.\n",
-                        insensitiveSearchFilter);
+        	jlog.debug("Searching with searchFilter: '{}'.", insensitiveSearchFilter);
 
             srchRes = lc.search(ldapConfig.searchBase, SearchScope.SUB,
                     searchFilterInstance);
 
-            if (DEBUGLOG)
-                System.out.printf("Found '%s': %d entries.\n", login,
-                        srchRes.getEntryCount());
+            jlog.debug("Found '{}': {} entries.", login, srchRes.getEntryCount());
         }
         catch (LDAPSearchException e) {
-            jlog.error("Error: Search for User failed: '%s'!\n", e);
+        	
+        	if( isTimeout(e) )
+        		{
+        		jlog.error("login user '{}': timeout reached: {}", login, e.toString());
+	            ldapTerminate(lc);
+	            return new LdapAuth3Result(null, LDAP_AUTH_RTIMEOUT);
+        		}
+        	else
+        		jlog.error("login user '{}': no results!", login);
         }
 
         if (srchRes == null || srchRes.getEntryCount() == 0) {
-            if (DEBUGLOG)
-                System.out.printf("Finding '%s': no entry found!\n", login);
+
+            jlog.error("login user '{}': no entry found!", login);
             ldapTerminate(lc);
             return new LdapAuth3Result(null, LDAP_AUTH_RUNKNOWN);
         }
@@ -250,12 +289,10 @@ public class LdapAuth3 {
                 }
             }
             catch (LDAPException e) {
-//                jlog.error("Error: login: Binding failed: '%s'!\n", e);
-                String error = String.format("Error: login: Binding failed: "
-                        + "'%s'!\n", e);
-                jlog.error(error);
+
+                jlog.error("login user '{}': binding with DN failed: {}. ", login, e.toString());
                 ldapTerminate(lc);
-                return new LdapAuth3Result(null, LDAP_AUTH_RUNKNOWN);
+                return new LdapAuth3Result(null, isTimeout(e) ? LDAP_AUTH_RTIMEOUT : LDAP_AUTH_RUNKNOWN);
             }
         }
 
