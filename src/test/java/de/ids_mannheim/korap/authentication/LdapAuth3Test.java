@@ -25,6 +25,8 @@ public class LdapAuth3Test {
 
     public static final String TEST_LDAPS_CONF = "src/test/resources/test-ldaps.conf";
 
+    public static final String TEST_LDAP_TIMEOUT_CONF = "src/test/resources/test-ldap-timeout.conf";
+
     public static final String TEST_LDAPS_TS_CONF = "src/test/resources/test-ldaps-with-truststore.conf";
 
     public static final String TEST_LDAP_USERS_LDIF = "src/test/resources/test-ldap-users.ldif";
@@ -68,6 +70,17 @@ public class LdapAuth3Test {
         server.shutDown(true);
     }
 
+    @Test
+    public void loginWithTimeout () throws LDAPException 
+    {
+    	// To trigger a timeout inside login(), we load TEST_LDAP_TIMEOUT_CONF which:
+    	// - sets a timeout for LDAP operations to the lowest value possible = 1ms;
+    	// - sets the host to be on the network, not localhost, to obtain a response time > 1ms.
+    	
+    	assertEquals(LDAP_AUTH_RTIMEOUT,
+                LdapAuth3.login("testuser123", "password", TEST_LDAP_TIMEOUT_CONF));
+    }
+    
     @Test
     public void loginWithExtraProfileNameWorks () throws LDAPException {
         assertEquals(LDAP_AUTH_ROK,

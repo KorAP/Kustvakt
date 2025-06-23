@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/*
+ * adding ldapTimeout for controlling timeout handling during LDAP operations - 23.06.25/FB
+ */
+
 public class LDAPConfig {
     public final boolean useSSL;
     public final String host;
@@ -21,7 +25,8 @@ public class LDAPConfig {
     public final String ldif;
     public final String authFilter;
     public final String userNotBlockedFilter;
-
+    public final int    ldapTimeout;
+    
     public LDAPConfig (String ldapConfigFilename)
             throws LdapConfigurationException {
         Map<String, String> ldapConfig = null;
@@ -52,6 +57,7 @@ public class LDAPConfig {
                 ldapConfig.getOrDefault("useEmbeddedServer", "false"));
         emailAttribute = ldapConfig.getOrDefault("emailAttribute", "mail");
         ldif = ldapConfig.getOrDefault("ldifFile", null);
+        ldapTimeout = Integer.parseInt(ldapConfig.getOrDefault("ldapTimeout",  "10000")); // time in [ms].
     }
 
     static HashMap<String, String> typeCastConvert (Properties prop) {
