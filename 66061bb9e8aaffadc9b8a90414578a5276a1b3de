@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eee9c0ef_29529cfd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-06-24T07:09:12Z",
+      "side": 1,
+      "message": "I have made a separate kustvakt-lite-test.conf and removed pipe config from kustvakt-lite.conf.",
+      "revId": "66061bb9e8aaffadc9b8a90414578a5276a1b3de",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
