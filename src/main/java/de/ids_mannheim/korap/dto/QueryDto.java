@@ -28,10 +28,10 @@ public class QueryDto {
     private String requiredAccess;
     private String createdBy;
 
-    private int numberOfDoc;
-    private int numberOfParagraphs;
-    private int numberOfSentences;
-    private int numberOfTokens;
+    private long numberOfDoc;
+    private long numberOfParagraphs;
+    private long numberOfSentences;
+    private long numberOfTokens;
 
     private String query;
     private String queryLanguage;

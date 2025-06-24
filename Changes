@@ -3,6 +3,7 @@
 - Implement timeout rewrite
 - Add a test: changing timeout using a pipe
 - Add pipe response rewriting (#794)
+- Fix datatype for query statistics (close #802)
 
 # version 0.78.2
 
