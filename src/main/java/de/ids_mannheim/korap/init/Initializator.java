@@ -10,9 +10,12 @@ import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
+import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.service.OAuth2InitClientService;
+import de.ids_mannheim.korap.user.KorAPUser;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.util.QueryException;
 
 /**
@@ -26,6 +29,8 @@ public class Initializator {
 
     @Autowired
     private AccessScopeDao accessScopeDao;
+    @Autowired
+    private AdminDao adminDao;
     @Autowired
     private NamedVCLoader vcLoader;
     @Autowired
@@ -61,6 +66,7 @@ public class Initializator {
 			clientService.createInitialTestSuperClient();
 		}
 		vcLoader.loadVCToCache("system-vc", "/vc/system-vc.jsonld");
+		adminDao.addAccount(new KorAPUser("admin"));
 	}
 
     public void initResourceTest () throws IOException, KustvaktException {

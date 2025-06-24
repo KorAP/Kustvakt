@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.dao;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.entity.Admin;
 import de.ids_mannheim.korap.entity.Admin_;
@@ -20,7 +21,7 @@ import jakarta.persistence.criteria.Root;
  * @author margaretha
  *
  */
-//@Transactional
+@Transactional
 @Repository
 public class AdminDaoImpl implements AdminDao {
 
@@ -32,9 +33,11 @@ public class AdminDaoImpl implements AdminDao {
      */
     @Override
     public void addAccount (User user) {
-        Admin admin = new Admin();
-        admin.setUserId(user.getUsername());
-        entityManager.persist(admin);
+		if (!isAdmin(user.getUsername())) {
+			Admin admin = new Admin();
+			admin.setUserId(user.getUsername());
+			entityManager.persist(admin);
+		}
     }
 
     /* (non-Javadoc)
