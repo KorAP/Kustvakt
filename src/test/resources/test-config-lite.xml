@@ -30,8 +30,8 @@
 				<value>classpath:test-jdbc.properties</value>
 				<value>file:./test-jdbc.properties</value>
 				<value>classpath:test-hibernate.properties</value>
-				<value>classpath:kustvakt-lite.conf</value>
-				<value>file:./kustvakt-lite.conf</value>
+				<value>classpath:kustvakt-lite-test.conf</value>
+				<value>file:./kustvakt-lite-test.conf</value>
 			</array>
 		</property>
 	</bean>
@@ -41,8 +41,8 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<array>
-				<value>classpath:kustvakt-lite.conf</value>
-				<value>file:./kustvakt-lite.conf</value>
+				<value>classpath:kustvakt-lite-test.conf</value>
+				<value>file:./kustvakt-lite-test.conf</value>
 			</array>
 		</property>
 	</bean>

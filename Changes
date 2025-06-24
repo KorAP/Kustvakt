@@ -1,7 +1,8 @@
 # version 0.79
 
-- Add a test: changing timeout using a pipe
 - Implement timeout rewrite
+- Add a test: changing timeout using a pipe
+- Add pipe response rewriting (#794)
 
 # version 0.78.2
 
