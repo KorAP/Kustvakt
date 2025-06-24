@@ -5,14 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.config.TestBase;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.user.KorAPUser;
@@ -27,7 +31,7 @@ import jakarta.ws.rs.core.Response.Status;
  * @date 18/06/2015
  */
 // MH todo: check position and information of rewrites!
-public class FoundryRewriteTest extends SpringJerseyTest {
+public class FoundryRewriteTest extends TestBase {
 
     // private static String simple_add_query = "[pos=ADJA]";
     // private static String simple_rewrite_query = "[base=Haus]";
@@ -74,8 +78,12 @@ public class FoundryRewriteTest extends SpringJerseyTest {
     @Test
     public void testRewritePosFoundryWithUserSetting ()
             throws KustvaktException {
-        // EM: see
-        // full/src/main/resources/db/insert/V3.6__insert_default_settings.sql
+		Map<String, Object> map = new HashMap<>();
+		map.put("pos-foundry", "corenlp");
+		map.put("lemma-foundry", "opennlp");
+		Response response = createUpdateDefaultSettings("bubbles", map);
+		assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+
         String username = "bubbles";
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[pos=ADJA]", "poliqarp");
@@ -85,12 +93,13 @@ public class FoundryRewriteTest extends SpringJerseyTest {
         assertEquals(node.at("/query/wrap/foundry").asText(), "corenlp");
         assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(),
                 "foundry");
+        
+        testRewriteLemmaFoundryWithUserSetting(username);
+        testDeleteSetting(username);
     }
 
-    @Test
-    public void testRewriteLemmaFoundryWithUserSetting ()
+    private void testRewriteLemmaFoundryWithUserSetting (String username)
             throws KustvaktException {
-        String username = "bubbles";
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(),
