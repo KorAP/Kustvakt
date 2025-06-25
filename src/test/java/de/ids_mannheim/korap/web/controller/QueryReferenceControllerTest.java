@@ -4,33 +4,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.config.TestBase;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
-public class QueryReferenceControllerTest extends SpringJerseyTest {
+public class QueryReferenceControllerTest extends TestBase {
 
     private String testUser = "qRefControllerTest";
 
     private String adminUser = "admin";
 
     private String system = "system";
-
-    private void testRetrieveQueryByName (String qName, String query,
-            String queryCreator, String username, ResourceType resourceType,
-            CorpusAccess access) throws KustvaktException {
+    
+	private void testRetrieveQueryByName (String qName, String query,
+			String queryCreator, String username,
+			ResourceType resourceType) throws KustvaktException {
         Response response = target().path(API_VERSION).path("query")
                 .path("~" + queryCreator).path(qName).request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -45,7 +45,6 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         assertEquals(queryCreator, node.at("/createdBy").asText());
         assertEquals(query, node.at("/query").asText());
         assertEquals(node.at("/queryLanguage").asText(), "poliqarp");
-        assertEquals(access.name(), node.at("/requiredAccess").asText());
     }
 
     private void testUpdateQuery (String qName, String qCreator,
@@ -60,8 +59,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(Entity.json(json));
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
-        testRetrieveQueryByName(qName, "Sonne", qCreator, username, type,
-                CorpusAccess.PUB);
+        testRetrieveQueryByName(qName, "Sonne", qCreator, username, type);
     }
 
     @Test
@@ -77,7 +75,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 .put(Entity.json(json));
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         testRetrieveQueryByName(qName, "der", testUser, testUser,
-                ResourceType.PRIVATE, CorpusAccess.PUB);
+                ResourceType.PRIVATE);
         testUpdateQuery(qName, testUser, testUser, ResourceType.PRIVATE);
         testDeleteQueryByName(qName, testUser, testUser);
     }
@@ -95,7 +93,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 .put(Entity.json(json));
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         testRetrieveQueryByName(qName, "Regen", testUser, testUser,
-                ResourceType.PUBLISHED, CorpusAccess.PUB);
+                ResourceType.PUBLISHED);
         testDeleteQueryByName(qName, testUser, testUser);
         // check if hidden group has been created
     }
@@ -114,7 +112,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 .put(Entity.json(json));
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         testRetrieveQueryByName(qName, "Sommer", "marlin", adminUser,
-                ResourceType.PRIVATE, CorpusAccess.PUB);
+                ResourceType.PRIVATE);
         testUpdateQuery(qName, "marlin", adminUser, ResourceType.PRIVATE);
         testDeleteQueryByName(qName, "marlin", adminUser);
     }
@@ -133,7 +131,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 .put(Entity.json(json));
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         testRetrieveQueryByName(qName, "Sommer", system, adminUser,
-                ResourceType.SYSTEM, CorpusAccess.PUB);
+                ResourceType.SYSTEM);
         testUpdateQuery(qName, system, adminUser, ResourceType.SYSTEM);
         testDeleteSystemQueryUnauthorized(qName);
         testDeleteQueryByName(qName, system, adminUser);
@@ -172,7 +170,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 .put(Entity.json(json));
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         testRetrieveQueryByName(qName, "Sohn", testUser, testUser,
-                ResourceType.PRIVATE, CorpusAccess.PUB);
+                ResourceType.PRIVATE);
         testDeleteQueryByName(qName, testUser, testUser);
     }
 
@@ -249,6 +247,8 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
     @Test
     public void testDeleteQueryUnauthorized () throws KustvaktException {
+    	createDoryQuery();
+    	
         Response response = target().path(API_VERSION).path("query")
                 .path("~dory").path("dory-q").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -261,6 +261,9 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals("Unauthorized operation for user: " + testUser,
                 node.at("/errors/0/1").asText());
+        
+        testListAvailableQueryForDory();
+        deleteDoryQuery();
     }
 
     private void testDeleteSystemQueryUnauthorized (String qName)
@@ -297,7 +300,6 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 "dory/non-existing-query");
     }
 
-    @Test
     public void testListAvailableQueryForDory ()
             throws ProcessingException, KustvaktException {
         JsonNode node = testListAvailableQuery("dory");
@@ -314,8 +316,6 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 node.at("/0/type").asText());
         assertEquals(node.at("/0/description").asText(), "\"system\" query");
         assertEquals(node.at("/0/query").asText(), "[]");
-        assertEquals(CorpusAccess.FREE.name(),
-                node.at("/0/requiredAccess").asText());
         // assertEquals("koral:token", node.at("/0/koralQuery/@type").asText());
     }
 

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -27,7 +28,9 @@ public class QueryConverter {
         dto.setId(query.getId());
         dto.setName(query.getName());
         dto.setCreatedBy(query.getCreatedBy());
-        dto.setRequiredAccess(query.getRequiredAccess().name());
+        if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+        	dto.setRequiredAccess(query.getRequiredAccess().name());
+        }
         dto.setStatus(query.getStatus());
         dto.setDescription(query.getDescription());
         dto.setType(query.getType().displayName());

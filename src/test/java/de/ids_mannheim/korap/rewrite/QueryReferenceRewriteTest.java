@@ -4,11 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.config.TestBase;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import jakarta.ws.rs.core.Response;
@@ -16,7 +17,7 @@ import jakarta.ws.rs.core.Response;
 /**
  * @author diewald
  */
-public class QueryReferenceRewriteTest extends SpringJerseyTest {
+public class QueryReferenceRewriteTest extends TestBase {
 
     @Test
     public void testRewriteRefNotFound () throws KustvaktException, Exception {
@@ -49,6 +50,8 @@ public class QueryReferenceRewriteTest extends SpringJerseyTest {
 
     @Test
     public void testRewriteRefRewrite () throws KustvaktException, Exception {
+    	createDoryQuery();
+    	
         // Added in the database migration sql for tests
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "{q}").queryParam("ql", "poliqarp")
@@ -68,5 +71,7 @@ public class QueryReferenceRewriteTest extends SpringJerseyTest {
         assertEquals("koral:queryRef", node.at("/0/original/@type").asText());
         assertEquals("dory/dory-q", node.at("/0/original/ref").asText());
         assertTrue(node.at("/0/scope").isMissingNode());
+        
+        deleteDoryQuery();
     }
 }

@@ -365,7 +365,7 @@ public class QueryService extends BasicService {
             }
         }
 
-        CorpusAccess requiredAccess = CorpusAccess.PUB;
+        CorpusAccess requiredAccess = CorpusAccess.FREE;
         if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
             requiredAccess = determineRequiredAccess(isCached, queryName,
                     koralQuery);
@@ -433,7 +433,8 @@ public class QueryService extends BasicService {
         if (DEBUG) {
             jlog.debug(koralQuery);
         }
-        return koralQuery;
+        JsonNode n = JsonUtils.readTree(koralQuery).get("query");
+        return n.toString();
     }
 
     public CorpusAccess determineRequiredAccess (boolean isCached, String name,

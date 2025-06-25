@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
+import org.apache.http.entity.ContentType;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 
@@ -46,4 +48,28 @@ public abstract class TestBase extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals(username, node.at("/errors/0/2").asText());
     }
+	
+	protected void createDoryQuery () throws KustvaktException {
+		String json = "{\"type\": \"PRIVATE\"" + ",\"queryType\": \"QUERY\""
+				+ ",\"queryLanguage\": \"poliqarp\""
+				+ ",\"query\": \"[]\"}";
+		String qName = "dory-q";
+		Response response = target().path(API_VERSION).path("query")
+				.path("~dory").path(qName).request()
+				.header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+						.createBasicAuthorizationHeaderValue("dory", "pass"))
+				.header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+				.put(Entity.json(json));
+		assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+	}
+	
+	protected void deleteDoryQuery () throws KustvaktException {
+		Response response = target().path(API_VERSION).path("query")
+				.path("~dory").path("dory-q").request()
+				.header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+						.createBasicAuthorizationHeaderValue("dory", "pass"))
+				.delete();
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+	}
 }
