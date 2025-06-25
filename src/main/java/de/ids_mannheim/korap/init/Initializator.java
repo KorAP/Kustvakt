@@ -10,13 +10,16 @@ import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
+import de.ids_mannheim.korap.constant.QueryType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.service.OAuth2InitClientService;
+import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.util.QueryException;
+import de.ids_mannheim.korap.web.input.QueryJson;
 
 /**
  * Initializes values in the database from kustvakt configuration and
@@ -39,6 +42,8 @@ public class Initializator {
     private FullConfiguration config;
     @Autowired
     private OAuth2InitClientService clientService;
+    @Autowired
+    private QueryService queryService;
 
     public Initializator () {}
 
@@ -67,6 +72,14 @@ public class Initializator {
 		}
 		vcLoader.loadVCToCache("system-vc", "/vc/system-vc.jsonld");
 		adminDao.addAccount(new KorAPUser("admin"));
+		
+		QueryJson q = new QueryJson();
+		q.setType(ResourceType.SYSTEM);
+		q.setQueryLanguage("poliqarp");
+		q.setQuery("[]");
+		q.setDescription("\"system\" query");
+		q.setQueryType(QueryType.QUERY);
+		queryService.handlePutRequest("system", "system", "system-q", q);
 	}
 
     public void initResourceTest () throws IOException, KustvaktException {
