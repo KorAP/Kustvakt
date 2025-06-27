@@ -74,11 +74,11 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         testInstallPluginNotPermitted(clientId);
         testRetrievePluginInfo(clientId);
         node = listPlugins(false);
-        assertEquals(3, node.size());
+        assertEquals(2, node.size());
 
         // permitted only
         node = listPlugins(true);
-        assertEquals(2, node.size());
+        assertEquals(1, node.size());
         testListUserRegisteredPlugins(username, clientId, clientName,
                 refreshTokenExpiry);
         deregisterClient(username, clientId);
@@ -257,7 +257,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
                 assertEquals(Status.OK.getStatusCode(), response.getStatus());
                 String entity = response.readEntity(String.class);
                 JsonNode node = JsonUtils.readTree(entity);
-                assertEquals(2, node.size());
+                assertEquals(1, node.size());
             }
             catch (KustvaktException e) {
                 e.printStackTrace();
@@ -271,16 +271,18 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     public void testListAllPlugins ()
             throws ProcessingException, KustvaktException {
         JsonNode node = listPlugins(false);
-        assertEquals(2, node.size());
+        assertEquals(1, node.size());
+        
         assertFalse(node.at("/0/client_id").isMissingNode());
         assertFalse(node.at("/0/client_name").isMissingNode());
         assertFalse(node.at("/0/client_description").isMissingNode());
         assertFalse(node.at("/0/client_type").isMissingNode());
         assertFalse(node.at("/0/permitted").isMissingNode());
-        assertTrue(node.at("/0/registration_date").isMissingNode());
         assertFalse(node.at("/0/source").isMissingNode());
+        
+        assertTrue(node.at("/0/registration_date").isMissingNode());
         assertTrue(node.at("/0/refresh_token_expiry").isMissingNode());
-        assertTrue(node.at("/1/client_redirect_uri").isMissingNode());
+        assertTrue(node.at("/0/client_redirect_uri").isMissingNode());
     }
 
     private JsonNode listPlugins (boolean permitted_only)

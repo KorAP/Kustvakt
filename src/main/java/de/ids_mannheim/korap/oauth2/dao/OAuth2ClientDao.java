@@ -49,11 +49,13 @@ public class OAuth2ClientDao {
     @Autowired
     private FullConfiguration config;
 
-    public void registerClient (String id, String secretHashcode, String name,
-            OAuth2ClientType type, String url, String redirectURI,
-            String registeredBy, String description, int refreshTokenExpiry,
-            JsonNode source) throws KustvaktException {
-        ParameterChecker.checkStringValue(id, "client_id");
+	public void registerClient (boolean isSuper, String id,
+			String secretHashcode, String name, OAuth2ClientType type,
+			String url, String redirectURI, String registeredBy,
+			String description, int refreshTokenExpiry, JsonNode source,
+			boolean isPermitted) throws KustvaktException {
+		
+		ParameterChecker.checkStringValue(id, "client_id");
         ParameterChecker.checkStringValue(name, "client_name");
         ParameterChecker.checkObjectValue(type, "client_type");
         ParameterChecker.checkStringValue(description, "client_description");
@@ -72,9 +74,18 @@ public class OAuth2ClientDao {
         client.setRegisteredBy(registeredBy);
         client.setRegistrationDate(ZonedDateTime.now());
         client.setDescription(description);
+        
+        if (isSuper) {
+        	client.setSuper(true);
+		}
         if (source != null && !source.isNull()) {
             if (type.equals(OAuth2ClientType.CONFIDENTIAL)) {
                 client.setSource(source.toString());
+                // setting permit for plugin, used in OAuth2TestBase
+                // this should be an admin function
+                if (isPermitted) { 
+                	client.setPermitted(isPermitted);
+                }
             }
             else {
                 throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
@@ -102,7 +113,15 @@ public class OAuth2ClientDao {
 
         client.setRefreshTokenExpiry(refreshTokenExpiry);
         entityManager.persist(client);
-    }
+	}
+    
+	public void registerClient (String id, String secretHashcode, String name,
+			OAuth2ClientType type, String url, String redirectURI,
+			String registeredBy, String description, int refreshTokenExpiry,
+			JsonNode source) throws KustvaktException {
+		registerClient(false, id, secretHashcode, name, type, url, redirectURI,
+				registeredBy, description, refreshTokenExpiry, source, false);
+	}
 
     public OAuth2Client retrieveClientById (String clientId)
             throws KustvaktException {

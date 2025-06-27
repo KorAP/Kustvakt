@@ -1,5 +1,9 @@
 package de.ids_mannheim.korap.web.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.net.URI;
 import java.time.ZoneId;
@@ -37,6 +41,7 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
+import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -47,8 +52,6 @@ import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Provides common methods and variables for OAuth2 tests,
@@ -68,14 +71,14 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     @Autowired
     protected RefreshTokenDao refreshTokenDao;
 
-    protected String publicClientId = "8bIDtZnH6NvRkW2Fq";
+    public String publicClientId = "8bIDtZnH6NvRkW2Fq";
     // without registered redirect URI
-    protected String publicClientId2 = "nW5qM63Rb2a7KdT9L";
-    protected String confidentialClientId = "9aHsGW6QflV13ixNpez";
-    protected String confidentialClientId2 = "52atrL0ajex_3_5imd9Mgw";
-    protected String superClientId = "fCBbQkAyYzI4NzUxMg";
-    protected String clientSecret = "secret";
-    protected String state = "thisIsMyState";
+    public String publicClientId2 = "nW5qM63Rb2a7KdT9L";
+    public String confidentialClientId = "9aHsGW6QflV13ixNpez";
+    public String confidentialClientId2 = "52atrL0ajex_3_5imd9Mgw";
+    public String superClientId = "fCBbQkAyYzI4NzUxMg";
+    public String clientSecret = "secret";
+    public String state = "thisIsMyState";
 
     public static String ACCESS_TOKEN_TYPE = "access_token";
     public static String REFRESH_TOKEN_TYPE = "refresh_token";
@@ -85,7 +88,70 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
     protected String clientURL = "http://example.client.com";
     protected String clientRedirectUri = "https://example.client.com/redirect";
-
+    
+    @PostConstruct
+    private void init () throws KustvaktException {
+		try {
+			clientDao.retrieveClientById(superClientId);
+		}
+		catch (KustvaktException e) {
+			clientDao.registerClient(true, superClientId,
+					"$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
+					"super confidential client", OAuth2ClientType.CONFIDENTIAL,
+					"http://korap.ids-mannheim.de/confidential",
+					"https://korap.ids-mannheim.de/confidential/redirect",
+					"system", "Super confidential client.", 0, null, false);
+		}
+		
+		try {
+			clientDao.retrieveClientById(publicClientId);
+		}
+		catch (KustvaktException e) {
+			clientDao.registerClient(publicClientId, null,
+					"public client plugin with redirect uri",
+					OAuth2ClientType.PUBLIC, "https://third.party.client.com",
+					"https://third.party.client.com/redirect", "system",
+					"Public client plugin with a registered redirect URI", 0,
+					null);
+		}
+		
+		try {
+			clientDao.retrieveClientById(publicClientId2);
+		}
+		catch (KustvaktException e) {
+			clientDao.registerClient(publicClientId2, null,
+					"test public client", OAuth2ClientType.PUBLIC,
+					"http://korap.ids-mannheim.de/public", null, "system",
+					"Public client without redirect uri", 0, null);
+		}
+		
+		try {
+			clientDao.retrieveClientById(confidentialClientId);
+		}
+		catch (KustvaktException e) {
+			clientDao.registerClient(confidentialClientId,
+					"$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
+					"non super confidential client",
+					OAuth2ClientType.CONFIDENTIAL,
+					"https://third.party.com/confidential",
+					"https://third.party.com/confidential/redirect", "system",
+					"Nonsuper confidential client with redirect URI", 0, null);
+		}
+		
+		try {
+			clientDao.retrieveClientById(confidentialClientId2);
+		}
+		catch (KustvaktException e) {
+			JsonNode source = JsonUtils.readTree("{\"key\":\"value\"}");
+			clientDao.registerClient(false, confidentialClientId2,
+					"$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
+					"confidential client 2", OAuth2ClientType.CONFIDENTIAL,
+					"http://example.client.de", null, "system",
+					"Nonsuper confidential client plugin without redirect URI",
+					0, source, true);
+		}
+	}
+    
     protected MultivaluedMap<String, String> getQueryParamsFromURI (URI uri) {
         return UriComponent.decodeQuery(uri, true);
     };
@@ -337,6 +403,19 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         assertEquals("SUCCESS", response.readEntity(String.class));
     }
 
+    protected OAuth2ClientJson createOAuth2ClientJson (String name,
+            OAuth2ClientType type, String description) {
+        OAuth2ClientJson client = new OAuth2ClientJson();
+        if (name != null) {
+            client.setName(name);
+        }
+        client.setType(type);
+        if (description != null) {
+            client.setDescription(description);
+        }
+        return client;
+    }
+    
     protected Response registerClient (String username, OAuth2ClientJson json)
             throws ProcessingException, KustvaktException {
         return target().path(API_VERSION).path("oauth2").path("client")

@@ -8,6 +8,7 @@
 - Remove user default settings from the database migration (close #810)
 - Fix KoralQuery and remove required access from query reference.
 - Remove query reference test data from the database migration (close #811)
+- Remove OAuth2 clients and access tokens from the DB migration (close #809)
 
 
 # version 0.78.2

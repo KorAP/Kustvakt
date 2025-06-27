@@ -331,7 +331,6 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(2, node.size());
         
         node = node.get(1);
-        System.out.println(node.toPrettyString());
         assertEquals(vcName, node.get("name").asText());
         assertEquals("ALL", node.get("requiredAccess").asText());
         deleteVC(vcName, testUser, testUser);
