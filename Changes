@@ -9,7 +9,7 @@
 - Fix KoralQuery and remove required access from query reference.
 - Remove query reference test data from the database migration (close #811)
 - Remove OAuth2 clients and access tokens from the DB migration (close #809)
-
+- Removed db/test folder (close #379)
 
 # version 0.78.2
 

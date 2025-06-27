@@ -135,7 +135,6 @@
 												<exclude>db/mysql/**</exclude>
 												<exclude>db/predefined/**</exclude>
 												<exclude>db/sqlite/**</exclude>
-												<exclude>db/test/**</exclude>
 												<exclude>com.novell.ldap</exclude>
 												<exclude>com.unboundid</exclude>
 												<exclude>org.glassfish.jersey.test-framework*</exclude>
