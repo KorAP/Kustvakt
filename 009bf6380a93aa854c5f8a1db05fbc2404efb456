@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96bd2526_4efed18e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 28
+      },
+      "writtenOn": "2025-06-30T09:52:46Z",
+      "side": 1,
+      "message": "Introduced constant for Default LDAP operation timeout.",
+      "revId": "009bf6380a93aa854c5f8a1db05fbc2404efb456",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
