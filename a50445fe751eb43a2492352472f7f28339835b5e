@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "657b6192_3693ade6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-07-04T10:40:41Z",
+      "side": 1,
+      "message": "Great! Thank you! Can you roll out this to instance 2?",
+      "revId": "a50445fe751eb43a2492352472f7f28339835b5e",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3e8d0cf_213aff36",
+        "filename": "src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-07-04T10:40:41Z",
+      "side": 1,
+      "message": "This doesn\u0027t change anything.",
+      "range": {
+        "startLine": 572,
+        "startChar": 7,
+        "endLine": 574,
+        "endChar": 23
+      },
+      "revId": "a50445fe751eb43a2492352472f7f28339835b5e",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
