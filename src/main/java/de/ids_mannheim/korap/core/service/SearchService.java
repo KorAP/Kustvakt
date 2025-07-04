@@ -170,11 +170,8 @@ public class SearchService extends BasicService {
         String query = serializer.toJSON();
 
         if (accessRewriteDisabled && showTokens) {
-            Notifications n = new Notifications();
-            n.addWarning(StatusCodes.NOT_ALLOWED,
+            query = addWarning(query, StatusCodes.NOT_ALLOWED,
                     "Tokens cannot be shown without access.");
-            JsonNode warning = n.toJsonNode();
-            query = addWarning(query, warning);
         }
 
         // Query pipe rewrite
@@ -303,6 +300,12 @@ public class SearchService extends BasicService {
      */
     private String runPipes (String query, String pipes)
             throws KustvaktException {
+		if (config.getPipeHost().isEmpty()) {
+			addWarning(query, StatusCodes.NOT_SUPPORTED,
+					"Pipe is not supported.");
+			return query;
+		}
+    	
     	if (pipes != null && !pipes.isEmpty()) {
 			String[] pipeArray = pipes.split(",");
 			
@@ -359,19 +362,17 @@ public class SearchService extends BasicService {
 
     private String handlePipeError (String query, String url, String message)
             throws KustvaktException {
-        jlog.warn(
-                "Failed running the pipe at " + url + ". Message: " + message);
 
-        Notifications n = new Notifications();
-        n.addWarning(StatusCodes.PIPE_FAILED, "Pipe failed", url, message);
-        JsonNode warning = n.toJsonNode();
-
-        query = addWarning(query, warning);
+        query = addWarning(query, StatusCodes.PIPE_FAILED, "Pipe failed", url, message);
         return query;
     }
 
-    private String addWarning (String query, JsonNode warning)
-            throws KustvaktException {
+	private String addWarning (String query, int statusCode,
+			String warningMessage, String ... terms) throws KustvaktException {
+		Notifications n = new Notifications();
+		n.addWarning(statusCode, warningMessage, terms);
+		JsonNode warning = n.toJsonNode();
+        
     	ObjectNode node = null;
 		try {
 			node = (ObjectNode) JsonUtils.readTree(query);

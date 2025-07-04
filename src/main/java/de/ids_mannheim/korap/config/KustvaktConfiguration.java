@@ -244,8 +244,7 @@ public class KustvaktConfiguration {
         loginTimeout = Integer.parseInt(properties.getProperty(
                 "timeout.login", "90000"));
         
-		pipeHost = properties.getProperty("pipe.host",
-				"https://korap.ids-mannheim.de");
+		pipeHost = properties.getProperty("pipe.host","");
     }
 
     @Deprecated
