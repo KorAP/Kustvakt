@@ -1,0 +1,81 @@
+{
+  "@context" : "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+  "meta" : {
+    "version" : "Krill-0.64.1"
+  },
+  "hasSnippet" : true,
+  "hasTokens" : false,
+  "matchID" : "match-GOE/AGA/01784-p36-37",
+  "context" : {
+    "left" : [ "token", 0 ],
+    "right" : [ "token", 0 ]
+  },
+  "snippet" : "<span class=\"context-left\"></span><span class=\"match\"><span title=\"corenlp/p:ART\">der</span> <span title=\"corenlp/p:ADJA\">alte</span> <span title=\"corenlp/p:ADJA\">freie</span> <span title=\"corenlp/p:NN\">Weg</span> <span title=\"corenlp/p:APPR\">nach</span> <span title=\"corenlp/p:NE\">Mainz</span> <span title=\"corenlp/p:VAFIN\">war</span> <span title=\"corenlp/p:VVPP\">gesperrt</span>, <span title=\"corenlp/p:PPER\">ich</span> <span title=\"corenlp/p:VMFIN\">mußte</span> <span title=\"corenlp/p:APPR\">über</span> <span title=\"corenlp/p:ART\">die</span> <span title=\"corenlp/p:NN\">Schiffbrücke</span> <span title=\"corenlp/p:APPR\">bei</span> <span title=\"corenlp/p:NE\">Rüsselsheim</span>; <span title=\"corenlp/p:APPR\">in</span> <span title=\"corenlp/p:NE\">Ginsheim</span> <span title=\"corenlp/p:VVFIN\">ward</span> <mark><span title=\"corenlp/p:VVPP\">gefüttert</span></mark>; <span title=\"corenlp/p:ART\">der</span> <span title=\"corenlp/p:NN\">Ort</span> <span title=\"corenlp/p:VAFIN\">ist</span> <span title=\"corenlp/p:ADV\">sehr</span> <span title=\"corenlp/p:ADJA\">zerschossen</span>; <span title=\"corenlp/p:ADV\">dann</span> <span title=\"corenlp/p:APPR\">über</span> <span title=\"corenlp/p:ART\">die</span> <span title=\"corenlp/p:NN\">Schiffbrücke</span> <span title=\"corenlp/p:APPR\">auf</span> <span title=\"corenlp/p:ART\">die</span> <span title=\"corenlp/p:NN\">Nonnenaue</span>, <span title=\"corenlp/p:PWAV\">wo</span> <span title=\"corenlp/p:PIDAT\">viele</span> <span title=\"corenlp/p:NN\">Bäume</span> <span title=\"corenlp/p:VVINF\">niedergehauen</span> <span title=\"corenlp/p:VVFIN\">lagen</span>, <span title=\"corenlp/p:ADV\">sofort</span> <span title=\"corenlp/p:APPR\">auf</span> <span title=\"corenlp/p:ART\">dem</span> <span title=\"corenlp/p:ADJA\">zweiten</span> <span title=\"corenlp/p:NN\">Teil</span> <span title=\"corenlp/p:ART\">der</span> <span title=\"corenlp/p:NN\">Schiffbrücke</span> <span title=\"corenlp/p:APPR\">über</span> <span title=\"corenlp/p:ART\">den</span> <span title=\"corenlp/p:ADJA\">größern</span> <span title=\"corenlp/p:NN\">Arm</span> <span title=\"corenlp/p:ART\">des</span> <span title=\"corenlp/p:NE\">Rheins</span>.</span><span class=\"context-right\"></span>",
+  "fields" : [ {
+    "@type" : "koral:field",
+    "key" : "ID"
+  }, {
+    "@type" : "koral:field",
+    "key" : "textSigle",
+    "type" : "type:string",
+    "value" : "GOE/AGA/01784"
+  }, {
+    "@type" : "koral:field",
+    "key" : "corpusID"
+  }, {
+    "@type" : "koral:field",
+    "key" : "author",
+    "type" : "type:text",
+    "value" : "Goethe, Johann Wolfgang von"
+  }, {
+    "@type" : "koral:field",
+    "key" : "title",
+    "type" : "type:text",
+    "value" : "Belagerung von Mainz"
+  }, {
+    "@type" : "koral:field",
+    "key" : "subTitle"
+  }, {
+    "@type" : "koral:field",
+    "key" : "textClass"
+  }, {
+    "@type" : "koral:field",
+    "key" : "pubPlace",
+    "type" : "type:string",
+    "value" : "München"
+  }, {
+    "@type" : "koral:field",
+    "key" : "pubDate",
+    "type" : "type:date",
+    "value" : "1982"
+  }, {
+    "@type" : "koral:field",
+    "key" : "availability",
+    "type" : "type:string",
+    "value" : "CC-BY-SA"
+  }, {
+    "@type" : "koral:field",
+    "key" : "layerInfos",
+    "type" : "type:store",
+    "value" : "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens"
+  }, {
+    "@type" : "koral:field",
+    "key" : "docSigle",
+    "type" : "type:string",
+    "value" : "GOE/AGA"
+  }, {
+    "@type" : "koral:field",
+    "key" : "corpusSigle",
+    "type" : "type:string",
+    "value" : "GOE"
+  } ],
+  "textSigle" : "GOE/AGA/01784",
+  "author" : "Goethe, Johann Wolfgang von",
+  "title" : "Belagerung von Mainz",
+  "pubPlace" : "München",
+  "pubDate" : "1982",
+  "availability" : "CC-BY-SA",
+  "layerInfos" : "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+  "docSigle" : "GOE/AGA",
+  "corpusSigle" : "GOE"
+}

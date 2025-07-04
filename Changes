@@ -12,6 +12,7 @@
 - Removed db/test folder (close #379)
 - Return Timeout Error Code for timeout during LDAP operations. 
   With test and special test conf (bodmo)
+- Implemented pipe response rewriting for match info API (#814)
 
 # version 0.78.2
 

@@ -267,6 +267,7 @@ public class SearchController {
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans,
+            @QueryParam("response-pipes") String responsePipes,
             @DefaultValue("true") @QueryParam("show-snippet") String snippetStr,
             @DefaultValue("false") @QueryParam("show-tokens") String tokensStr,
             @QueryParam("expand") String expansion,
@@ -305,7 +306,7 @@ public class SearchController {
             String results = searchService.retrieveMatchInfo(corpusId, docId,
                     textId, matchId, true, foundries,
                     tokenContext.getUsername(), headers, layers, spans, snippet,
-                    tokens, expandToSentence, highlights, true);
+                    tokens, expandToSentence, highlights, true, responsePipes);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {
@@ -326,6 +327,7 @@ public class SearchController {
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans,
+            @QueryParam("response-pipes") String responsePipes,
             @DefaultValue("true") @QueryParam("show-snippet") String snippetStr,
             @DefaultValue("false") @QueryParam("show-tokens") String tokensStr,
             @QueryParam("expand") String expansion,
@@ -364,7 +366,7 @@ public class SearchController {
             String results = searchService.retrieveMatchInfo(corpusId, docId,
                     textId, matchId, true, foundries,
                     tokenContext.getUsername(), headers, layers, spans, snippet,
-                    tokens, expandToSentence, highlights, false);
+                    tokens, expandToSentence, highlights, false, responsePipes);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {
@@ -384,7 +386,8 @@ public class SearchController {
     public Response getMetadata (@PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
             @PathParam("textId") String textId,
-            @QueryParam("fields") String fields, @Context SecurityContext ctx,
+            @QueryParam("fields") String fields, 
+            @Context SecurityContext ctx,
             @Context HttpHeaders headers) throws KustvaktException {
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         try {

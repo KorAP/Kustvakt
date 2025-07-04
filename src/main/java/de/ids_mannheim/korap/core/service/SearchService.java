@@ -500,10 +500,11 @@ public class SearchService extends BasicService {
 
     public String retrieveMatchInfo (String corpusId, String docId,
             String textId, String matchId, boolean info, Set<String> foundries,
-            String username, HttpHeaders headers, Set<String> layers,
-            boolean spans, boolean snippet, boolean tokens,
-            boolean sentenceExpansion, boolean highlights, boolean isDeprecated)
-            throws KustvaktException {
+            String username, HttpHeaders headers, Set<String> layers, 
+			boolean spans, boolean snippet, boolean tokens,
+			boolean sentenceExpansion, boolean highlights, boolean isDeprecated,
+			String responsePipes)
+			throws KustvaktException {
         String matchid = searchKrill.getMatchId(corpusId, docId, textId,
                 matchId);
 
@@ -546,6 +547,9 @@ public class SearchService extends BasicService {
         //            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
         //                    e.getMessage());
         //        }
+        
+        results = runPipes(results, responsePipes);
+        
         if (DEBUG) {
             jlog.debug("MatchInfo results: " + results);
         }
@@ -565,7 +569,9 @@ public class SearchService extends BasicService {
             p = determineAvailabilityPattern(user);
         }
         String textSigle = searchKrill.getTextSigle(corpusId, docId, textId);
-        return searchKrill.getFields(textSigle, fieldList, p);
+        String results = searchKrill.getFields(textSigle, fieldList, p);
+        
+        return results;
     }
 
     public String getCollocationBase (String query) throws KustvaktException {

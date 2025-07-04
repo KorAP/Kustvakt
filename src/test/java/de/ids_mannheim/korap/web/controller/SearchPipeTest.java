@@ -41,9 +41,11 @@ public class SearchPipeTest extends SpringJerseyTest {
 
     private int port = 6071;
 
-    private String pipeJson, pipeWithParamJson, pipeTimeout;
+    private String pipeJson, pipeWithParamJson, pipeTimeout, termMapperJson;
 
     private String glemmUri = "http://localhost:" + port + "/glemm";
+	private String termMapperUri = "http://localhost:" + port
+			+ "/term-mapper?foundry=corenlp";
 
     public SearchPipeTest () throws URISyntaxException, IOException {
         pipeJson = IOUtils.toString(
@@ -57,6 +59,11 @@ public class SearchPipeTest extends SpringJerseyTest {
         pipeWithParamJson = IOUtils.toString(
                 ClassLoader.getSystemResourceAsStream(
                         "pipe-output/with-param.jsonld"),
+                StandardCharsets.UTF_8);
+        
+        termMapperJson = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "pipe-output/term-mapper.jsonld"),
                 StandardCharsets.UTF_8);
     }
 
@@ -99,6 +106,40 @@ public class SearchPipeTest extends SpringJerseyTest {
         assertEquals(br.readLine(), "{test}");
     }
 
+	@Test
+	public void testRetrieveMatchInfoWithResponsePipe ()
+			throws KustvaktException {
+		
+		mockClient.reset()
+        .when(request().withMethod("POST")
+        		.withPath("/term-mapper")
+        		.withQueryStringParameter("foundry", "corenlp")
+                .withHeaders(
+                        new Header("Content-Type",
+                                "application/json; charset=utf-8"),
+                        new Header("Accept", "application/json")))
+        .respond(response()
+                .withHeader(new Header("Content-Type",
+                        "application/json; charset=utf-8"))
+                .withBody(termMapperJson).withStatusCode(200));
+
+		Response response = target().path(API_VERSION).path("corpus")
+				.path("GOE").path("AGA").path("01784").path("p36-37")
+				.queryParam("foundry", "tt")
+				.queryParam("response-pipes", termMapperUri)
+				.request().get();
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+		String entity = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(entity);
+		
+		assertTrue(node.at("/snippet").asText().startsWith(
+				"<span class=\"context-left\"></span><span class=\"match\">"
+				+ "<span title=\"corenlp/p:ART\">der</span> <span title="
+				+ "\"corenlp/p:ADJA\">alte</span> <span title="
+				+ "\"corenlp/p:ADJA\">freie</span> <span title="
+				+ "\"corenlp/p:NN\">Weg</span>"));
+	}
+    
     @Test
     public void testSearchWithPipes ()
             throws IOException, KustvaktException, URISyntaxException {
