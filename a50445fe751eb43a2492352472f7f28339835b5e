@@ -18,6 +18,23 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "581daa7a_eb3f84f4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-07-15T07:43:59Z",
+      "side": 1,
+      "message": "This is shouldn\u0027t be included in the master branch and has a separate branch 0.79-alpha.",
+      "revId": "a50445fe751eb43a2492352472f7f28339835b5e",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3e8d0cf_213aff36",
@@ -31,6 +48,30 @@
       "writtenOn": "2025-07-04T10:40:41Z",
       "side": 1,
       "message": "This doesn\u0027t change anything.",
+      "range": {
+        "startLine": 572,
+        "startChar": 7,
+        "endLine": 574,
+        "endChar": 23
+      },
+      "revId": "a50445fe751eb43a2492352472f7f28339835b5e",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8821e5ed_93c40f3e",
+        "filename": "src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-07-15T07:43:59Z",
+      "side": 1,
+      "message": "Ah yes, I was testing something. It is easier to print the results in this structure, but I agree it doesn\u0027t change anything.",
+      "parentUuid": "c3e8d0cf_213aff36",
       "range": {
         "startLine": 572,
         "startChar": 7,
