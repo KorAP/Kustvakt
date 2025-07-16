@@ -16,12 +16,14 @@ public class TimeoutRewrite implements RewriteTask.RewriteQuery {
             int timeout = (access.equals(CorpusAccess.FREE)) ?
 				config.getGuestTimeout() : config.getLoginTimeout();
             
-			if (node.has("timeout")) {
-				RewriteIdentifier id = new RewriteIdentifier("timeout",
-						node.get("timeout"), "Timeout has been replaced. "
-						+ "The original value is described in the original "
-						+ "property.");
-				node.replace("timeout", timeout, id);
+			if (node.has("timeout")) { 
+				if (node.at("/timeout").asInt() > timeout) {
+    				RewriteIdentifier id = new RewriteIdentifier("timeout",
+    						node.get("timeout"), "Timeout has been replaced. "
+    						+ "The original value is described in the original "
+    						+ "property.");
+    				node.replace("timeout", timeout, id);
+				}
 			}
             else {
             	RewriteIdentifier id = new RewriteIdentifier("timeout", null, 

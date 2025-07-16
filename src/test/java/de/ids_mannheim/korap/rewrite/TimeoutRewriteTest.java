@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +24,26 @@ public class TimeoutRewriteTest extends SpringJerseyTest {
 	@Autowired
 	public KustvaktConfiguration config;
 
+	@Test
+	public void testNoRewrite () throws KustvaktException {
+		RewriteHandler handler = new RewriteHandler(config);
+        handler.add(TimeoutRewrite.class);
+        
+        Map<String, Object> map = new HashMap<String,Object>();
+        map.put("count", 25);
+        map.put("timeout", 1000);
+        QuerySerializer s = new QuerySerializer();
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
+        s.setMeta(map);
+        String result = s.toJSON();
+        JsonNode node = JsonUtils.readTree(handler.processQuery(result,
+                User.UserFactory.getUser("test_user")));
+        
+        node = node.at("/meta"); 
+        assertEquals(1000, node.at("/timeout").asInt());
+        assertTrue(node.at("/rewrites").isMissingNode());
+	}
+	
 	@Test
 	public void testReplaceTimeout () throws KustvaktException {
 		RewriteHandler handler = new RewriteHandler(config);
