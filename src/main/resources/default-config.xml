@@ -195,6 +195,8 @@
 	<!-- Rewrite -->
 	<bean id="foundryRewrite"
 		class="de.ids_mannheim.korap.rewrite.FoundryRewrite" />
+	<bean id="timeoutRewrite"
+		class="de.ids_mannheim.korap.rewrite.TimeoutRewrite" />
 	<bean id="availabilityRewrite"
 		class="de.ids_mannheim.korap.rewrite.AvailabilityRewrite" />
 	<bean id="virtualCorpusRewrite"
@@ -205,6 +207,7 @@
 	<util:list id="rewriteTasks"
 		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
 		<ref bean="foundryRewrite" />
+		<ref bean="timeoutRewrite" />
 		<ref bean="availabilityRewrite" />
 		<ref bean="virtualCorpusRewrite" />
 		<ref bean="queryReferenceRewrite" />
