@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -116,7 +116,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             throws ProcessingException, KustvaktException {
         JsonNode clientInfo = retrieveClientInfo(clientId, "other-user");
         assertEquals(clientId, clientInfo.at("/client_id").asText());
-        assertEquals("Plugin", clientInfo.at("/client_name").asText());
+        assertEquals(clientInfo.at("/client_name").asText(), "Plugin");
         assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
                 clientInfo.at("/client_type").asText());
         assertNotNull(clientInfo.at("/client_description").asText());
@@ -385,9 +385,9 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         Response response = installPlugin(form);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("Unknown client: unknown",
-            node.at("/error_description").asText());
-        assertEquals("invalid_client", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Unknown client: unknown");
+        assertEquals(node.at("/error").asText(), "invalid_client");
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
@@ -399,9 +399,9 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         Response response = installPlugin(form);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("Missing parameter: super_client_secret",
-            node.at("/error_description").asText());
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Missing parameter: super_client_secret");
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -412,9 +412,9 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         Response response = installPlugin(form);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("Missing parameter: super_client_id",
-            node.at("/error_description").asText());
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Missing parameter: super_client_id");
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -427,7 +427,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         Response response = installPlugin(form);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("unauthorized_client", node.at("/error").asText());
+        assertEquals(node.at("/error").asText(), "unauthorized_client");
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 

@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -88,9 +88,9 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
                 response.getStatus());
 
         URI redirectUri = response.getLocation();
-        assertEquals("https", redirectUri.getScheme());
-        assertEquals("third.party.com", redirectUri.getHost());
-        assertEquals("/confidential/redirect", redirectUri.getPath());
+        assertEquals(redirectUri.getScheme(), "https");
+        assertEquals(redirectUri.getHost(), "third.party.com");
+        assertEquals(redirectUri.getPath(), "/confidential/redirect");
 
         String[] queryParts = redirectUri.getQuery().split("&");
         assertEquals("error_description=scope+is+required", queryParts[1]);

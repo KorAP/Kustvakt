@@ -11,6 +11,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.controller.oauth2.OAuth2TestBase;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;

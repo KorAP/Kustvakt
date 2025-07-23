@@ -10,7 +10,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
+import de.ids_mannheim.korap.web.controller.oauth2.OAuth2TestBase;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;

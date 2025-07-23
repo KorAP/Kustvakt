@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -165,8 +165,8 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Scope vc_info is not authorized",
-            node.at("/errors/0/1").asText());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Scope vc_info is not authorized");
         // search
         response = searchWithAccessToken(accessToken);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -182,7 +182,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token is invalid",
-            node.at("/errors/0/1").asText());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Access token is invalid");
     }
 }

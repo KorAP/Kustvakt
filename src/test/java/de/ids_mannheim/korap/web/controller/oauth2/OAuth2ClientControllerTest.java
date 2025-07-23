@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,8 +49,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         // public client plugin
         JsonNode clientInfo = retrieveClientInfo(publicClientId, "system");
         assertEquals(publicClientId, clientInfo.at("/client_id").asText());
-        assertEquals("public client plugin with redirect uri",
-            clientInfo.at("/client_name").asText());
+        assertEquals(clientInfo.at("/client_name").asText(),
+                "public client plugin with redirect uri");
         assertNotNull(clientInfo.at("/client_description"));
         assertNotNull(clientInfo.at("/client_url"));
         assertEquals("PUBLIC", clientInfo.at("/client_type").asText());
@@ -59,8 +59,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         clientInfo = retrieveClientInfo(confidentialClientId, "system");
         assertEquals(confidentialClientId,
                 clientInfo.at("/client_id").asText());
-        assertEquals("non super confidential client",
-            clientInfo.at("/client_name").asText());
+        assertEquals(clientInfo.at("/client_name").asText(),
+                "non super confidential client");
         assertNotNull(clientInfo.at("/client_url"));
         assertNotNull(clientInfo.at("/redirect_uri"));
         assertEquals(false, clientInfo.at("/super").asBoolean());
@@ -102,9 +102,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         Response response = registerClient(username, clientJson);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("client_name must contain at least 3 characters",
-            node.at("/error_description").asText());
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "client_name must contain at least 3 characters");
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -116,9 +116,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         Response response = registerClient(username, clientJson);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("client_name must contain at least 3 characters",
-            node.at("/error_description").asText());
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "client_name must contain at least 3 characters");
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -130,9 +130,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         Response response = registerClient(username, clientJson);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("client_name is null",
-            node.at("/error_description").asText());
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "client_name is null");
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -144,9 +144,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         Response response = registerClient(username, clientJson);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("client_description is null",
-            node.at("/error_description").asText());
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "client_description is null");
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -158,9 +158,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         Response response = registerClient(username, clientJson);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("client_type is null",
-            node.at("/error_description").asText());
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "client_type is null");
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -201,7 +201,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         clientJson.setRefreshTokenExpiry(31535000);
         Response response = registerClient(username, clientJson);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -230,9 +230,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         clientJson.setRefreshTokenExpiry(31537000);
         Response response = registerClient(username, clientJson);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals("Maximum refresh token expiry is 31536000 seconds (1 year)",
-            node.at("/error_description").asText());
-        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Maximum refresh token expiry is 31536000 seconds (1 year)");
+        assertEquals(node.at("/error").asText(), "invalid_request");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -258,7 +258,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             throws KustvaktException {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Invalid URL", node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(), "Invalid URL");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), status);
     }
 
@@ -299,7 +299,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         Response response = requestTokenWithAuthorizationCodeAndForm(clientId,
                 clientSecret, code);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals("match_info search", node.at("/scope").asText());
+        assertEquals(node.at("/scope").asText(), "match_info search");
         String accessToken = node.at("/access_token").asText();
         OAuth2ClientJson clientJson = createOAuth2ClientJson("R client",
                 OAuth2ClientType.PUBLIC, null);
@@ -312,8 +312,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Scope register_client is not authorized",
-            node.at("/errors/0/1").asText());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Scope register_client is not authorized");
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
@@ -416,8 +416,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token is invalid",
-            node.at("/errors/0/1").asText());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Access token is invalid");
     }
 
     private void testDeregisterPublicClientMissingUserAuthentication (
@@ -468,8 +468,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Operation is not allowed for public clients",
-            node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Operation is not allowed for public clients");
     }
 
     private String testResetConfidentialClientSecret (String clientId,
@@ -513,9 +513,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(2, node.size());
         assertEquals(confidentialClientId, node.at("/0/client_id").asText());
         assertEquals(publicClientId, node.at("/1/client_id").asText());
-        assertEquals("non super confidential client",
-            node.at("/0/client_name").asText());
-        assertEquals("CONFIDENTIAL", node.at("/0/client_type").asText());
+        assertEquals(node.at("/0/client_name").asText(),
+                "non super confidential client");
+        assertEquals(node.at("/0/client_type").asText(), "CONFIDENTIAL");
         assertFalse(node.at("/0/client_url").isMissingNode());
         assertFalse(node.at("/0/client_description").isMissingNode());
     }
@@ -547,7 +547,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         JsonNode node = listUserClients(username,"");
         assertEquals(1, node.size());
         assertEquals(clientId, node.at("/0/client_id").asText());
-        assertEquals("OAuth2ClientTest", node.at("/0/client_name").asText());
+        assertEquals(node.at("/0/client_name").asText(), "OAuth2ClientTest");
         assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
                 node.at("/0/client_type").asText());
         assertNotNull(node.at("/0/client_description"));
@@ -684,12 +684,12 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertEquals("SUCCESS", response.readEntity(String.class));
+        assertEquals(response.readEntity(String.class), "SUCCESS");
         response = searchWithAccessToken(accessToken);
         node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token is invalid",
-            node.at("/errors/0/1").asText());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Access token is invalid");
     }
 }

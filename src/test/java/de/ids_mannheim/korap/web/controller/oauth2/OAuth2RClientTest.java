@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,8 +71,8 @@ public class OAuth2RClientTest extends OAuth2TestBase {
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();
-        assertEquals("http", redirectUri.getScheme());
-        assertEquals("localhost", redirectUri.getHost());
+        assertEquals(redirectUri.getScheme(), "http");
+        assertEquals(redirectUri.getHost(), "localhost");
         assertEquals(1410, redirectUri.getPort());
         MultiValueMap<String, String> params = UriComponentsBuilder
                 .fromUri(redirectUri).build().getQueryParams();

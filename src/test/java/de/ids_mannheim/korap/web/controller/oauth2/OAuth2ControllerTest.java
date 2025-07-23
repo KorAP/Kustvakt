@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.web.controller.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -98,8 +98,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
-        assertEquals("Invalid authorization",
-            node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Invalid authorization");
     }
 
     @Test
@@ -144,8 +144,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
-        assertEquals("Missing redirect URI",
-            node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Missing redirect URI");
     }
 
     private void testRequestTokenAuthorizationInvalidRedirectUri (String code)
@@ -174,8 +174,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
-        assertEquals("Invalid authorization",
-            node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Invalid authorization");
     }
 
     @Test
@@ -190,13 +190,13 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(TokenType.BEARER.displayName(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-        assertEquals("all", node.at("/scope").asText());
+        assertEquals(node.at("/scope").asText(), "all");
         String refresh = node.at("/refresh_token").asText();
         RefreshToken refreshToken = refreshTokenDao
                 .retrieveRefreshToken(refresh);
         Set<AccessScope> scopes = refreshToken.getScopes();
         assertEquals(1, scopes.size());
-        assertEquals("[all]", scopes.toString());
+        assertEquals(scopes.toString(), "[all]");
         testRefreshTokenExpiry(refresh);
     }
 
@@ -237,8 +237,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.UNAUTHORIZED_CLIENT,
                 node.at("/error").asText());
-        assertEquals("Password grant is not allowed for third party clients",
-            node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Password grant is not allowed for third party clients");
     }
 
     @Test
@@ -250,8 +250,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.UNAUTHORIZED_CLIENT,
                 node.at("/error").asText());
-        assertEquals("Password grant is not allowed for third party clients",
-            node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Password grant is not allowed for third party clients");
     }
 
     @Test
@@ -330,8 +330,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Missing parameter: client_secret",
-            node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(),
+                "Missing parameter: client_secret");
     }
 
     @Test
@@ -413,7 +413,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(TokenType.BEARER.displayName(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-        assertEquals("client_info", node.at("/scope").asText());
+        assertEquals(node.at("/scope").asText(), "client_info");
     }
 
     @Test
