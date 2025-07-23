@@ -29,7 +29,7 @@ import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
+import de.ids_mannheim.korap.web.controller.oauth2.OAuth2TestBase;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
