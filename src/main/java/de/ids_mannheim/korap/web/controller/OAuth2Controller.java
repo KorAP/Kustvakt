@@ -32,9 +32,11 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
+import de.ids_mannheim.korap.web.filter.APIDeprecationFilter;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
+import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotEmpty;
@@ -106,6 +108,8 @@ public class OAuth2Controller {
     @POST
     @Path("authorize")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @ResourceFilters({APIDeprecationFilter.class, 
+    	AuthenticationFilter.class, DemoUserFilter.class})
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
             @Context SecurityContext context, @FormParam("scope") String scope,
