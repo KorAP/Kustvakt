@@ -33,6 +33,37 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue("dory", "password");
     }
 
+    @Test
+    public void testAuthorizeConfidentialClient() throws KustvaktException {
+        Form form = new Form();
+        form.param("response_type", "code");
+        form.param("client_id", confidentialClientId);
+        form.param("state", "thisIsMyState");
+        form.param("scope", "search");
+        Response response = requestAuthorizationCode(form, userAuthHeader);
+        assertEquals(Status.NOT_FOUND.getStatusCode(),
+                response.getStatus());
+    }
+
+    @Test
+    public void testAuthorizeConfidentialClientV1_0 () throws KustvaktException {
+        Form form = new Form();
+        form.param("response_type", "code");
+        form.param("client_id", confidentialClientId);
+        form.param("state", "thisIsMyState");
+        form.param("scope", "search");
+        Response response = requestAuthorizationCodeV1_0(form, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+        URI redirectUri = response.getLocation();
+        MultiValueMap<String, String> params = UriComponentsBuilder
+                .fromUri(redirectUri).build().getQueryParams();
+        assertNotNull(params.getFirst("code"));
+        assertEquals(params.getFirst("state"), "thisIsMyState");
+        
+        testRequestTokenAuthorizationConfidential(redirectUri);
+    }
+    
     private Response requestAuthorizationCode (Form form, String authHeader)
             throws KustvaktException {
         return target().path(API_VERSION).path("oauth2").path("authorize")
@@ -43,38 +74,24 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
                 .post(Entity.form(form));
     }
 
-    @Test
-    public void testAuthorizeConfidentialClient () throws KustvaktException {
-        Form form = new Form();
-        form.param("response_type", "code");
-        form.param("client_id", confidentialClientId);
-        form.param("state", "thisIsMyState");
-        form.param("scope", "search");
-        Response response = requestAuthorizationCode(form, userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-        URI redirectUri = response.getLocation();
-        MultiValueMap<String, String> params = UriComponentsBuilder
-                .fromUri(redirectUri).build().getQueryParams();
-        assertNotNull(params.getFirst("code"));
-        assertEquals(params.getFirst("state"), "thisIsMyState");
-    }
-
-    @Test
-    public void testRequestTokenAuthorizationConfidential ()
+    private Response requestAuthorizationCodeV1_0 (Form form, String authHeader)
             throws KustvaktException {
-        Form authForm = new Form();
-        authForm.param("response_type", "code");
-        authForm.param("client_id", confidentialClientId);
-        authForm.param("scope", "search");
-        Response response = requestAuthorizationCode(authForm, userAuthHeader);
-        URI redirectUri = response.getLocation();
+        return target().path(API_VERSION_V1_0).path("oauth2").path("authorize")
+                .request().header(Attributes.AUTHORIZATION, authHeader)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
+    }
+    
+	private void testRequestTokenAuthorizationConfidential (URI redirectUri)
+			throws KustvaktException {
 
         MultivaluedMap<String, String> params = UriComponent
                 .decodeQuery(redirectUri, true);
         String code = params.get("code").get(0);
 
-        response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);

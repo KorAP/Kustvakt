@@ -1,6 +1,8 @@
 # version 0.80-SNAPSHOT
+
 - Introduced APIDeprecationFilter (#759)
 - Deprecated matchInfo web-service has been removed for API v1.1.
+- Remove deprecated Authorization Post web-service for API v1.1.
 
 # version 0.79
 
