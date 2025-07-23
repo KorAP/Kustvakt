@@ -15,6 +15,7 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.filter.APIDeprecationFilter;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
@@ -203,6 +204,8 @@ public class UserGroupController {
     @POST
     @Path("@{groupName}/invite")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @ResourceFilters({APIDeprecationFilter.class, 
+    	AuthenticationFilter.class, BlockingFilter.class})
     public Response inviteGroupMembers (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
@@ -251,6 +254,8 @@ public class UserGroupController {
     @POST
     @Path("@{groupName}/role/add")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @ResourceFilters({APIDeprecationFilter.class, 
+    	AuthenticationFilter.class, BlockingFilter.class})
     public Response addMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
@@ -350,6 +355,8 @@ public class UserGroupController {
     @Deprecated
     @POST
     @Path("@{groupName}/subscribe")
+    @ResourceFilters({APIDeprecationFilter.class, 
+    	AuthenticationFilter.class, BlockingFilter.class})
     public Response subscribeToGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
         throw kustvaktResponseHandler.throwit(new KustvaktException(
@@ -373,6 +380,8 @@ public class UserGroupController {
     @Deprecated
     @DELETE
     @Path("@{groupName}/unsubscribe")
+    @ResourceFilters({APIDeprecationFilter.class, 
+    	AuthenticationFilter.class, BlockingFilter.class})
     public Response unsubscribeFromGroup (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
