@@ -55,8 +55,8 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
     }
     
     @Test
-    public void testUsingDeprecatedMatchInfoService () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("corpus")
+    public void testDeprecatedMatchInfoWithV1_0 () throws KustvaktException {
+        Response response = target().path(API_VERSION_V1_0).path("corpus")
                 .path("GOE").path("AGA").path("01784").path("p36-100")
                 .path("matchInfo")
                 .queryParam("foundry", "*").request().get();
@@ -69,6 +69,15 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
                 + "service URL instead: {version}/corpus/{corpusId}/{docId}/"
                 + "{textId}/{matchId}",
                 node.at("/warnings/0/1").asText());
+    }
+    
+    @Test
+    public void testDeprecatedMatchInfo () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus")
+                .path("GOE").path("AGA").path("01784").path("p36-100")
+                .path("matchInfo")
+                .queryParam("foundry", "*").request().get();
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 
     @Test

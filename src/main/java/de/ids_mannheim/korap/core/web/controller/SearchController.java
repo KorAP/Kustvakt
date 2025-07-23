@@ -23,6 +23,7 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.filter.APIDeprecationFilter;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -257,6 +258,8 @@ public class SearchController {
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
+    @ResourceFilters({APIDeprecationFilter.class, 
+    	AuthenticationFilter.class, DemoUserFilter.class})
     //@SearchResourceFilters
     public Response getMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
@@ -315,7 +318,7 @@ public class SearchController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}")
+    @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}")    
     //@SearchResourceFilters
     public Response retrieveMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,

@@ -23,7 +23,8 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
 @ContextConfiguration("classpath:test-config.xml")
 public abstract class SpringJerseyTest extends JerseyTest {
 
-    public final static String API_VERSION = "v1.0";
+    public final static String API_VERSION = "v1.1";
+    public final static String API_VERSION_V1_0 = "v1.0";
 
     protected final static String allCorpusAccess = "All corpus access policy "
 			+ "has been added.";
