@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.dto.RoleDto;
 import de.ids_mannheim.korap.dto.QueryDto;
+import de.ids_mannheim.korap.dto.RoleDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
@@ -18,6 +18,7 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.filter.APIDeprecationFilter;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -271,6 +272,8 @@ public class VirtualCorpusController {
     @Deprecated
     @GET
     @Path("~{createdBy}")
+    @ResourceFilters({APIDeprecationFilter.class, 
+    	AuthenticationFilter.class, BlockingFilter.class})
     public List<QueryDto> listUserOrSystemVC (
             @PathParam("createdBy") String createdBy,
             @Context SecurityContext securityContext) {
@@ -390,6 +393,8 @@ public class VirtualCorpusController {
     @Deprecated
     @DELETE
     @Path("access/{accessId}")
+    @ResourceFilters({APIDeprecationFilter.class, 
+    	AuthenticationFilter.class, BlockingFilter.class})
     public Response deleteAccessById (
             @Context SecurityContext securityContext,
             @PathParam("accessId") int accessId) {
