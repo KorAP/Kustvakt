@@ -27,8 +27,10 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
@@ -218,11 +220,17 @@ public class OAuthClientController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public List<OAuth2ClientInfoDto> listUserClients (
             @Context SecurityContext context,
+            @Context ContainerRequestContext requestContext,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,
             @FormParam("authorized_only") boolean authorizedOnly, // deprecated
             @FormParam("filter_by") String filterBy) {
 
+    	List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double requestedVersion = Double.parseDouble(version.substring(1));
+        
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
 
@@ -234,28 +242,34 @@ public class OAuthClientController {
             
             List<OAuth2ClientInfoDto> clients = null; 
             
-            if (authorizedOnly) {
-                clients = clientService.listUserAuthorizedClients(username);
+        	if (requestedVersion == 1) {
+        		if (authorizedOnly) {
+            		clients = clientService.listUserAuthorizedClients(username);
+            		return clients;
+            	}
+            }
+            
+        	if (filterBy !=null && !filterBy.isEmpty()) {
+                if (filterBy.equals("authorized_only")) {
+                    clients = clientService.listUserAuthorizedClients(username);
+                }
+                else if (filterBy.equals("owned_only")) {
+                    clients = clientService.listUserRegisteredClients(username); 
+                }
+                else {
+                    throw new KustvaktException(
+                            StatusCodes.UNSUPPORTED_VALUE, "filter_by");
+                }
             }
             else {
-                if (filterBy !=null && !filterBy.isEmpty()) {
-                    if (filterBy.equals("authorized_only")) {
-                        clients = clientService.listUserAuthorizedClients(username);
-                    }
-                    else if (filterBy.equals("owned_only")) {
-                        clients = clientService.listUserRegisteredClients(username); 
-                    }
-                    else {
-                        throw new KustvaktException(
-                                StatusCodes.UNSUPPORTED_VALUE, "filter_by");
-                    }
-                }
-                else {               
-//                    clients = clientService.listUserAuthorizedClients(username);
-//                    clients.addAll(clientService.listUserRegisteredClients(username));
-                
-                    clients = clientService.listUserRegisteredClients(username);
-                }
+            	if (requestedVersion == 1) {
+            		clients = clientService.listUserRegisteredClients(username);
+            	}
+				else {
+					clients = clientService.listUserAuthorizedClients(username);
+					clients.addAll(
+							clientService.listUserRegisteredClients(username));
+				}
             }
             
             return clients;
