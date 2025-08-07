@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.constant;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import de.ids_mannheim.korap.security.context.TokenContext;
 

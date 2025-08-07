@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.utils;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -119,11 +119,11 @@ public class StringUtils {
     }
 
     public static String normalizeHTML (String value) {
-        return StringEscapeUtils.escapeHtml(value);
+        return StringEscapeUtils.escapeHtml4(value);
     }
 
     public static String decodeHTML (String value) {
-        return StringEscapeUtils.unescapeHtml(value);
+        return StringEscapeUtils.unescapeHtml4(value);
     }
 
     public static String getDocSigle (String textSigle) {
