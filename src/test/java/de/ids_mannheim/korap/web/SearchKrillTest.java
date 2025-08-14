@@ -57,7 +57,7 @@ public class SearchKrillTest extends SpringJerseyTest {
 
     @Test
     public void testSearch () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery("[orth=der]", "poliqarp");
         String result = krill.search(s.toJSON());
         JsonNode node = JsonUtils.readTree(result);
@@ -67,7 +67,7 @@ public class SearchKrillTest extends SpringJerseyTest {
 
     @Test
     public void testTimeOut () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery("[orth=der]", "poliqarp");
         // s.setQuery("node ->malt/d[func=/.*/] node", "annis");
         MetaQueryBuilder meta = new MetaQueryBuilder();

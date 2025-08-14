@@ -85,7 +85,7 @@ public class FoundryRewriteTest extends TestBase {
 		assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         String username = "bubbles";
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[pos=ADJA]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(),
                 new KorAPUser(username));
@@ -100,7 +100,7 @@ public class FoundryRewriteTest extends TestBase {
 
     private void testRewriteLemmaFoundryWithUserSetting (String username)
             throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[base=Haus]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(),
                 new KorAPUser(username));
@@ -124,7 +124,7 @@ public class FoundryRewriteTest extends TestBase {
     @Test
     public void testDefaultFoundryInjectLemmaThrowsNoError ()
             throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[base=Haus]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
@@ -141,7 +141,7 @@ public class FoundryRewriteTest extends TestBase {
     @Test
     public void testDefaultFoundryInjectPOSNoErrors ()
             throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[pos=ADJA]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
@@ -158,7 +158,7 @@ public class FoundryRewriteTest extends TestBase {
     @Test
     public void testFoundryInjectJoinedQueryNoErrors ()
             throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[orth=laufe/i & base!=Lauf]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
@@ -173,7 +173,7 @@ public class FoundryRewriteTest extends TestBase {
     @Test
     public void testFoundryInjectGroupedQueryNoErrors ()
             throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[(base=laufen | tt/pos=VVFIN)]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
@@ -187,7 +187,7 @@ public class FoundryRewriteTest extends TestBase {
 
     @Test
     public void testFoundryBaseRewrite () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[orth=laufen]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
