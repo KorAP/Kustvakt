@@ -57,7 +57,7 @@ public class ServiceInfo {
 
 //            this.krillVersion = (String) props.get("krill.version");
 
-            QuerySerializer s = new QuerySerializer();
+            QuerySerializer s = new QuerySerializer(1.1);
             this.koralVersion = s.getVersion();
         }
         catch (IOException e) {
