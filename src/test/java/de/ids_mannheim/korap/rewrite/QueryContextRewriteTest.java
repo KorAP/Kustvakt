@@ -47,7 +47,7 @@ public class QueryContextRewriteTest extends SpringJerseyTest {
 
     @Test
     public void testMetaRewrite () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery("Schnee within s", "poliqarp");
         
         MetaQueryBuilder meta = new MetaQueryBuilder();

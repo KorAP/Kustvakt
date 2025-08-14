@@ -39,7 +39,7 @@ public class InfoControllerTest extends SpringJerseyTest {
                 node.at("/kustvakt_version").asText());
         assertEquals(krill.getIndex().getVersion(),
                 node.at("/krill_version").asText());
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         assertEquals(s.getVersion(), node.at("/koral_version").asText());
     }
 }

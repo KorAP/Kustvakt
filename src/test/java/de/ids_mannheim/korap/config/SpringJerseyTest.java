@@ -25,6 +25,8 @@ public abstract class SpringJerseyTest extends JerseyTest {
 
     public final static String API_VERSION = "v1.1";
     public final static String API_VERSION_V1_0 = "v1.0";
+    
+    protected final static double API_VERSION_DOUBLE = Double.parseDouble(API_VERSION.substring(1));
 
     protected final static String allCorpusAccess = "All corpus access policy "
 			+ "has been added.";

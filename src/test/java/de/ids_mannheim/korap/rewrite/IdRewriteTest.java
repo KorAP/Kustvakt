@@ -30,7 +30,7 @@ public class IdRewriteTest extends SpringJerseyTest {
         RewriteHandler handler = new RewriteHandler(config);
         assertTrue(handler.add(IdWriter.class));
         String query = "[surface=Wort]";
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery(query, "poliqarp");
         String value = handler.processQuery(s.toJSON(), new KorAPUser());
         JsonNode result = JsonUtils.readTree(value);
@@ -42,7 +42,7 @@ public class IdRewriteTest extends SpringJerseyTest {
     public void testIdWriterTest () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         assertTrue(handler.add(IdWriter.class));
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery("[base=Haus]", "poliqarp");
         String result = handler.processQuery(s.toJSON(), new KorAPUser());
         JsonNode node = JsonUtils.readTree(result);

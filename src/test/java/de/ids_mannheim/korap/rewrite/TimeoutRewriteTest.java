@@ -32,7 +32,7 @@ public class TimeoutRewriteTest extends SpringJerseyTest {
         Map<String, Object> map = new HashMap<String,Object>();
         map.put("count", 25);
         map.put("timeout", 1000);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setMeta(map);
         String result = s.toJSON();
@@ -52,7 +52,7 @@ public class TimeoutRewriteTest extends SpringJerseyTest {
         Map<String, Object> map = new HashMap<String,Object>();
         map.put("count", 25);
         map.put("timeout", 50000);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setMeta(map);
         String result = s.toJSON();
@@ -71,7 +71,7 @@ public class TimeoutRewriteTest extends SpringJerseyTest {
         
         Map<String, Object> map = new HashMap<String,Object>();
         map.put("count", 25);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setMeta(map);
         String result = s.toJSON();

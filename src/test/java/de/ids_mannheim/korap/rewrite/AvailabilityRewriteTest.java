@@ -22,13 +22,15 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
 
     @Autowired
     public KustvaktConfiguration config;
+    
+    private double apiVersion = Double.parseDouble(API_VERSION.substring(1));
 
     @Test
     public void testCollectionNodeRemoveCorpusIdNoErrors ()
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("textClass=politik & corpusSigle=WPD");
         String result = s.toJSON();
@@ -46,7 +48,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("corpusSigle=BRZ13 & corpusSigle=WPD");
         String result = s.toJSON();
@@ -63,7 +65,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection(
                 "(corpusSigle=BRZ13 & textClass=Wissenschaft) & corpusSigle=WPD");
@@ -86,7 +88,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection(
                 "(corpusSigle=BRZ13 & corpusSigle=WPD) & textClass=Wissenschaft & textClass=Sport");
@@ -110,7 +112,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & textClass=wissenschaft)");
         String result = s.toJSON();
@@ -130,7 +132,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection(
                 "(corpusSigle=BRZ13 & corpusSigle=WPD) & textClass=Wissenschaft");
@@ -150,7 +152,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection(
                 "(docID=random & textClass=Wissenschaft) & corpusSigle=WPD");
@@ -173,7 +175,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(AvailabilityRewrite.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
@@ -192,7 +194,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(AvailabilityRewrite.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(docSigle=WPD_AAA & textClass=wissenschaft)");
         String org = s.toJSON();
@@ -219,7 +221,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection(
                 "(corpusSigle=BRZ14 & textClass=wissenschaft) | (corpusSigle=AZPR | textClass=freizeit)");
@@ -246,7 +248,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         handler.add(CollectionConstraint.class);
         // todo: use this collection query also to test clean up filter! after reduction of corpusSigle (wiss | freizeit)!
         handler.add(CollectionCleanRewrite.class);
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection(
                 "(corpusSigle=BRZ14 & textClass=wissenschaft) | (corpusSigle=AZPR | textClass=freizeit)");

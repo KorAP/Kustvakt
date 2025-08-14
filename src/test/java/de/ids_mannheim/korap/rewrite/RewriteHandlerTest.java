@@ -91,7 +91,7 @@ public class RewriteHandlerTest extends SpringJerseyTest {
     public void testRewriteConfigThrowsException () {
         assertThrows(RuntimeException.class, () -> {
             RewriteHandler handler = new RewriteHandler();
-            QuerySerializer s = new QuerySerializer();
+            QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
             s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]",
                     "poliqarp");
             assertTrue(handler.add(FoundryInject.class));
