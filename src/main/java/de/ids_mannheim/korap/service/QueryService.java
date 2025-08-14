@@ -223,23 +223,27 @@ public class QueryService extends BasicService {
     }
 
     public Status handlePutRequest (String username, String queryCreator,
-            String queryName, QueryJson queryJson) throws KustvaktException {
+            String queryName, QueryJson queryJson, double apiVersion) 
+            		throws KustvaktException {
 
         verifyUsername(username, queryCreator);
         QueryDO query = queryDao.retrieveQueryByName(queryName, queryCreator);
 
         if (query == null) {
-            storeQuery(queryJson, queryName, queryCreator, username);
+            storeQuery(queryJson, queryName, queryCreator, username, 
+            		apiVersion);
             return Status.CREATED;
         }
         else {
-            editQuery(query, queryJson, queryName, username);
+            editQuery(query, queryJson, queryName, username, 
+            		apiVersion);
             return Status.NO_CONTENT;
         }
     }
 
     public void editQuery (QueryDO existingQuery, QueryJson newQuery,
-            String queryName, String username) throws KustvaktException {
+            String queryName, String username, double apiVersion) 
+    		throws KustvaktException {
 
         if (!username.equals(existingQuery.getCreatedBy())
                 && !adminDao.isAdmin(username)) {
@@ -253,13 +257,13 @@ public class QueryService extends BasicService {
         String query = newQuery.getQuery();
         String queryLanguage = newQuery.getQueryLanguage();
         if (corpusQuery != null && !corpusQuery.isEmpty()) {
-            koralQuery = serializeCorpusQuery(corpusQuery);
+            koralQuery = serializeCorpusQuery(corpusQuery, apiVersion);
             requiredAccess = determineRequiredAccess(newQuery.isCached(),
                     queryName, koralQuery);
         }
         else if (query != null && !query.isEmpty() && queryLanguage != null
                 && !queryLanguage.isEmpty()) {
-            koralQuery = serializeQuery(query, queryLanguage);
+            koralQuery = serializeQuery(query, queryLanguage, apiVersion);
         }
 
         ResourceType type = newQuery.getType();
@@ -311,7 +315,8 @@ public class QueryService extends BasicService {
     }
 
     public void storeQuery (QueryJson query, String queryName,
-            String queryCreator, String username) throws KustvaktException {
+            String queryCreator, String username, double apiVersion) 
+            		throws KustvaktException {
         QueryType queryType = query.getQueryType();
         if (!checkNumberOfQueryLimit(username, queryType)) {
             String type = queryType.displayName().toLowerCase();
@@ -320,7 +325,7 @@ public class QueryService extends BasicService {
                             + type + " has been reached.");
         }
 
-        String koralQuery = computeKoralQuery(query);
+        String koralQuery = computeKoralQuery(query, apiVersion);
         storeQuery(username, queryName, query.getType(), query.getQueryType(),
                 koralQuery, query.getDefinition(), query.getDescription(),
                 query.getStatus(), query.isCached(), queryCreator,
@@ -336,19 +341,20 @@ public class QueryService extends BasicService {
             return false;
     }
 
-    private String computeKoralQuery (QueryJson query)
+    private String computeKoralQuery (QueryJson query, double apiVersion)
             throws KustvaktException {
         if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
             ParameterChecker.checkStringValue(query.getCorpusQuery(),
                     "corpusQuery");
-            return serializeCorpusQuery(query.getCorpusQuery());
+            return serializeCorpusQuery(query.getCorpusQuery(), apiVersion);
         }
 
         if (query.getQueryType().equals(QueryType.QUERY)) {
             ParameterChecker.checkStringValue(query.getQuery(), "query");
             ParameterChecker.checkStringValue(query.getQueryLanguage(),
                     "queryLanguage");
-            return serializeQuery(query.getQuery(), query.getQueryLanguage());
+            return serializeQuery(query.getQuery(), query.getQueryLanguage(), 
+            		apiVersion);
         }
 
         return null;
@@ -434,9 +440,9 @@ public class QueryService extends BasicService {
         }
     }
 
-    public String serializeCorpusQuery (String corpusQuery)
+    public String serializeCorpusQuery (String corpusQuery, double apiVersion)
             throws KustvaktException {
-        QuerySerializer serializer = new QuerySerializer();
+        QuerySerializer serializer = new QuerySerializer(apiVersion);
         serializer.setCollection(corpusQuery);
         String koralQuery;
         try {
@@ -452,9 +458,10 @@ public class QueryService extends BasicService {
         return koralQuery;
     }
 
-    private String serializeQuery (String query, String queryLanguage)
+    private String serializeQuery (String query, String queryLanguage, double 
+    		apiVersion)
             throws KustvaktException {
-        QuerySerializer serializer = new QuerySerializer();
+        QuerySerializer serializer = new QuerySerializer(apiVersion);
         String koralQuery;
         koralQuery = serializer.setQuery(query, queryLanguage).toJSON();
         if (DEBUG) {

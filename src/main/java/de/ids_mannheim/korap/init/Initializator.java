@@ -79,7 +79,7 @@ public class Initializator {
 		q.setQuery("[]");
 		q.setDescription("\"system\" query");
 		q.setQueryType(QueryType.QUERY);
-		queryService.handlePutRequest("system", "system", "system-q", q);
+		queryService.handlePutRequest("system", "system", "system-q", q, 1.1);
 	}
 
     public void initResourceTest () throws IOException, KustvaktException {

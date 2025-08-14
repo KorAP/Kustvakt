@@ -28,8 +28,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.SecurityContext;
@@ -83,10 +85,16 @@ public class QueryReferenceController {
     @Path("/~{qCreator}/{qName}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response createQuery (@Context SecurityContext securityContext,
+    		@Context ContainerRequestContext requestContext,
             @PathParam("qCreator") String qCreator,
             @PathParam("qName") String qName, QueryJson query)
             throws KustvaktException {
 
+    	List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double requestedVersion = Double.parseDouble(version.substring(1));
+        
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
 
@@ -97,7 +105,7 @@ public class QueryReferenceController {
                 query.setQueryType(QueryType.QUERY);
             }
             Status status = service.handlePutRequest(context.getUsername(),
-                    qCreator, qName, query);
+                    qCreator, qName, query, requestedVersion);
             return Response.status(status).build();
         }
         catch (KustvaktException e) {
