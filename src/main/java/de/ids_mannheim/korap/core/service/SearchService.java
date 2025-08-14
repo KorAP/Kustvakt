@@ -80,9 +80,10 @@ public class SearchService extends BasicService {
     @SuppressWarnings("unchecked")
     public String serializeQuery (String q, String ql, String v, String cq,
             Integer pageIndex, Integer startPage, Integer pageLength,
-            String context, Boolean cutoff, boolean accessRewriteDisabled)
+            String context, Boolean cutoff, boolean accessRewriteDisabled,
+            double apiVersion)
             throws KustvaktException {
-        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
+        QuerySerializer ss = new QuerySerializer(apiVersion).setQuery(q, ql, v);
         if (cq != null)
             ss.setCollection(cq);
 
@@ -125,7 +126,8 @@ public class SearchService extends BasicService {
     }
 
     @SuppressWarnings("unchecked")
-	public String search (String engine, String username, HttpHeaders headers,
+	public String search (double requestedVersion, String engine, 
+			String username, HttpHeaders headers,
 			String q, String ql, String v, List<String> cqList, String fields,
 			String pipes, String responsePipes, Integer pageIndex,
 			Integer pageInteger, String ctx, Integer pageLength, Boolean cutoff,
@@ -147,7 +149,7 @@ public class SearchService extends BasicService {
             user.setCorpusAccess(CorpusAccess.ALL);
         }
 
-        QuerySerializer serializer = new QuerySerializer();
+        QuerySerializer serializer = new QuerySerializer(requestedVersion);
         serializer.setQuery(q, ql, v);
         String cq = combineMultipleCorpusQuery(cqList);
         if (cq != null)

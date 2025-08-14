@@ -6,16 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response.Status;
-
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import jakarta.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -25,7 +21,10 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * @author hanl, margaretha
@@ -35,6 +34,8 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Autowired
     private FullConfiguration config;
+    
+    private double apiVersion = Double.parseDouble(API_VERSION.substring(1));
 
     private JsonNode requestSearchWithFields (String fields)
             throws KustvaktException {
@@ -49,7 +50,7 @@ public class SearchControllerTest extends SpringJerseyTest {
     }
 
     private String createJsonQuery () {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery("[orth=der]", "poliqarp");
         s.setCollection("corpusSigle=GOE");
         s.setQuery("Wasser", "poliqarp");
@@ -397,7 +398,7 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Disabled
     @Test
     public void testSearchSimpleCQL () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery("(der) or (das)", "CQL");
         Response response = target().path(API_VERSION).path("search").request()
                 .post(Entity.json(s.toJSON()));
