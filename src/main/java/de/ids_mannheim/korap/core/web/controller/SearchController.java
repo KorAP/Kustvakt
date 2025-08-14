@@ -38,9 +38,11 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
@@ -127,6 +129,7 @@ public class SearchController {
     //    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response serializeQuery (@Context Locale locale,
             @Context SecurityContext securityContext, @QueryParam("q") String q,
+            @Context ContainerRequestContext requestContext,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String context,
             @QueryParam("cutoff") Boolean cutoff,
@@ -135,12 +138,18 @@ public class SearchController {
             @QueryParam("page") Integer startPage,
             @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
             @QueryParam("cq") String cq) {
+    	
+    	List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
+        
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(ctx, OAuth2Scope.SERIALIZE_QUERY);
             String result = searchService.serializeQuery(q, ql, v, cq,
                     pageIndex, startPage, pageLength, context, cutoff,
-                    accessRewriteDisabled);
+                    accessRewriteDisabled, apiVersion);
             if (DEBUG) {
                 jlog.debug("Query: " + result);
             }
@@ -217,6 +226,7 @@ public class SearchController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     //@SearchResourceFilters
     public Response searchGet (@Context SecurityContext securityContext,
+    		@Context ContainerRequestContext requestContext,
             @Context HttpServletRequest request, @Context HttpHeaders headers,
             @Context Locale locale, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
@@ -234,13 +244,19 @@ public class SearchController {
             @QueryParam("cq") List<String> cq,
             @QueryParam("engine") String engine) {
 
+    	List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double requestedVersion = Double.parseDouble(version.substring(1));
+        
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
 
         String result;
         try {
             scopeService.verifyScope(context, OAuth2Scope.SEARCH);
-            result = searchService.search(engine, context.getUsername(),
+            result = searchService.search(requestedVersion, 
+            		engine, context.getUsername(),
                     headers, q, ql, v, cq, fields, pipes, responsePipes, 
                     pageIndex, pageInteger, ctx, pageLength, cutoff, 
                     accessRewriteDisabled, showTokens, showSnippet);

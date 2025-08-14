@@ -39,6 +39,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Autowired
     private KustvaktConfiguration config;
+    
+    private double apiVersion = Double.parseDouble(API_VERSION.substring(1));
+
 
     // EM: The API is disabled
     @Disabled
@@ -139,7 +142,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Test
     @Disabled
     public void testQueryPost () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery("[orth=das]", "poliqarp");
         Response response = target().path(API_VERSION).path("search").request()
                 .post(Entity.json(s.toJSON()));

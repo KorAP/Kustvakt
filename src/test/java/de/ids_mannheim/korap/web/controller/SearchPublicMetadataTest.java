@@ -22,6 +22,8 @@ import jakarta.ws.rs.core.Response.Status;
 
 public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
 
+	private double apiVersion = Double.parseDouble(API_VERSION.substring(1));
+
     @Test
     public void testSearchPublicMetadata () throws KustvaktException {
         Response response = target().path(API_VERSION).path("search")
@@ -92,7 +94,7 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
     @Disabled
     @Test
     public void testSearchPostPublicMetadata () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
+        QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery("[orth=der]", "poliqarp");
         s.setCollection("corpusSigle=GOE");
         s.setQuery("Wasser", "poliqarp");
