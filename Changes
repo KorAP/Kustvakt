@@ -8,6 +8,7 @@
 - Remove deprecated authorized_only parameter in the client list API for v1.1 (#760)
 - Add API version to the QueryService (#806)
 - Add API version to the search service (#806)
+- Add API version to ResourceParser & ServiceInfo (#806)
 
 # version 0.79
 

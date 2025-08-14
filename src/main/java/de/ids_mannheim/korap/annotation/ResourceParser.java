@@ -69,7 +69,7 @@ public class ResourceParser {
             if (requiredAccess.isEmpty()){
 				if (!corpusQuery.isEmpty()) {
 					String koralQuery = queryService
-							.serializeCorpusQuery(corpusQuery);
+							.serializeCorpusQuery(corpusQuery, 1.0);
 					// assume all vc are not cached and use the given koralQuery
 					// for cached-vc, the koralQuery should contain referTo
 					CorpusAccess access = queryService.determineRequiredAccess(
