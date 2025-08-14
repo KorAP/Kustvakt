@@ -36,8 +36,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.SecurityContext;
@@ -102,12 +104,18 @@ public class VirtualCorpusController {
     @Path("/~{vcCreator}/{vcName}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response createUpdateVC (@Context SecurityContext securityContext,
+    		@Context ContainerRequestContext requestContext,
             @PathParam("vcCreator") String vcCreator,
             @PathParam("vcName") String vcName, QueryJson vc)
             throws KustvaktException {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
-
+        
+        List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
+        
         try {
             scopeService.verifyScope(context, OAuth2Scope.CREATE_VC);
             ParameterChecker.checkObjectValue(vc, "request entity");
@@ -115,7 +123,7 @@ public class VirtualCorpusController {
                 vc.setQueryType(QueryType.VIRTUAL_CORPUS);
             }
             Status status = service.handlePutRequest(context.getUsername(),
-                    vcCreator, vcName, vc);
+                    vcCreator, vcName, vc, apiVersion);
             return Response.status(status).build();
         }
         catch (KustvaktException e) {
