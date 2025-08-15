@@ -130,14 +130,21 @@ public class QueryReferenceController {
             DemoUserFilter.class})
     public QueryDto retrieveQueryByName (
             @Context SecurityContext securityContext,
+            @Context ContainerRequestContext requestContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("qName") String qName) {
+    	
+    	List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
+        
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.retrieveQueryByName(context.getUsername(), qName,
-                    createdBy, QueryType.QUERY);
+                    createdBy, QueryType.QUERY, apiVersion);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -194,13 +201,19 @@ public class QueryReferenceController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<QueryDto> listAvailableQuery (
             @Context SecurityContext securityContext,
+            @Context ContainerRequestContext requestContext,
             @QueryParam("username") String username) {
+    	List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
+        
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             List<QueryDto> dtos = service.listAvailableQueryForUser(
-                    context.getUsername(), QueryType.QUERY);
+                    context.getUsername(), QueryType.QUERY, apiVersion);
             return dtos;
         }
         catch (KustvaktException e) {

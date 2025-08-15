@@ -51,9 +51,10 @@ public class BasicService {
         return user;
     }
     
-	protected String buildKoralQueryFromCorpusQuery (List<String> cqList)
-			throws KustvaktException {
-		KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+	protected String buildKoralQueryFromCorpusQuery (List<String> cqList,
+			double apiVersion) throws KustvaktException {
+		KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder(
+				apiVersion);
 		String cq = combineMultipleCorpusQuery(cqList);
 		String json = null;
 		if (cq != null && !cq.isEmpty()) {

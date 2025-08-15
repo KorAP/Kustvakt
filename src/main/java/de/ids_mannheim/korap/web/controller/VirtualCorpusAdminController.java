@@ -20,7 +20,10 @@ import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -66,11 +69,16 @@ public class VirtualCorpusAdminController {
     @Path("list")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public List<QueryDto> listVCByType (
+    		@Context ContainerRequestContext requestContext,
             @FormParam("createdBy") String createdBy,
             @FormParam("type") ResourceType type) {
+    	List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
         try {
             return service.listQueryByType(createdBy, type,
-                    QueryType.VIRTUAL_CORPUS);
+                    QueryType.VIRTUAL_CORPUS, apiVersion);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

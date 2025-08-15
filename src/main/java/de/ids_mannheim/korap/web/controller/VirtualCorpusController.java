@@ -150,14 +150,19 @@ public class VirtualCorpusController {
     @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
             DemoUserFilter.class})
     public QueryDto retrieveVCByName (@Context SecurityContext securityContext,
+    		@Context ContainerRequestContext requestContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("vcName") String vcName) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
+        List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.retrieveQueryByName(context.getUsername(), vcName,
-                    createdBy, QueryType.VIRTUAL_CORPUS);
+                    createdBy, QueryType.VIRTUAL_CORPUS, apiVersion);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -227,21 +232,27 @@ public class VirtualCorpusController {
      */
     @GET
     public List<QueryDto> listAvailableVC (
+    		@Context ContainerRequestContext requestContext,
             @Context SecurityContext securityContext,
             @QueryParam("filter-by") String filter) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
+        List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
 
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             if (filter != null && !filter.isEmpty()) {
                 filter = filter.toLowerCase();
                 if (filter.equals("system")) {
-                    return service.listSystemQuery(QueryType.VIRTUAL_CORPUS);
+                    return service.listSystemQuery(QueryType.VIRTUAL_CORPUS, 
+                    		apiVersion);
                 }
                 else if (filter.equals("own")) {
                     return service.listOwnerQuery(context.getUsername(),
-                            QueryType.VIRTUAL_CORPUS);
+                            QueryType.VIRTUAL_CORPUS, apiVersion);
                 }
                 else {
                     throw new KustvaktException(StatusCodes.UNSUPPORTED_VALUE,
@@ -250,7 +261,7 @@ public class VirtualCorpusController {
             }
             else {
                 return service.listAvailableQueryForUser(context.getUsername(),
-                        QueryType.VIRTUAL_CORPUS);
+                        QueryType.VIRTUAL_CORPUS, apiVersion);
             }
         }
         catch (KustvaktException e) {

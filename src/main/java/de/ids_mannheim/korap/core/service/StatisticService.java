@@ -18,9 +18,10 @@ public class StatisticService extends BasicService {
 	private RewriteHandler statisticsRewriteHandler;
 	
 	public String retrieveStatisticsForCorpusQuery (List<String> cqList,
-			String username, HttpHeaders headers) throws KustvaktException {
+			String username, HttpHeaders headers, double apiVersion) 
+					throws KustvaktException {
 
-		String json = buildKoralQueryFromCorpusQuery(cqList);
+		String json = buildKoralQueryFromCorpusQuery(cqList, apiVersion);
 		//System.out.println("Before:" + json + "\n");
 		if (!cqList.isEmpty() && !combineMultipleCorpusQuery(cqList).isEmpty()) {
 			User user = createUser(username, headers);
