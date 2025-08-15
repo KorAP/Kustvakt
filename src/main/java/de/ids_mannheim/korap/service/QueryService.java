@@ -110,37 +110,37 @@ public class QueryService extends BasicService {
         }
     }
 
-    public List<QueryDto> listOwnerQuery (String username, QueryType queryType)
-            throws KustvaktException {
+	public List<QueryDto> listOwnerQuery (String username, QueryType queryType,
+			double apiVersion) throws KustvaktException {
         List<QueryDO> list = queryDao.retrieveOwnerQuery(username, queryType);
-        return createQueryDtos(list, queryType);
+        return createQueryDtos(list, queryType, apiVersion);
     }
 
-    public List<QueryDto> listSystemQuery (QueryType queryType)
-            throws KustvaktException {
+	public List<QueryDto> listSystemQuery (QueryType queryType,
+			double apiVersion) throws KustvaktException {
         List<QueryDO> list = queryDao.retrieveQueryByType(ResourceType.SYSTEM,
                 null, queryType);
-        return createQueryDtos(list, queryType);
+        return createQueryDtos(list, queryType, apiVersion);
     }
 
     public List<QueryDto> listAvailableQueryForUser (String username,
-            QueryType queryType) throws KustvaktException {
+            QueryType queryType, double apiVersion) throws KustvaktException {
         List<QueryDO> list = queryDao.retrieveQueryByUser(username, queryType);
-        return createQueryDtos(list, queryType);
+        return createQueryDtos(list, queryType, apiVersion);
     }
 
     public List<QueryDto> listQueryByType (String createdBy, ResourceType type,
-            QueryType queryType) throws KustvaktException {
+            QueryType queryType, double apiVersion) throws KustvaktException {
 
         List<QueryDO> virtualCorpora = queryDao.retrieveQueryByType(type,
                 createdBy, queryType);
         Collections.sort(virtualCorpora);
-        return createQueryDtos(virtualCorpora, queryType);
+        return createQueryDtos(virtualCorpora, queryType, apiVersion);
 
     }
 
     private ArrayList<QueryDto> createQueryDtos (List<QueryDO> queryList,
-            QueryType queryType) throws KustvaktException {
+            QueryType queryType, double apiVersion) throws KustvaktException {
         ArrayList<QueryDto> dtos = new ArrayList<>(queryList.size());
         QueryDO query;
         Iterator<QueryDO> i = queryList.iterator();
@@ -259,7 +259,7 @@ public class QueryService extends BasicService {
         if (corpusQuery != null && !corpusQuery.isEmpty()) {
             koralQuery = serializeCorpusQuery(corpusQuery, apiVersion);
             requiredAccess = determineRequiredAccess(newQuery.isCached(),
-                    queryName, koralQuery);
+                    queryName, koralQuery, apiVersion);
         }
         else if (query != null && !query.isEmpty() && queryLanguage != null
                 && !queryLanguage.isEmpty()) {
@@ -329,7 +329,7 @@ public class QueryService extends BasicService {
         storeQuery(username, queryName, query.getType(), query.getQueryType(),
                 koralQuery, query.getDefinition(), query.getDescription(),
                 query.getStatus(), query.isCached(), queryCreator,
-                query.getQuery(), query.getQueryLanguage());
+                query.getQuery(), query.getQueryLanguage(), apiVersion);
     }
 
     private boolean checkNumberOfQueryLimit (String username,
@@ -364,17 +364,17 @@ public class QueryService extends BasicService {
             ResourceType type, QueryType queryType, String koralQuery,
             String definition, String description, String status,
             boolean isCached, String queryCreator, String query,
-            String queryLanguage) throws KustvaktException {
+            String queryLanguage, double apiVersion) throws KustvaktException {
         storeQuery(null, username, queryName, type, queryType, koralQuery,
                 definition, description, status, isCached, queryCreator, query,
-                queryLanguage);
+                queryLanguage, apiVersion);
     }
     
     public void storeQuery (QueryDO existingQuery, String username, String queryName,
             ResourceType type, QueryType queryType, String koralQuery,
             String definition, String description, String status,
             boolean isCached, String queryCreator, String query,
-            String queryLanguage) throws KustvaktException {
+            String queryLanguage, double apiVersion) throws KustvaktException {
         ParameterChecker.checkNameValue(queryName, "queryName");
         ParameterChecker.checkObjectValue(type, "type");
 
@@ -401,7 +401,7 @@ public class QueryService extends BasicService {
         CorpusAccess requiredAccess = CorpusAccess.FREE;
         if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
             requiredAccess = determineRequiredAccess(isCached, queryName,
-                    koralQuery);
+                    koralQuery, apiVersion);
         }
 
         if (DEBUG) {
@@ -472,10 +472,11 @@ public class QueryService extends BasicService {
     }
 
     public CorpusAccess determineRequiredAccess (boolean isCached, String name,
-            String koralQuery) throws KustvaktException {
+            String koralQuery, double apiVersion) throws KustvaktException {
 
         if (isCached) {
-            KoralCollectionQueryBuilder koral = new KoralCollectionQueryBuilder();
+            KoralCollectionQueryBuilder koral = 
+            		new KoralCollectionQueryBuilder(apiVersion);
             koral.with("referTo " + name);
             koralQuery = koral.toJSON();
             if (DEBUG) {
@@ -484,20 +485,23 @@ public class QueryService extends BasicService {
 
         }
 
-        if (findDocWithLicense(koralQuery, config.getAllOnlyRegex())) {
-            return CorpusAccess.ALL;
-        }
-        else if (findDocWithLicense(koralQuery, config.getPublicOnlyRegex())) {
-            return CorpusAccess.PUB;
+		if (findDocWithLicense(koralQuery, config.getAllOnlyRegex(),
+				apiVersion)) {
+			return CorpusAccess.ALL;
+		}
+		else if (findDocWithLicense(koralQuery, config.getPublicOnlyRegex(),
+				apiVersion)) {
+			return CorpusAccess.PUB;
         }
         else {
             return CorpusAccess.FREE;
         }
     }
 
-    private boolean findDocWithLicense (String koralQuery, String license)
-            throws KustvaktException {
-        KoralCollectionQueryBuilder koral = new KoralCollectionQueryBuilder();
+    private boolean findDocWithLicense (String koralQuery, String license, 
+    		double apiVersion) throws KustvaktException {
+        KoralCollectionQueryBuilder koral = 
+        		new KoralCollectionQueryBuilder(apiVersion);
         koral.setBaseQuery(koralQuery);
         koral.with("availability=/" + license + "/");
         String json = koral.toJSON();
@@ -721,7 +725,8 @@ public class QueryService extends BasicService {
     }
 
 	public QueryDto retrieveQueryByName (String username, String queryName,
-            String createdBy, QueryType queryType) throws KustvaktException {
+            String createdBy, QueryType queryType, double apiVersion) 
+            		throws KustvaktException {
         QueryDO query = searchQueryByName(username, queryName, createdBy,
                 queryType);
 
@@ -731,7 +736,7 @@ public class QueryService extends BasicService {
 			if (query.isCached()) {
 				List<String> cqList = new ArrayList<>(1);
 				cqList.add("referTo " + query.getName());
-				json = buildKoralQueryFromCorpusQuery(cqList);
+				json = buildKoralQueryFromCorpusQuery(cqList, apiVersion);
 			}
 			else { 
 				json = query.getKoralQuery();

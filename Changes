@@ -10,6 +10,7 @@
 - Add API version to the search service (#806)
 - Add API version to ResourceParser & ServiceInfo (#806)
 - Update Query QuerySerializer with API version in the test suite (#806)
+- Add API version to KoralCollectionQueryBuilder (#806)
 
 # version 0.79.1
 

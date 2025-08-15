@@ -22,9 +22,11 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
@@ -70,16 +72,22 @@ public class StatisticController {
      */
 	@GET
 	public Response getStatistics (@Context SecurityContext securityContext,
+			@Context ContainerRequestContext requestContext,
 			@Context Locale locale, @Context HttpHeaders headers,
 			@QueryParam("cq") List<String> cq) {
 
+		List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
+        
 		TokenContext context = (TokenContext) securityContext
 				.getUserPrincipal();
 
         String stats;
         try {
 			stats = service.retrieveStatisticsForCorpusQuery(cq,
-					context.getUsername(), headers);
+					context.getUsername(), headers, apiVersion);
             if (DEBUG) {
                 jlog.debug("Stats: " + stats);
             }

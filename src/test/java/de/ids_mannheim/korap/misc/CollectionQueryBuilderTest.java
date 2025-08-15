@@ -20,7 +20,7 @@ public class CollectionQueryBuilderTest {
 	
     @Test
     public void testsimpleAdd () throws KustvaktException {
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.with("corpusSigle=WPD");
         JsonNode node = JsonUtils.readTree(b.toJSON());
         assertNotNull(node);
@@ -30,7 +30,7 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testSimpleConjunction () throws KustvaktException {
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.with("corpusSigle=WPD & textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
         assertNotNull(node);
@@ -45,7 +45,7 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testSimpleDisjunction () throws KustvaktException {
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.with("corpusSigle=WPD | textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
         assertNotNull(node);
@@ -58,7 +58,7 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testComplexSubQuery () throws KustvaktException {
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.with("(corpusSigle=WPD) | (textClass=freizeit & corpusSigle=BRZ13)");
         JsonNode node = JsonUtils.readTree(b.toJSON());
         assertNotNull(node);
@@ -71,9 +71,9 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testAddResourceQueryAfter () throws KustvaktException {
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.with("(textClass=politik & title=\"random title\") | textClass=wissenschaft");
-        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder(apiVersion);
         c.setBaseQuery(b.toJSON());
         c.with("corpusSigle=WPD");
         JsonNode node = JsonUtils.readTree(c.toJSON());
@@ -97,9 +97,9 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testAddComplexResourceQueryAfter () throws KustvaktException {
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.with("(title=\"random title\") | (textClass=wissenschaft)");
-        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder(apiVersion);
         c.setBaseQuery(b.toJSON());
         c.with("(corpusSigle=BRZ13 | corpusSigle=AZPS)");
         JsonNode node = JsonUtils.readTree(c.toJSON());
@@ -125,7 +125,7 @@ public class CollectionQueryBuilderTest {
         QuerySerializer check = new QuerySerializer(apiVersion);
         check.setQuery(query, "poliqarp");
         check.setCollection(coll);
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.setBaseQuery(check.toJSON());
         b.with("textClass=freizeit");
         JsonNode res = (JsonNode) b.rebaseCollection();
@@ -152,9 +152,9 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testBaseQueryBuild () throws KustvaktException {
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.with("(corpusSigle=ADF) | (textClass=freizeit & corpusSigle=WPD)");
-        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder(apiVersion);
         c.setBaseQuery(b.toJSON());
         c.with("corpusSigle=BRZ13");
         JsonNode base = (JsonNode) c.rebaseCollection();
@@ -175,9 +175,9 @@ public class CollectionQueryBuilderTest {
         QuerySerializer check = new QuerySerializer(apiVersion);
         check.setQuery(query, "poliqarp");
         check.setCollection(coll);
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.setBaseQuery(check.toJSON());
-        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder(apiVersion);
         test.with("textClass=wissenschaft | textClass=politik");
         JsonNode node = (JsonNode) test.rebaseCollection();
         node = b.mergeWith(node);
@@ -193,9 +193,9 @@ public class CollectionQueryBuilderTest {
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer(apiVersion);
         check.setQuery(query, "poliqarp");
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.setBaseQuery(check.toJSON());
-        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder(apiVersion);
         test.with("corpusSigle=WPD");
         // String json = test.toJSON();
         // System.out.println(json);
@@ -212,9 +212,9 @@ public class CollectionQueryBuilderTest {
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer(apiVersion);
         check.setQuery(query, "poliqarp");
-        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder(apiVersion);
         b.setBaseQuery(check.toJSON());
-        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder(apiVersion);
         // operator is not supposed to be here!
         test.and().with("corpusSigle=WPD");
         // String json = test.toJSON();
@@ -236,7 +236,7 @@ public class CollectionQueryBuilderTest {
         QuerySerializer check = new QuerySerializer(apiVersion);
         check.setQuery(query, "poliqarp");
         check.setCollection(coll);
-        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder(apiVersion);
         test.setBaseQuery(check.toJSON());
         test.or().with("textClass=wissenschaft | textClass=politik");
         JsonNode node = (JsonNode) test.rebaseCollection();
@@ -253,7 +253,7 @@ public class CollectionQueryBuilderTest {
         QuerySerializer check = new QuerySerializer(apiVersion);
         check.setQuery(query, "poliqarp");
         check.setCollection(coll);
-        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder(apiVersion);
         test.setBaseQuery(check.toJSON());
         test.and().with("textClass=wissenschaft | textClass=politik");
         JsonNode node = (JsonNode) test.rebaseCollection();
@@ -271,7 +271,7 @@ public class CollectionQueryBuilderTest {
         QuerySerializer check = new QuerySerializer(apiVersion);
         check.setQuery(query, "poliqarp");
         check.setCollection(coll);
-        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder(apiVersion);
         test.setBaseQuery(check.toJSON());
         test.with("textClass=wissenschaft | textClass=politik");
         JsonNode node = (JsonNode) test.rebaseCollection();
@@ -287,9 +287,9 @@ public class CollectionQueryBuilderTest {
         // base is missing collection segment
         QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery("[base=Haus]", "poliqarp");
-        KoralCollectionQueryBuilder total = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder total = new KoralCollectionQueryBuilder(apiVersion);
         total.setBaseQuery(s.toJSON());
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder(apiVersion);
         builder.with("textClass=politik & corpusSigle=WPD");
         JsonNode node = total.and()
                 .mergeWith((JsonNode) builder.rebaseCollection());
@@ -313,9 +313,11 @@ public class CollectionQueryBuilderTest {
         QuerySerializer s = new QuerySerializer(apiVersion);
         s.setQuery("[base=Haus]", "poliqarp");
         s.setCollection("textClass=wissenschaft");
-        KoralCollectionQueryBuilder total = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder total = 
+        		new KoralCollectionQueryBuilder(apiVersion);
         total.setBaseQuery(s.toJSON());
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder builder = 
+        		new KoralCollectionQueryBuilder(apiVersion);
         JsonNode node = total.and()
                 .mergeWith((JsonNode) builder.rebaseCollection());
         assertNotNull(node);

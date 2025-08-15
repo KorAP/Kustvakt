@@ -30,16 +30,18 @@ public class KoralCollectionQueryBuilder {
     private JsonNode base;
     private StringBuilder builder;
     private String mergeOperator;
+    private double apiVersion;
 
-    public KoralCollectionQueryBuilder () {
-        this(false);
+    public KoralCollectionQueryBuilder (double apiVersion) {
+        this(false, apiVersion);
     }
 
-    public KoralCollectionQueryBuilder (boolean verbose) {
+    public KoralCollectionQueryBuilder (boolean verbose, double apiVersion) {
         this.verbose = verbose;
         this.builder = new StringBuilder();
         this.base = null;
         this.mergeOperator = null;
+        this.apiVersion = apiVersion;
     }
 
     /**
@@ -102,7 +104,7 @@ public class KoralCollectionQueryBuilder {
         JsonNode request = null;
         if (this.builder.length() != 0) {
             CollectionQueryProcessor tree = new CollectionQueryProcessor(
-                    this.verbose);
+                    this.verbose, apiVersion);
             tree.process(this.builder.toString());
             if (tree.getErrors().size() > 0) {
                 // legacy support
@@ -143,11 +145,14 @@ public class KoralCollectionQueryBuilder {
     }
 
     public JsonNode mergeWith (JsonNode node) {
+    	String nodeName = (apiVersion >= 1.1) ? "corpus"
+				: "collection";
+    	
         if (this.base != null) {
             if (node != null) {
-                JsonNode tobase = node.at("/collection");
+                JsonNode tobase = node.at("/"+nodeName);
                 JsonNode base = this.base.deepCopy();
-                JsonNode result = base.at("/collection");
+                JsonNode result = base.at("/"+nodeName);
 
                 if (result.isMissingNode() && !tobase.isMissingNode())
                     result = tobase;
@@ -159,7 +164,7 @@ public class KoralCollectionQueryBuilder {
                                     ? this.mergeOperator.toLowerCase()
                                     : "and", result, tobase);
                 }
-                ((ObjectNode) base).put("collection", result);
+                ((ObjectNode) base).put(nodeName, result);
                 return base;
             }
             return this.base;
