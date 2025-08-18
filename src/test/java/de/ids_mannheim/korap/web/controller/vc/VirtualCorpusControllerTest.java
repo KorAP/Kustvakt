@@ -444,30 +444,31 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             throws ProcessingException, KustvaktException {
     	createDoryVC();
         JsonNode node = testRetrieveKoralQuery("dory", "dory-vc");
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals("operation:and",
-            node.at("/collection/operation").asText());
-        assertEquals(2, node.at("/collection/operands").size());
+        node = node.at("/corpus");
+        assertEquals("koral:docGroup", node.at("/@type").asText());
+        assertEquals(
+                "operation:and",node.at("/operation").asText());
+        assertEquals(2, node.at("/operands").size());
         String json = "{\"corpusQuery\": \"corpusSigle=WPD17\"}";
         editVC("dory", "dory", "dory-vc", json);
+        
         node = testRetrieveKoralQuery("dory", "dory-vc");
-        assertEquals("koral:doc", node.at("/collection/@type").asText());
-        assertEquals("corpusSigle", node.at("/collection/key").asText());
-        assertEquals("WPD17", node.at("/collection/value").asText());
+        node = node.at("/corpus");
+        assertEquals("koral:doc",node.at("/@type").asText());
+        assertEquals("corpusSigle",node.at("/key").asText());
+        assertEquals("WPD17",node.at("/value").asText());
         
         json = "{\"corpusQuery\": \"corpusSigle=GOE AND creationDate since "
                 + "1820\"}";
         editVC("dory", "dory", "dory-vc", json);
         node = testRetrieveKoralQuery("dory", "dory-vc");
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals("operation:and",
-            node.at("/collection/operation").asText());
-        assertEquals("corpusSigle",
-            node.at("/collection/operands/0/key").asText());
-        assertEquals("GOE", node.at("/collection/operands/0/value").asText());
-        assertEquals("creationDate",
-            node.at("/collection/operands/1/key").asText());
-        assertEquals("1820", node.at("/collection/operands/1/value").asText());
+        node = node.at("/corpus");
+        assertEquals("koral:docGroup", node.at("/@type").asText());
+        assertEquals("operation:and", node.at("/operation").asText());
+        assertEquals("corpusSigle",node.at("/operands/0/key").asText());
+        assertEquals("GOE",node.at("/operands/0/value").asText());
+        assertEquals("creationDate", node.at("/operands/1/key").asText());
+        assertEquals("1820", node.at("/operands/1/value").asText());
         
         deleteVC("dory-vc", "dory", "dory");
     }

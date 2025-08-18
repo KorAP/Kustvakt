@@ -140,7 +140,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals(302, node.at("/errors/0/0").asInt());
         assertEquals(302, node.at("/errors/1/0").asInt());
         assertTrue(node.at("/errors/2").isMissingNode());
-        assertFalse(node.at("/collection").isMissingNode());
+        assertFalse(node.at("/corpus").isMissingNode());
         assertEquals(13, node.at("/meta/count").asInt());
     }
 

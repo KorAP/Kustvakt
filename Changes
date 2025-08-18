@@ -13,6 +13,7 @@
 - Add API version to KoralCollectionQueryBuilder (#806)
 - Clean up collection node from Krill response (#806)
 - Add API version to NamedVCLoader (#806)
+- Add corpus support at VirtualCorpusRewrite (#806)
 
 # version 0.79.1
 

@@ -32,7 +32,12 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
-        if (node.has("collection")) {
+    	if (node.has("corpus")) {
+            node = node.at("/corpus");
+            findVCRef(user.getUsername(), node);
+        }
+    	// EM: legacy
+    	else if (node.has("collection")) {
             node = node.at("/collection");
             findVCRef(user.getUsername(), node);
         }
@@ -106,8 +111,14 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
     protected void rewriteVC (QueryDO vc, KoralNode koralNode)
             throws KustvaktException {
         String koralQuery = vc.getKoralQuery();
-        JsonNode newKoralQuery = JsonUtils.readTree(koralQuery).at("/collection");
-        
+        JsonNode queryNode = JsonUtils.readTree(koralQuery);
+        JsonNode newKoralQuery;
+        if (queryNode.has("collection")) {
+        	newKoralQuery = JsonUtils.readTree(koralQuery).at("/collection");
+        }
+        else {
+        	newKoralQuery = JsonUtils.readTree(koralQuery).at("/corpus");
+        }
         String source = koralNode.rawNode().toString();
         JsonNode sourceNode = JsonUtils.readTree(source);
         
