@@ -13,6 +13,8 @@ import de.ids_mannheim.korap.user.User;
  * EM: not used anymore. This rewrite was to remove an empty koral:doc
  * group in operands.
  * 
+ * EM: legacy "collection" term should be replaced with "corpus".
+ * 
  * @author hanl
  * @date 28/07/2015
  */

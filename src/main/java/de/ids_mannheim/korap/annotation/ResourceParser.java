@@ -44,6 +44,8 @@ public class ResourceParser {
     public static String RESOURCE_FILE = "resources.json";
     public static ObjectMapper mapper = new ObjectMapper();
 
+    private double apiVersion = 1.0;
+    
     public void run () throws IOException, KustvaktException {
         InputStream is = null;
         File f = new File("data/"+RESOURCE_FILE);
@@ -69,11 +71,11 @@ public class ResourceParser {
             if (requiredAccess.isEmpty()){
 				if (!corpusQuery.isEmpty()) {
 					String koralQuery = queryService
-							.serializeCorpusQuery(corpusQuery, 1.0);
+							.serializeCorpusQuery(corpusQuery, apiVersion);
 					// assume all vc are not cached and use the given koralQuery
 					// for cached-vc, the koralQuery should contain referTo
 					CorpusAccess access = queryService.determineRequiredAccess(
-							false, resourceId, koralQuery);
+							false, resourceId, koralQuery, apiVersion);
 					requiredAccess = access.name();
 				}
             }

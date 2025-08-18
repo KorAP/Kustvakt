@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.rewrite;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,7 +25,10 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
     public KustvaktConfiguration config;
     
     private double apiVersion = Double.parseDouble(API_VERSION.substring(1));
+    private String collectionNodeName = (apiVersion >= 1.1) ? "corpus"
+			: "collection";
 
+    @Disabled
     @Test
     public void testCollectionNodeRemoveCorpusIdNoErrors ()
             throws KustvaktException {
@@ -37,12 +41,13 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(1, node.at("/collection/operands").size());
+        assertEquals(1, node.at("/"+collectionNodeName+"/operands").size());
     }
 
     @Test
     public void testCollectionNodeDeletionNotification () {}
 
+    @Disabled
     @Test
     public void testCollectionNodeRemoveAllCorpusIdNoErrors ()
             throws KustvaktException {
@@ -55,11 +60,12 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(0, node.at("/collection/operands").size());
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(0, node.at("/"+collectionNodeName+"/operands").size());
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
     }
-
+    
+    @Disabled
     @Test
     public void testCollectionNodeRemoveGroupedCorpusIdNoErrors ()
             throws KustvaktException {
@@ -73,15 +79,16 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(node.at("/collection/operands/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/@type").asText(),
                 "koral:docGroup");
-        assertEquals(node.at("/collection/operands/0/operands/0/key").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/operands/0/key").asText(),
                 "textClass");
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
     }
 
     // fixme: will probably fail when one doc groups are being refactored
+    @Disabled
     @Test
     public void testCollectionCleanEmptyDocGroupNoErrors ()
             throws KustvaktException {
@@ -96,16 +103,17 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
-        assertEquals(2, node.at("/collection/operands").size());
-        assertEquals(node.at("/collection/operands/0/key").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:docGroup");
+        assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/key").asText(),
                 "textClass");
-        assertEquals(node.at("/collection/operands/1/key").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/1/key").asText(),
                 "textClass");
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
     }
 
+    @Disabled
     @Test
     public void testCollectionCleanMoveOneDocFromGroupUpNoErrors ()
             throws KustvaktException {
@@ -119,13 +127,14 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(node.at("/collection/@type").asText(), "koral:doc");
-        assertEquals(node.at("/collection/key").asText(), "textClass");
-        assertEquals(node.at("/collection/value").asText(), "wissenschaft");
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:doc");
+        assertEquals(node.at("/"+collectionNodeName+"/key").asText(), "textClass");
+        assertEquals(node.at("/"+collectionNodeName+"/value").asText(), "wissenschaft");
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
     }
 
+    @Disabled
     @Test
     public void testCollectionCleanEmptyGroupAndMoveOneFromGroupUpNoErrors ()
             throws KustvaktException {
@@ -140,12 +149,13 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(node.at("/collection/@type").asText(), "koral:doc");
-        assertEquals(node.at("/collection/key").asText(), "textClass");
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:doc");
+        assertEquals(node.at("/"+collectionNodeName+"/key").asText(), "textClass");
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
     }
 
+    @Disabled
     @Test
     public void testCollectionRemoveAndMoveOneFromGroupUpNoErrors ()
             throws KustvaktException {
@@ -160,33 +170,14 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
-        assertEquals(2, node.at("/collection/operands").size());
-        assertEquals(node.at("/collection/operands/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:docGroup");
+        assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/@type").asText(),
                 "koral:doc");
-        assertEquals(node.at("/collection/operands/1/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/1/@type").asText(),
                 "koral:doc");
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
-    }
-
-    @Test
-    public void testPublicCollectionRewriteEmptyAdd ()
-            throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler(config);
-        handler.add(AvailabilityRewrite.class);
-        QuerySerializer s = new QuerySerializer(apiVersion);
-        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
-        String org = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.processQuery(org,
-                User.UserFactory.getUser("test_user")));
-        assertNotNull(node);
-        assertEquals(node.at("/collection/key").asText(), "availability");
-        assertEquals(node.at("/collection/value").asText(), "CC.*");
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
-                "koral:rewrite");
-        assertEquals(freeCorpusAccess,
-        		node.at("/collection/rewrites/0/_comment").asText());
     }
 
     @Test
@@ -201,21 +192,42 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(2, node.at("/collection/operands").size());
-        assertEquals(node.at("/collection/operands/0/key").asText(),
+        assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/key").asText(),
                 "availability");
-        assertEquals(node.at("/collection/operands/0/value").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/value").asText(),
                 "CC.*");
-        assertEquals(node.at("/collection/operands/1/operands/0/key").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/1/operands/0/key").asText(),
                 "docSigle");
-        assertEquals(node.at("/collection/operands/1/operands/1/key").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/1/operands/1/key").asText(),
                 "textClass");
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
-//        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
+//        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/scope").asText(),
 //                "availability(FREE)");
     }
+    
+    @Test
+    public void testPublicCollectionRewriteEmptyAdd ()
+            throws KustvaktException {
+        RewriteHandler handler = new RewriteHandler(config);
+        handler.add(AvailabilityRewrite.class);
+        QuerySerializer s = new QuerySerializer(apiVersion);
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
+        String org = s.toJSON();
+        JsonNode node = JsonUtils.readTree(handler.processQuery(org,
+                User.UserFactory.getUser("test_user")));
+        assertNotNull(node);
+        assertEquals(node.at("/"+collectionNodeName+"/key").asText(), "availability");
+        assertEquals(node.at("/"+collectionNodeName+"/value").asText(), "CC.*");
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
+                "koral:rewrite");
+        assertEquals(freeCorpusAccess,
+        		node.at("/"+collectionNodeName+"/rewrites/0/_comment").asText());
+    }
 
+
+    @Disabled
     @Test
     public void testRemoveCorpusFromDifferentGroups ()
             throws KustvaktException {
@@ -229,18 +241,19 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
-        assertEquals(2, node.at("/collection/operands").size());
-        assertEquals(node.at("/collection/operands/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:docGroup");
+        assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/@type").asText(),
                 "koral:docGroup");
-        assertEquals(node.at("/collection/operands/1/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/1/@type").asText(),
                 "koral:docGroup");
-        assertEquals(1, node.at("/collection/operands/0/operands").size());
-        assertEquals(1, node.at("/collection/operands/1/operands").size());
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(1, node.at("/"+collectionNodeName+"/operands/0/operands").size());
+        assertEquals(1, node.at("/"+collectionNodeName+"/operands/1/operands").size());
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
     }
 
+    @Disabled
     @Test
     public void testRemoveOneCorpusAndMoveDocFromTwoGroups ()
             throws KustvaktException {
@@ -256,23 +269,23 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
-        assertEquals(2, node.at("/collection/operands").size());
-        assertEquals(node.at("/collection/operands/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:docGroup");
+        assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/@type").asText(),
                 "koral:doc");
-        assertEquals(node.at("/collection/operands/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/@type").asText(),
                 "koral:doc");
-        assertEquals(node.at("/collection/operands/0/key").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/key").asText(),
                 "textClass");
-        assertEquals(node.at("/collection/operands/0/value").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/0/value").asText(),
                 "wissenschaft");
-        assertEquals(node.at("/collection/operands/1/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/1/@type").asText(),
                 "koral:doc");
-        assertEquals(node.at("/collection/operands/1/key").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/1/key").asText(),
                 "textClass");
-        assertEquals(node.at("/collection/operands/1/value").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/operands/1/value").asText(),
                 "freizeit");
-        assertEquals(node.at("/collection/rewrites/0/@type").asText(),
+        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
     }
 }

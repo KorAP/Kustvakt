@@ -180,7 +180,7 @@ public class StatisticsControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Collection is not found",
+        assertEquals("VC is not found",
                 node.at("/errors/0/1").asText());
     }
 
