@@ -44,6 +44,8 @@ public class Initializator {
     private OAuth2InitClientService clientService;
     @Autowired
     private QueryService queryService;
+    
+    private double apiVersion = 1.1;
 
     public Initializator () {}
 
@@ -58,6 +60,7 @@ public class Initializator {
                     OAuth2InitClientService.OUTPUT_FILENAME);
         }
 
+        vcLoader.apiVersion = apiVersion;
         Thread t = new Thread(vcLoader);
         t.start();
     }
@@ -70,6 +73,7 @@ public class Initializator {
 		if (config.createInitialSuperClient()) {
 			clientService.createInitialTestSuperClient();
 		}
+		vcLoader.apiVersion = apiVersion;
 		vcLoader.loadVCToCache("system-vc", "/vc/system-vc.jsonld");
 		adminDao.addAccount(new KorAPUser("admin"));
 		
@@ -79,7 +83,8 @@ public class Initializator {
 		q.setQuery("[]");
 		q.setDescription("\"system\" query");
 		q.setQueryType(QueryType.QUERY);
-		queryService.handlePutRequest("system", "system", "system-q", q, 1.1);
+		queryService.handlePutRequest("system", "system", "system-q", q, 
+				apiVersion);
 	}
 
     public void initResourceTest () throws IOException, KustvaktException {
