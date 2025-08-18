@@ -126,7 +126,7 @@ public class SearchService extends BasicService {
     }
 
     @SuppressWarnings("unchecked")
-	public String search (double requestedVersion, String engine, 
+	public String search (double apiVersion, String engine, 
 			String username, HttpHeaders headers,
 			String q, String ql, String v, List<String> cqList, String fields,
 			String pipes, String responsePipes, Integer pageIndex,
@@ -149,7 +149,7 @@ public class SearchService extends BasicService {
             user.setCorpusAccess(CorpusAccess.ALL);
         }
 
-        QuerySerializer serializer = new QuerySerializer(requestedVersion);
+        QuerySerializer serializer = new QuerySerializer(apiVersion);
         serializer.setQuery(q, ql, v);
         String cq = combineMultipleCorpusQuery(cqList);
         if (cq != null)
@@ -170,7 +170,6 @@ public class SearchService extends BasicService {
         }
 
         String query = serializer.toJSON();
-
         if (accessRewriteDisabled && showTokens) {
             query = addWarning(query, StatusCodes.NOT_ALLOWED,
                     "Tokens cannot be shown without access.");
@@ -189,7 +188,7 @@ public class SearchService extends BasicService {
         if (config.isTotalResultCacheEnabled() && !hasCutOff) {
             query = precheckTotalResultCache(hashedKoralQuery, query);
         }
-
+        
         KustvaktConfiguration.BACKENDS searchEngine = this.config
                 .chooseBackend(engine);
         String result;
@@ -212,11 +211,26 @@ public class SearchService extends BasicService {
             result = removeCutOff(result);
         }
         
+        checkApiVersion(result, apiVersion);
+        
         // Response pipe rewrite
         result = runPipes(result, responsePipes);
         return result;
 
     }
+    
+    private String checkApiVersion (String result, double apiVersion) 
+    		throws KustvaktException {
+    	ObjectNode resultNode = (ObjectNode) JsonUtils.readTree(result);
+    	if (apiVersion >=1.1) {
+    		resultNode.remove("collection");
+    	}
+    	else {
+    		resultNode.remove("corpus");
+            // add API deprecation warning ?
+    	}
+        return resultNode.toString();
+	}
     
     private String removeCutOff (String result) throws KustvaktException {
         ObjectNode resultNode = (ObjectNode) JsonUtils.readTree(result);
