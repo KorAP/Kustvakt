@@ -12,6 +12,7 @@
 - Update Query QuerySerializer with API version in the test suite (#806)
 - Add API version to KoralCollectionQueryBuilder (#806)
 - Clean up collection node from Krill response (#806)
+- Add API version to NamedVCLoader (#806)
 
 # version 0.79
 

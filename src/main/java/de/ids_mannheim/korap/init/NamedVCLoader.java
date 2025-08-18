@@ -54,6 +54,8 @@ public class NamedVCLoader implements Runnable {
 
     public static Logger jlog = LogManager.getLogger(NamedVCLoader.class);
     public static boolean DEBUG = false;
+    
+    public double apiVersion;
 
     @Override
     public void run () {
@@ -69,11 +71,11 @@ public class NamedVCLoader implements Runnable {
         }
     }
 
-    public void loadVCToCache (String filename, String filePath)
-            throws IOException, QueryException, KustvaktException {
-        loadVCToCache(filename,filePath,null);
-    }
-    
+	public void loadVCToCache (String filename, String filePath)
+			throws IOException, QueryException, KustvaktException {
+		loadVCToCache(filename, filePath, null);
+	}
+
     /**
      * Used for testing
      * 
@@ -83,14 +85,14 @@ public class NamedVCLoader implements Runnable {
      * @throws QueryException
      * @throws KustvaktException
      */
-    public void loadVCToCache (String filename, String filePath, String json)
-            throws IOException, QueryException {
+    public void loadVCToCache (String filename, String filePath, String json) 
+    		throws IOException, QueryException {
 
         if (json==null || json.isEmpty()) {
             InputStream is = NamedVCLoader.class.getResourceAsStream(filePath);
             json = IOUtils.toString(is, "utf-8");
         }
-        processVC(filename, json);
+        processVC(filename, json, apiVersion);
     }
 
     public void loadVCToCache () throws IOException, QueryException {
@@ -116,7 +118,7 @@ public class NamedVCLoader implements Runnable {
             filename = strArr[0];
             String json = strArr[1];
             if (json != null) {
-                processVC(filename, json);
+                processVC(filename, json, this.apiVersion);
             }
         }
     }
@@ -142,7 +144,7 @@ public class NamedVCLoader implements Runnable {
      * @throws IOException
      * @throws QueryException
      */
-    private void processVC (String vcId, String json)
+    private void processVC (String vcId, String json, double apiVersion)
             throws IOException, QueryException {
         boolean updateCache = false;
         try {
@@ -155,13 +157,13 @@ public class NamedVCLoader implements Runnable {
             if (json.hashCode() != koralQuery.hashCode()) {
                 updateCache = true;
                 // updateVCinDB
-                storeVCinDB(vcId, json, existingVC);
+                storeVCinDB(vcId, json, existingVC, apiVersion);
             }
         }
         catch (KustvaktException e) {
             // VC doesn't exist in the DB
             if (e.getStatusCode() == StatusCodes.NO_RESOURCE_FOUND) {
-                storeVCinDB(vcId, json, null);
+                storeVCinDB(vcId, json, null, apiVersion);
             }
             else {
                 throw new RuntimeException(e);
@@ -244,14 +246,15 @@ public class NamedVCLoader implements Runnable {
      * @param vcId
      * @param koralQuery
      */
-    private void storeVCinDB (String vcId, String koralQuery, QueryDO existingVC) {
+    private void storeVCinDB (String vcId, String koralQuery, 
+    		QueryDO existingVC, double apiVersion) {
         try {
             String info = (existingVC == null) ? "Storing" : "Updating";
             jlog.info("{} {} in the database ", info, vcId);
             
             vcService.storeQuery(existingVC, "system", vcId, ResourceType.SYSTEM,
                     QueryType.VIRTUAL_CORPUS, koralQuery, null, null, null,
-                    true, "system", null, null);
+                    true, "system", null, null, apiVersion);
         }
         catch (Exception e) {
             jlog.error("Failed storing VC: "+vcId, e);
