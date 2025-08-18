@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.rewrite;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.text.CaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,6 +43,8 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
 
     public static Logger jlog = LogManager.getLogger(AvailabilityRewrite.class);
+    
+    private double apiVersion = 1.1; 
 
     public AvailabilityRewrite () {
         super();
@@ -104,10 +105,10 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
         return actualAvailabilities;
     }
 
-    @Override
-    public KoralNode rewriteQuery (KoralNode koralNode, KustvaktConfiguration config,
-            User user) throws KustvaktException {
-        JsonNode jsonNode = koralNode.rawNode();
+	@Override
+	public KoralNode rewriteQuery (KoralNode koralNode,
+			KustvaktConfiguration config, User user) throws KustvaktException {
+		JsonNode jsonNode = koralNode.rawNode();
 
         FullConfiguration fullConfig = (FullConfiguration) config;
         CorpusAccess corpusAccess = user.getCorpusAccess();
@@ -117,16 +118,21 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
 
         String availabilityQuery = getCorpusQuery(corpusAccess, fullConfig);
         
-        if (jsonNode.has("collection")) {
+        String collectionNodeName = (apiVersion >= 1.1) ? "corpus"
+				: "collection";
+        
+        if (jsonNode.has(collectionNodeName)) {
             if (jsonNode.toString().contains("availability")) {
             	List<String> actualAvalability = new ArrayList<>();
                 actualAvalability.addAll(availabilityRules);
 
-                actualAvalability = checkAvailability(jsonNode.at("/collection"),
-                		availabilityRules, actualAvalability, false);
-                if (!actualAvalability.isEmpty()) {
-                	createOperationAnd(availabilityQuery, jsonNode,
-    						corpusAccessName, koralNode);
+				actualAvalability = checkAvailability(
+						jsonNode.at("/" + collectionNodeName),
+						availabilityRules, actualAvalability, false);
+				if (!actualAvalability.isEmpty()) {
+					createOperationAnd(availabilityQuery, jsonNode,
+							corpusAccessName, koralNode, apiVersion,
+							collectionNodeName);
                 	
 //                    builder.with(availabilityQuery);
 //                    builder.setBaseQuery(builder.toJSON());
@@ -136,45 +142,49 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
 			}
 			else {
 				createOperationAnd(availabilityQuery, jsonNode,
-						corpusAccessName, koralNode);
+						corpusAccessName, koralNode, apiVersion,
+						collectionNodeName);
 			}
         }
 		else {
 			KoralCollectionQueryBuilder builder = 
-					new KoralCollectionQueryBuilder();
+					new KoralCollectionQueryBuilder(apiVersion);
 			builder.with(availabilityQuery);
 			JsonNode rewrittenNode = JsonUtils.readTree(builder.toJSON())
-					.at("/collection");
+					.at("/"+collectionNodeName);
 			
 			RewriteIdentifier identifier = new RewriteIdentifier(null, null,
-						corpusAccessName + " corpus access policy has been added.");
-			koralNode.set("collection", rewrittenNode, identifier);
+					corpusAccessName + " corpus access policy has been added.");
+			koralNode.set(collectionNodeName, rewrittenNode, identifier);
 		}
 
-        koralNode = koralNode.at("/collection");
+        koralNode = koralNode.at("/"+collectionNodeName);
         return koralNode;
     }
     
     private void createOperationAnd (String availabilityQuery,
-			JsonNode jsonNode, String corpusAccessName, KoralNode node)
+			JsonNode jsonNode, String corpusAccessName, KoralNode node,
+			double apiVersion, String collectionNodeName)
 			throws KustvaktException {
 
 		KoralCollectionQueryBuilder availabilityBuilder = 
-				new KoralCollectionQueryBuilder();
+				new KoralCollectionQueryBuilder(apiVersion);
 		availabilityBuilder.with(availabilityQuery);
 		JsonNode availabilityNode = JsonUtils
 				.readTree(availabilityBuilder.toJSON());
 
-		String source = jsonNode.at("/collection").toString();
+		String source = jsonNode.at("/"+collectionNodeName).toString();
 		JsonNode sourceNode = JsonUtils.readTree(source);
 
-		KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-		// Base query must contains collection
+		KoralCollectionQueryBuilder builder = 
+				new KoralCollectionQueryBuilder(apiVersion);
+		// Base query must contains collection or corpus node
 		builder.setBaseQuery(availabilityNode);
-		JsonNode rewrittenNode = builder.mergeWith(jsonNode).at("/collection");
+		JsonNode rewrittenNode = builder.mergeWith(jsonNode)
+				.at("/" + collectionNodeName);
 		RewriteIdentifier identifier = new RewriteIdentifier(null, sourceNode,
 				corpusAccessName + " corpus access policy has been added.");
-		node.replace("collection", rewrittenNode, identifier);
+		node.replace(collectionNodeName, rewrittenNode, identifier);
 	}
     
     private List<String> getAvailabilityRules (CorpusAccess access,

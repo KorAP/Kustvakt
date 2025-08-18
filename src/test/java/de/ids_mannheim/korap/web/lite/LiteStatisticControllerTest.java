@@ -89,11 +89,11 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
                 .post(Entity.json("{}"));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION,
-            node.at("/errors/0/0").asInt());
-        assertTrue(node.at("/errors/0/1").asText().contains(" is not found"));
-    }
+		JsonNode node = JsonUtils.readTree(ent);
+		assertEquals(de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION,
+				node.at("/errors/0/0").asInt());
+		assertEquals("VC is not found", node.at("/errors/0/1").asText());
+	}
 
     @Test
     public void testGetStatisticsWithIncorrectJson ()

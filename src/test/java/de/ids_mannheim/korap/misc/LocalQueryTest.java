@@ -24,6 +24,8 @@ import de.ids_mannheim.korap.web.SearchKrill;
 public class LocalQueryTest extends SpringJerseyTest {
 
     private static String index;
+    
+    private double apiVersion = 1.0;
 
     @Autowired
     KustvaktConfiguration config;
@@ -40,7 +42,8 @@ public class LocalQueryTest extends SpringJerseyTest {
         // qstring = "textType = Aphorismus";
         // qstring = "title ~ \"Werther\"";
         SearchKrill krill = new SearchKrill(index);
-        KoralCollectionQueryBuilder coll = new KoralCollectionQueryBuilder();
+        KoralCollectionQueryBuilder coll = 
+        		new KoralCollectionQueryBuilder(apiVersion);
         coll.with(qstring);
         String stats = krill.getStatistics(coll.toJSON());
         assert stats != null && !stats.isEmpty() && !stats.equals("null");
@@ -49,7 +52,7 @@ public class LocalQueryTest extends SpringJerseyTest {
     @Test
     public void testCollQuery () throws IOException, KustvaktException {
         String qstring = "creationDate since 1800 & creationDate until 1820";
-        CollectionQueryProcessor processor = new CollectionQueryProcessor();
+        CollectionQueryProcessor processor = new CollectionQueryProcessor(1.0);
         processor.process(qstring);
         String s = JsonUtils.toJSON(processor.getRequestMap());
         KrillCollection c = new KrillCollection(s);

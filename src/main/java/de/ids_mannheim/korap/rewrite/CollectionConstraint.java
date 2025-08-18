@@ -10,6 +10,8 @@ import de.ids_mannheim.korap.user.User;
  * EM: not used anymore. This rewrite was meant to remove doc from
  * a collection by checking user access to the doc.
  * 
+ * EM: legacy "collection" term should be replaced with "corpus".
+ * 
  * @author hanl
  * @date 03/07/2015
  */
