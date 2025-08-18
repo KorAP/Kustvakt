@@ -11,7 +11,6 @@ import jakarta.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class MultipleCorpusQueryTest extends SpringJerseyTest {
@@ -26,7 +25,7 @@ public class MultipleCorpusQueryTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        node = node.at("/collection/operands/1");
+        node = node.at("/corpus/operands/1");
         assertEquals(node.at("/@type").asText(), "koral:docGroup");
         assertEquals(node.at("/operation").asText(), "operation:and");
         assertEquals(2, node.at("/operands").size());
