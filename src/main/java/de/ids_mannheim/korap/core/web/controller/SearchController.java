@@ -166,6 +166,7 @@ public class SearchController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     //@SearchResourceFilters
     public Response searchPost (@Context SecurityContext context,
+    		@Context ContainerRequestContext requestContext,
             @Context Locale locale, @Context HttpHeaders headers,
             String jsonld) {
 
@@ -173,11 +174,16 @@ public class SearchController {
             jlog.debug("Serialized search: " + jsonld);
         }
 
+        List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double requestedVersion = Double.parseDouble(version.substring(1));
+        
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
             scopeService.verifyScope(ctx, OAuth2Scope.SEARCH);
             String result = searchService.search(jsonld, ctx.getUsername(),
-                    headers);
+                    headers, requestedVersion);
             return Response.ok(result).build();
         }
         catch (KustvaktException e) {

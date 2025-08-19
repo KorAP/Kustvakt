@@ -20,14 +20,14 @@ public class FoundryInject implements RewriteTask.IterableRewritePath {
 
     @Override
     public KoralNode rewriteQuery (KoralNode koralNode, KustvaktConfiguration config,
-            User user) throws KustvaktException {
+            User user, double apiVersion) throws KustvaktException {
 
     	// EM: I don't know the purpose of the following code and it is not 
     	// tested
         if (koralNode.get("@type").equals("koral:span")) {
             if (!koralNode.isMissingNode("/wrap")) {
                 koralNode = koralNode.at("/wrap");
-                JsonNode term = rewriteQuery(koralNode, config, user).rawNode();
+                JsonNode term = rewriteQuery(koralNode, config, user, apiVersion).rawNode();
                 koralNode.replaceAt("/wrap", term,
                         new RewriteIdentifier("koral:term", "replace", ""));
             }

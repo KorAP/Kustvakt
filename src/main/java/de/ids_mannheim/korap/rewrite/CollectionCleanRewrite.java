@@ -22,7 +22,7 @@ public class CollectionCleanRewrite implements RewriteTask.RewriteNodeAt {
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-            User user) {
+            User user, double apiVersion) {
         JsonNode jsonNode = process(node.rawNode());
         return node.wrapNode(jsonNode);
     }

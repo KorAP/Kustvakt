@@ -31,7 +31,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-            User user) throws KustvaktException {
+            User user, double apiVersion) throws KustvaktException {
     	if (node.has("corpus")) {
             node = node.at("/corpus");
             findVCRef(user.getUsername(), node);

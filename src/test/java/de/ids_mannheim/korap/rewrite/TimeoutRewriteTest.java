@@ -37,7 +37,7 @@ public class TimeoutRewriteTest extends SpringJerseyTest {
         s.setMeta(map);
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         
         node = node.at("/meta"); 
         assertEquals(1000, node.at("/timeout").asInt());
@@ -57,7 +57,7 @@ public class TimeoutRewriteTest extends SpringJerseyTest {
         s.setMeta(map);
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         
         node = node.at("/meta"); 
         assertEquals(10000, node.at("/timeout").asInt());
@@ -76,7 +76,7 @@ public class TimeoutRewriteTest extends SpringJerseyTest {
         s.setMeta(map);
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         
         node = node.at("/meta"); 
         assertEquals(10000, node.at("/timeout").asInt());
