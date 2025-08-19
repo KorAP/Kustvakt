@@ -39,7 +39,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         s.setCollection("textClass=politik & corpusSigle=WPD");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(1, node.at("/"+collectionNodeName+"/operands").size());
     }
@@ -58,7 +58,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         s.setCollection("corpusSigle=BRZ13 & corpusSigle=WPD");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(0, node.at("/"+collectionNodeName+"/operands").size());
         assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
@@ -77,7 +77,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 "(corpusSigle=BRZ13 & textClass=Wissenschaft) & corpusSigle=WPD");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(node.at("/"+collectionNodeName+"/operands/0/@type").asText(),
                 "koral:docGroup");
@@ -101,7 +101,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 "(corpusSigle=BRZ13 & corpusSigle=WPD) & textClass=Wissenschaft & textClass=Sport");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:docGroup");
         assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
@@ -125,7 +125,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         s.setCollection("(corpusSigle=BRZ13 & textClass=wissenschaft)");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:doc");
         assertEquals(node.at("/"+collectionNodeName+"/key").asText(), "textClass");
@@ -147,7 +147,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 "(corpusSigle=BRZ13 & corpusSigle=WPD) & textClass=Wissenschaft");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:doc");
         assertEquals(node.at("/"+collectionNodeName+"/key").asText(), "textClass");
@@ -168,7 +168,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 "(docID=random & textClass=Wissenschaft) & corpusSigle=WPD");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:docGroup");
         assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
@@ -190,7 +190,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         s.setCollection("(docSigle=WPD_AAA & textClass=wissenschaft)");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
         assertEquals(node.at("/"+collectionNodeName+"/operands/0/key").asText(),
@@ -216,7 +216,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(node.at("/"+collectionNodeName+"/key").asText(), "availability");
         assertEquals(node.at("/"+collectionNodeName+"/value").asText(), "CC.*");
@@ -239,7 +239,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 "(corpusSigle=BRZ14 & textClass=wissenschaft) | (corpusSigle=AZPR | textClass=freizeit)");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:docGroup");
         assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());
@@ -267,7 +267,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 "(corpusSigle=BRZ14 & textClass=wissenschaft) | (corpusSigle=AZPR | textClass=freizeit)");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
-                User.UserFactory.getUser("test_user")));
+                User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals(node.at("/"+collectionNodeName+"/@type").asText(), "koral:docGroup");
         assertEquals(2, node.at("/"+collectionNodeName+"/operands").size());

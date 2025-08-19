@@ -25,7 +25,7 @@ public class StatisticService extends BasicService {
 		//System.out.println("Before:" + json + "\n");
 		if (!cqList.isEmpty() && !combineMultipleCorpusQuery(cqList).isEmpty()) {
 			User user = createUser(username, headers);
-			json = statisticsRewriteHandler.processQuery(json, user);
+			json = statisticsRewriteHandler.processQuery(json, user, apiVersion);
 		}
 		//System.out.println("After:" + json);
 		String stats = searchKrill.getStatistics(json);

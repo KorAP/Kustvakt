@@ -99,7 +99,7 @@ public class RewriteHandler {
      * @return boolean if rewriter class was successfully added to
      *         rewrite handler!
      */
-    @Deprecated
+    // EM: MH marked this as @Deprecated
     public boolean add (Class<? extends RewriteTask> rewriter) {
         RewriteTask task;
         try {
@@ -114,27 +114,27 @@ public class RewriteHandler {
         return addProcessor(task);
     }
 
-    public String processQuery (JsonNode root, User user)
+    public String processQuery (JsonNode root, User user, double apiVersion)
             throws KustvaktException {
         RewriteProcess process = new RewriteProcess(root, user);
-        JsonNode pre = process.start(false);
+        JsonNode pre = process.start(false, apiVersion);
         return JsonUtils.toJSON(pre);
     }
 
-    public String processQuery (String json, User user)
+    public String processQuery (String json, User user, double apiVersion)
             throws KustvaktException {
-        return processQuery(JsonUtils.readTree(json), user);
+        return processQuery(JsonUtils.readTree(json), user, apiVersion);
     }
 
-    public String processResult (String json, User user)
+    public String processResult (String json, User user, double apiVersion)
             throws KustvaktException {
-        return processResult(JsonUtils.readTree(json), user);
+        return processResult(JsonUtils.readTree(json), user, apiVersion);
     }
 
-    public String processResult (JsonNode node, User user)
+    public String processResult (JsonNode node, User user, double apiVersion)
             throws KustvaktException {
         RewriteProcess process = new RewriteProcess(node, user);
-        JsonNode pre = process.start(true);
+        JsonNode pre = process.start(true, apiVersion);
         return JsonUtils.toJSON(pre);
     }
 
@@ -161,7 +161,7 @@ public class RewriteHandler {
         }
 
         private KoralNode processNode (String key, JsonNode value,
-                boolean result) throws KustvaktException {
+                boolean result, double apiVersion) throws KustvaktException {
             KoralNode kroot = KoralNode.wrapNode(value);
             if (value.isObject()) {
                 if (value.has("operands")) {
@@ -169,7 +169,7 @@ public class RewriteHandler {
                     Iterator<JsonNode> it = ops.elements();
                     while (it.hasNext()) {
                         JsonNode next = it.next();
-                        KoralNode kn = processNode(key, next, result);
+                        KoralNode kn = processNode(key, next, result, apiVersion);
                         if (kn.isRemove())
                             it.remove();
                     }
@@ -177,19 +177,19 @@ public class RewriteHandler {
                 else if (value.path("@type").asText().equals("koral:token")) {
                     // todo: koral:token nodes cannot be flagged for deletion --> creates the possibility for empty koral:token nodes
                     rewrite(key, kroot,
-                            RewriteHandler.this.token_node_processors, result);
-                    return processNode(key, value.path("wrap"), result);
+                            RewriteHandler.this.token_node_processors, result, apiVersion);
+                    return processNode(key, value.path("wrap"), result, apiVersion);
                 }
                 else {
                     return rewrite(key, kroot,
-                            RewriteHandler.this.node_processors, result);
+                            RewriteHandler.this.node_processors, result, apiVersion);
                 }
             }
             else if (value.isArray()) {
                 Iterator<JsonNode> it = value.elements();
                 while (it.hasNext()) {
                     JsonNode next = it.next();
-                    KoralNode kn = processNode(key, next, result);
+                    KoralNode kn = processNode(key, next, result, apiVersion);
                     if (kn.isRemove())
                         it.remove();
                 }
@@ -197,7 +197,7 @@ public class RewriteHandler {
             return kroot;
         }
 
-        private JsonNode start (boolean result) throws KustvaktException {
+        private JsonNode start (boolean result, double apiVersion) throws KustvaktException {
             if (DEBUG) {
                 jlog.debug("Running rewrite process on query " + root);
             }
@@ -205,10 +205,10 @@ public class RewriteHandler {
                 Iterator<Map.Entry<String, JsonNode>> it = root.fields();
                 while (it.hasNext()) {
                     Map.Entry<String, JsonNode> next = it.next();
-                    processNode(next.getKey(), next.getValue(), result);
+                    processNode(next.getKey(), next.getValue(), result, apiVersion);
                 }
                 processFixedNode(root, RewriteHandler.this.query_processors,
-                        result);
+                        result, apiVersion);
             }
             return root;
         }
@@ -216,12 +216,13 @@ public class RewriteHandler {
         /**
          * @param node
          * @param tasks
+         * @param apiVersion 
          * @return boolean true if node is to be removed from parent!
          *         Only
          *         applies if parent is an array node
          */
         private KoralNode rewrite (String rootNode, KoralNode node,
-                Collection<? extends RewriteTask> tasks, boolean result)
+                Collection<? extends RewriteTask> tasks, boolean result, double apiVersion)
                 throws KustvaktException {
             if (RewriteHandler.this.config == null)
                 throw new RuntimeException(
@@ -249,7 +250,7 @@ public class RewriteHandler {
                 }
                 if (!result && task instanceof RewriteTask.RewriteQuery) {
                     ((RewriteTask.RewriteQuery) task).rewriteQuery(node,
-                            RewriteHandler.this.config, this.user);
+                            RewriteHandler.this.config, this.user, apiVersion);
                 }
                 else if (task instanceof RewriteTask.RewriteResult) {
                     ((RewriteTask.RewriteResult) task).rewriteResult(node);
@@ -267,7 +268,7 @@ public class RewriteHandler {
 
         // fixme: merge with processNode!
         private void processFixedNode (JsonNode node,
-                Collection<RewriteTask> tasks, boolean post)
+                Collection<RewriteTask> tasks, boolean post, double apiVersion)
                 throws KustvaktException {
             for (RewriteTask task : tasks) {
                 KoralNode next = KoralNode.wrapNode(node);
@@ -280,7 +281,7 @@ public class RewriteHandler {
 
                 if (!post & task instanceof RewriteTask.RewriteQuery)
                     next = ((RewriteTask.RewriteQuery) task).rewriteQuery(next,
-                            RewriteHandler.this.config, user);
+                            RewriteHandler.this.config, user, apiVersion);
                 else if (task instanceof RewriteTask.RewriteResult)
                     ((RewriteTask.RewriteResult) task).rewriteResult(next);
                 next.buildRewrites();

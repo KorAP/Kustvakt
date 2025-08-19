@@ -61,7 +61,8 @@ public class QueryContextRewriteTest extends SpringJerseyTest {
         assertEquals(60, context.at("/left/1").asInt());
         assertEquals(60, context.at("/right/1").asInt());
         
-        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), 
+        		new KorAPUser("test"), API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         
         context = node.at("/meta/context");

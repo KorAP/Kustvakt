@@ -59,7 +59,7 @@ public class TreeConstraint implements RewriteTask.RewriteNodeAt {
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-            User user) {
+            User user, double apiVersion) {
         System.out.println("FIND PATH " + node.rawNode().findParent(pointer));
 
         return node;

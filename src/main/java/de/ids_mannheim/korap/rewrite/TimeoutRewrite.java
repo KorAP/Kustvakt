@@ -9,7 +9,7 @@ public class TimeoutRewrite implements RewriteTask.RewriteQuery {
 
 	@Override
 	public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-			User user) throws KustvaktException {
+			User user, double apiVersion) throws KustvaktException {
 		CorpusAccess access = user.getCorpusAccess();
 		if (node.has("meta")) {
             node = node.at("/meta");

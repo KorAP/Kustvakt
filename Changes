@@ -14,6 +14,7 @@
 - Clean up collection node from Krill response (#806)
 - Add API version to NamedVCLoader (#806)
 - Add corpus support at VirtualCorpusRewrite (#806)
+- Add apiVersion to rewrite (#806)
 
 # version 0.79
 

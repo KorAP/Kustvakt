@@ -19,7 +19,7 @@ public class FoundryRewrite extends FoundryInject {
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-            User user) throws KustvaktException {
+            User user, double apiVersion) throws KustvaktException {
         String username = user.getUsername();
         String jsonSettings = settingService.retrieveDefaultSettings(username);
         if (jsonSettings != null) {
@@ -27,6 +27,6 @@ public class FoundryRewrite extends FoundryInject {
                     jsonSettings);
             user.setUserSettingProcessor(processor);
         }
-        return super.rewriteQuery(node, config, user);
+        return super.rewriteQuery(node, config, user, apiVersion);
     }
 }

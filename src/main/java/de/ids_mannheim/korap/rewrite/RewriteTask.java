@@ -26,10 +26,12 @@ public interface RewriteTask {
          *            injected by rewrite handler if available. Might
          *            cause {@link NullPointerException} if not
          *            checked properly
+         * @param apiVersion
+         *            the version of the API
          * @return
          */
         KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-                User user) throws KustvaktException;
+                User user, double apiVersion) throws KustvaktException;
 
     }
 

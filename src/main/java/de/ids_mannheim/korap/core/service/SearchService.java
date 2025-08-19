@@ -102,11 +102,12 @@ public class SearchService extends BasicService {
         // return ss.toJSON();
 
         String query = ss.toJSON();
-        query = rewriteHandler.processQuery(ss.toJSON(), null);
+        query = rewriteHandler.processQuery(ss.toJSON(), null, apiVersion);
         return query;
     }
 
-    public String search (String jsonld, String username, HttpHeaders headers)
+    public String search (String jsonld, String username, HttpHeaders headers, 
+    		double apiVersion)
             throws KustvaktException {
 
         User user = createUser(username, headers);
@@ -117,7 +118,7 @@ public class SearchService extends BasicService {
             user.setCorpusAccess(CorpusAccess.ALL);
         }
 
-        String query = this.rewriteHandler.processQuery(jsonld, user);
+        String query = this.rewriteHandler.processQuery(jsonld, user, apiVersion);
         // MH: todo: should be possible to add the meta part to
         // the query serialization
         // User user = controller.getUser(ctx.getUsername());
@@ -178,7 +179,7 @@ public class SearchService extends BasicService {
         // Query pipe rewrite
         query = runPipes(query, pipes);
 
-        query = this.rewriteHandler.processQuery(query, user);
+        query = this.rewriteHandler.processQuery(query, user, apiVersion);
         if (DEBUG) {
             jlog.debug("the serialized query " + query);
         }

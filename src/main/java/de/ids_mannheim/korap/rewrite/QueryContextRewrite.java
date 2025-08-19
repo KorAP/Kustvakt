@@ -19,7 +19,7 @@ public class QueryContextRewrite implements RewriteTask.RewriteQuery {
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-            User user) throws KustvaktException {
+            User user, double apiVersion) throws KustvaktException {
         
         if (config.getMaxTokenContext() > 0) {
             boolean isContextCut = false;

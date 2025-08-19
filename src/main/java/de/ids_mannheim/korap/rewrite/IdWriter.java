@@ -1,8 +1,7 @@
 package de.ids_mannheim.korap.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.ids_mannheim.korap.config.BeanInjectable;
-import de.ids_mannheim.korap.config.ContextHolder;
+
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 
@@ -20,7 +19,7 @@ public class IdWriter implements RewriteTask.RewriteKoralToken {
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-            User user) {
+            User user, double apiVersion) {
         if (node.get("@type").equals("koral:token")) {
             String s = extractToken(node.rawNode());
             if (s != null && !s.isEmpty())

@@ -4,11 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.rewrite.AvailabilityRewrite;
-import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -24,7 +23,8 @@ public class ResultRewriteTest extends SpringJerseyTest {
     public void testPostRewriteNothingToDo () throws KustvaktException {
         assertEquals(true, rewriteHandler.add(AvailabilityRewrite.class),
                 "Handler could not be added to rewrite handler instance!");
-        String v = rewriteHandler.processResult(TestVariables.RESULT, null);
+        String v = rewriteHandler.processResult(TestVariables.RESULT, null, 
+        		API_VERSION_DOUBLE);
         assertEquals(JsonUtils.readTree(TestVariables.RESULT),
                 JsonUtils.readTree(v), "results do not match");
     }

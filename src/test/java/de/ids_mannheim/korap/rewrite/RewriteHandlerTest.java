@@ -1,15 +1,14 @@
 package de.ids_mannheim.korap.rewrite;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * EM: to do: Fix tests
@@ -95,7 +94,7 @@ public class RewriteHandlerTest extends SpringJerseyTest {
             s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]",
                     "poliqarp");
             assertTrue(handler.add(FoundryInject.class));
-            handler.processQuery(s.toJSON(), null);
+            handler.processQuery(s.toJSON(), null, API_VERSION_DOUBLE);
         });
     }
     // @Deprecated

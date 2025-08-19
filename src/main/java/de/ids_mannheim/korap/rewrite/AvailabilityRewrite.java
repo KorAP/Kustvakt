@@ -44,8 +44,6 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
 
     public static Logger jlog = LogManager.getLogger(AvailabilityRewrite.class);
     
-    private double apiVersion = 1.1; 
-
     public AvailabilityRewrite () {
         super();
     }
@@ -107,7 +105,8 @@ public class AvailabilityRewrite implements RewriteTask.RewriteQuery {
 
 	@Override
 	public KoralNode rewriteQuery (KoralNode koralNode,
-			KustvaktConfiguration config, User user) throws KustvaktException {
+			KustvaktConfiguration config, User user, double apiVersion) 
+			throws KustvaktException {
 		JsonNode jsonNode = koralNode.rawNode();
 
         FullConfiguration fullConfig = (FullConfiguration) config;

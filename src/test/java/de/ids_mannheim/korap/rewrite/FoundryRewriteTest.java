@@ -88,7 +88,7 @@ public class FoundryRewriteTest extends TestBase {
         QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[pos=ADJA]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(),
-                new KorAPUser(username));
+                new KorAPUser(username), API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         assertEquals(node.at("/query/wrap/foundry").asText(), "corenlp");
         assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(),
@@ -103,7 +103,7 @@ public class FoundryRewriteTest extends TestBase {
         QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[base=Haus]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(),
-                new KorAPUser(username));
+                new KorAPUser(username), API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         // EM: only for testing, in fact, opennlp lemma does not
         // exist!
@@ -126,7 +126,8 @@ public class FoundryRewriteTest extends TestBase {
             throws KustvaktException {
         QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), 
+        		new KorAPUser("test"), API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
@@ -143,7 +144,8 @@ public class FoundryRewriteTest extends TestBase {
             throws KustvaktException {
         QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[pos=ADJA]", "poliqarp");
-        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), 
+        		new KorAPUser("test"), API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
@@ -160,7 +162,8 @@ public class FoundryRewriteTest extends TestBase {
             throws KustvaktException {
         QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[orth=laufe/i & base!=Lauf]", "poliqarp");
-        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), 
+        		new KorAPUser("test"), API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertEquals(node.at("/query/wrap/@type").asText(), "koral:termGroup");
@@ -175,7 +178,8 @@ public class FoundryRewriteTest extends TestBase {
             throws KustvaktException {
         QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[(base=laufen | tt/pos=VVFIN)]", "poliqarp");
-        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), 
+        		new KorAPUser("test"), API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertEquals(node.at("/query/wrap/@type").asText(), "koral:termGroup");
@@ -189,7 +193,8 @@ public class FoundryRewriteTest extends TestBase {
     public void testFoundryBaseRewrite () throws KustvaktException {
         QuerySerializer s = new QuerySerializer(1.1);;
         s.setQuery("[orth=laufen]", "poliqarp");
-        String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
+        String result = rewriteHandler.processQuery(s.toJSON(), 
+        		new KorAPUser("test"), API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         assertEquals(node.at("/query/wrap/@type").asText(), "koral:term");
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());

@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.rewrite.IdWriter;
-import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -32,7 +32,8 @@ public class IdRewriteTest extends SpringJerseyTest {
         String query = "[surface=Wort]";
         QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery(query, "poliqarp");
-        String value = handler.processQuery(s.toJSON(), new KorAPUser());
+        String value = handler.processQuery(s.toJSON(), new KorAPUser(), 
+        		API_VERSION_DOUBLE);
         JsonNode result = JsonUtils.readTree(value);
         assertNotNull(result);
         assertTrue(result.path("query").has("idn"));
@@ -44,7 +45,8 @@ public class IdRewriteTest extends SpringJerseyTest {
         assertTrue(handler.add(IdWriter.class));
         QuerySerializer s = new QuerySerializer(API_VERSION_DOUBLE);
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), new KorAPUser());
+        String result = handler.processQuery(s.toJSON(), new KorAPUser(), 
+        		API_VERSION_DOUBLE);
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap").isMissingNode());

@@ -19,7 +19,7 @@ public class CollectionConstraint implements RewriteTask.IterableRewritePath {
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-            User user) {
+            User user, double apiVersion) {
         if (node.get("@type").equals("koral:doc")) {
             if (node.get("key").equals(Attributes.CORPUS_SIGLE)) {
                 String id = node.get("value");
