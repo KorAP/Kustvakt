@@ -21,7 +21,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class LiteStatisticControllerTest extends LiteJerseyTest {
 
     @Test
-    public void testStatisticsWithCq () throws KustvaktException {
+    public void testStatisticsWithCq() throws KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
                 .request().method("GET");
@@ -38,7 +38,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testStatisticsEmptyCq () throws KustvaktException {
+    public void testStatisticsEmptyCq() throws KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("cq", "").request().method("GET");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -60,7 +60,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testGetStatisticsWithKoralQuery ()
+    public void testGetStatisticsWithKoralQuery()
             throws IOException, KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
                 .request()
@@ -81,7 +81,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testGetStatisticsWithEmptyCollection ()
+    public void testGetStatisticsWithEmptyCollection()
             throws IOException, KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
                 .request()
@@ -93,11 +93,11 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
         assertEquals(node.at("/errors/0/0").asInt(),
                 de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION);
         assertEquals(node.at("/errors/0/1").asText(),
-                "Collection is not found");
+                "VC is not found");
     }
 
     @Test
-    public void testGetStatisticsWithIncorrectJson ()
+    public void testGetStatisticsWithIncorrectJson()
             throws IOException, KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
                 .request()
@@ -113,7 +113,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testGetStatisticsWithoutKoralQuery ()
+    public void testGetStatisticsWithoutKoralQuery()
             throws IOException, KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
                 .request().post(Entity.json(""));
@@ -125,9 +125,9 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
         assertEquals(25074, node.at("/sentences").asInt());
         assertEquals(772, node.at("/paragraphs").asInt());
     }
-    
+
     @Test
-    public void testStatisticsWithNamedVC () throws KustvaktException {
+    public void testStatisticsWithNamedVC() throws KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("cq", "referTo unknownVC")
                 .request().method("GET");
