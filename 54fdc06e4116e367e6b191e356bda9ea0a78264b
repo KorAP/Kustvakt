@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebc60bae_e62ac9cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2025-09-12T16:51:34Z",
+      "side": 1,
+      "message": "Fixes Krill github ci build error: https://github.com/KorAP/Krill/actions/runs/17679367300/job/50249536888",
+      "revId": "54fdc06e4116e367e6b191e356bda9ea0a78264b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
