@@ -214,8 +214,8 @@ public class LdapAuth3 {
             jlog.debug("{}: connect: successfull.", ldapConfig.useSSL ? "LDAPS" : "LDAP");
             }
         catch (LDAPException e) {
-            String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
-                    .getFullStackTrace(e);
+            String fullStackTrace = org.apache.commons.lang3.exception.ExceptionUtils
+                    .getStackTrace(e);
             jlog.error("Connecting to LDAP Server: failed: '{}'!\n", fullStackTrace);
             
             ldapTerminate(lc);
