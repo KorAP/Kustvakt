@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a7f1ed1_1ba5d992",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2025-09-17T15:36:36Z",
+      "side": 1,
+      "message": "Now you can see the difference",
+      "revId": "e2155b4e3c28ae2f30eeaafcc109d2f963441d80",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
