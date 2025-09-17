@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73c2f345_c401e8c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2025-09-17T06:32:56Z",
+      "side": 1,
+      "message": "Dependabot alerts were disabled due to inactivity.",
+      "revId": "adb4857a94f3e1da2ae8acc240283b7872193f3c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
