@@ -16,6 +16,23 @@
       "message": "Dependabot alerts were disabled due to inactivity.",
       "revId": "adb4857a94f3e1da2ae8acc240283b7872193f3c",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d076ebe1_8a68f5d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2025-09-17T09:34:55Z",
+      "side": 1,
+      "message": "Maybe wait for https://korap.ids-mannheim.de/gerrit/c/KorAP/Krill/+/9730",
+      "revId": "adb4857a94f3e1da2ae8acc240283b7872193f3c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
