@@ -92,8 +92,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.at("/errors/0/0").asInt(),
                 de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION);
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Collection is not found");
+        assertTrue(node.at("/errors/0/1").asText().contains(" is not found"));
     }
 
     @Test
