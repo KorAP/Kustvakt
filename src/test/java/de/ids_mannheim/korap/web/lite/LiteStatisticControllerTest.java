@@ -93,7 +93,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
         assertEquals(node.at("/errors/0/0").asInt(),
                 de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION);
         assertEquals(node.at("/errors/0/1").asText(),
-                "Collection is not found");
+                "VC is not found");
     }
 
     @Test
