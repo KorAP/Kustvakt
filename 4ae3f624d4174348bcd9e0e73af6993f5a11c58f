@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5508c850_f110df26",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2025-09-17T15:37:56Z",
+      "side": 1,
+      "message": "That\u0027s the reason why there are no dependabot pull requests anymore",
+      "revId": "4ae3f624d4174348bcd9e0e73af6993f5a11c58f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
