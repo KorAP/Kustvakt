@@ -33,6 +33,23 @@
       "message": "Maybe wait for https://korap.ids-mannheim.de/gerrit/c/KorAP/Krill/+/9730",
       "revId": "adb4857a94f3e1da2ae8acc240283b7872193f3c",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6445bea_68e444f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-09-23T09:29:26Z",
+      "side": 1,
+      "message": "Didn\u0027t work for me because of #9733",
+      "revId": "adb4857a94f3e1da2ae8acc240283b7872193f3c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ],
   "submitRequirementResults": []
