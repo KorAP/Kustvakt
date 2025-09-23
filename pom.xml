@@ -574,7 +574,7 @@
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
-			<version>2.12.6</version>
+			<version>2.14.0</version>
 		</dependency>
 			<!-- Apache Commons Lang 3 (maintained) -->
 			<dependency>
