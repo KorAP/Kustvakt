@@ -72,7 +72,7 @@ public class UserSettingControllerTest extends TestBase {
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(), "key/");
+        assertEquals("key/", node.at("/errors/0/2").asText());
     }
 
     @Test
