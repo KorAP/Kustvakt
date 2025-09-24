@@ -18,7 +18,7 @@ public class MetaQueryBuilderTest {
         MetaQueryBuilder m = QueryBuilderUtil.defaultMetaBuilder(0, 1, 5,
                 "sentence", false);
         Map<?, ?> map = m.raw();
-        assertEquals(map.get("context"), "sentence");
+        assertEquals("sentence", map.get("context"));
         assertEquals(1, map.get("startPage"));
         assertEquals(0, map.get("startIndex"));
         assertEquals(false, map.get("cutOff"));
