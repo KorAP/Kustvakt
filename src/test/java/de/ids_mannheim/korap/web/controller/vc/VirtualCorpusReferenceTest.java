@@ -38,9 +38,9 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         JsonNode node = testSearchWithRef_VC1();
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Virtual corpus system/named-vc1 is not found.");
-        assertEquals(node.at("/errors/0/2").asText(), "system/named-vc1");
+        assertEquals("Virtual corpus system/named-vc1 is not found.",
+            node.at("/errors/0/1").asText());
+        assertEquals("system/named-vc1", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -166,7 +166,7 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(), "username/vc1");
+        assertEquals("username/vc1", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -179,7 +179,7 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(), "guest");
+        assertEquals("guest", node.at("/errors/0/2").asText());
         deleteVC("dory-vc", "dory", "dory");
     }
 
@@ -194,17 +194,17 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
-        assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC.*");
-        assertEquals(node.at("/collection/operands/1/@type").asText(),
-                "koral:doc");
-        assertEquals(node.at("/collection/operands/1/value").asText(), "GOE");
-        assertEquals(node.at("/collection/operands/1/key").asText(),
-                "corpusSigle");
+        assertEquals("CC.*",
+            node.at("/collection/operands/0/value").asText());
+        assertEquals("koral:doc",
+            node.at("/collection/operands/1/@type").asText());
+        assertEquals("GOE", node.at("/collection/operands/1/value").asText());
+        assertEquals("corpusSigle",
+            node.at("/collection/operands/1/key").asText());
 
         node = node.at("/collection/operands/1");
-        assertEquals(node.at("/rewrites/0/operation").asText(),
-                "operation:override");
+        assertEquals("operation:override",
+            node.at("/rewrites/0/operation").asText());
         assertEquals("koral:docGroupRef",
                 node.at("/rewrites/0/original/@type").asText());
         assertEquals("marlin/published-vc",
