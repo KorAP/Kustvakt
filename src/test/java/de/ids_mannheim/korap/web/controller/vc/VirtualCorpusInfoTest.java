@@ -25,7 +25,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
     public void testRetrieveSystemVC ()
             throws KustvaktException {
         JsonNode node = retrieveVCInfo(testUser, "system", "system-vc");
-        assertEquals(node.at("/name").asText(), "system-vc");
+        assertEquals("system-vc", node.at("/name").asText());
         assertEquals(ResourceType.SYSTEM.displayName(),
                 node.at("/type").asText());
         // assertEquals("koral:doc", node.at("/koralQuery/collection/@type").asText());
@@ -48,7 +48,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~system").path("system-vc").request().get();
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(node.at("/name").asText(), "system-vc");
+        assertEquals("system-vc", node.at("/name").asText());
         assertEquals(ResourceType.SYSTEM.displayName(),
                 node.at("/type").asText());
     }
@@ -58,7 +58,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
             throws KustvaktException {
     	createDoryVC();
         JsonNode node = retrieveVCInfo("dory", "dory", "dory-vc");
-        assertEquals(node.at("/name").asText(), "dory-vc");
+        assertEquals("dory-vc", node.at("/name").asText());
         assertEquals(ResourceType.PRIVATE.displayName(),
                 node.at("/type").asText());
         
@@ -89,14 +89,14 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         createAccess("dory", "group-vc", doryGroupName, "dory");
         
         JsonNode node = retrieveVCInfo("nemo", "dory", "group-vc");
-        assertEquals(node.at("/name").asText(), "group-vc");
+        assertEquals("group-vc", node.at("/name").asText());
         assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
         
         addMember(doryGroupName, "pearl", "dory");
         
         node = retrieveVCInfo("pearl", "dory", "group-vc");
-        assertEquals(node.at("/name").asText(), "group-vc");
+        assertEquals("group-vc", node.at("/name").asText());
         assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
         
@@ -142,7 +142,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(node.at("/name").asText(), "dory-vc");
+        assertEquals("dory-vc", node.at("/name").asText());
         deleteVC("dory-vc", "dory", "dory");
     }
 
@@ -158,7 +158,7 @@ public class VirtualCorpusInfoTest extends VirtualCorpusTestBase {
         String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(node.at("/name").asText(), "group-vc");
+        assertEquals("group-vc", node.at("/name").asText());
         assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
         deleteVC("group-vc", "dory", "dory");
