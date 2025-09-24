@@ -60,10 +60,10 @@ public class SearchControllerTest extends SpringJerseyTest {
     public void testApiWelcomeMessage () {
         Response response = target().path(API_VERSION).path("").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertEquals(response.getHeaders().getFirst("X-Index-Revision"),
-                "Wes8Bd4h1OypPqbWF5njeQ==");
+        assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getHeaders().getFirst("X-Index-Revision"));
         String message = response.readEntity(String.class);
-        assertEquals(message, config.getApiWelcomeMessage());
+        assertEquals(config.getApiWelcomeMessage(), message);
     }
 
     @Test
