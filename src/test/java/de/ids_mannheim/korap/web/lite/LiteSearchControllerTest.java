@@ -85,7 +85,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String message = response.readEntity(String.class);
         assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
             response.getHeaders().getFirst("X-Index-Revision"));
-        assertEquals(message, config.getApiWelcomeMessage());
+        assertEquals(config.getApiWelcomeMessage(), message);
     }
 
     @Test
