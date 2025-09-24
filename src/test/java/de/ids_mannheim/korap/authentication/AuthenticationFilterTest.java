@@ -21,9 +21,9 @@ public class AuthenticationFilterTest extends SpringJerseyTest {
                 .request().header(Attributes.AUTHORIZATION, "Blah blah").get();
         String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity);
-        assertEquals(n.at("/errors/0/0").asText(), "2001");
-        assertEquals(n.at("/errors/0/1").asText(),
-                "Authentication scheme is not supported.");
-        assertEquals(n.at("/errors/0/2").asText(), "Blah");
+        assertEquals("2001", n.at("/errors/0/0").asText());
+        assertEquals("Authentication scheme is not supported.",
+            n.at("/errors/0/1").asText());
+        assertEquals("Blah", n.at("/errors/0/2").asText());
     }
 }
