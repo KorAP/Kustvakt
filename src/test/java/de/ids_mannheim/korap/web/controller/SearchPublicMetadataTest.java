@@ -64,10 +64,10 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
 		assertEquals(allCorpusAccess,
 				node.at("/collection/rewrites/0/_comment").asText());
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
-        assertEquals(node.at("/matches/0/author").asText(),
-                "Goethe, Johann Wolfgang von");
-        assertEquals(node.at("/matches/0/title").asText(),
-                "Italienische Reise");
+        assertEquals("Goethe, Johann Wolfgang von",
+            node.at("/matches/0/author").asText());
+        assertEquals("Italienische Reise",
+            node.at("/matches/0/title").asText());
         // assertEquals(3, node.at("/matches/0").size());
     }
 
@@ -83,9 +83,9 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.NON_PUBLIC_FIELD_IGNORED,
                 node.at("/warnings/0/0").asInt());
-        assertEquals(node.at("/warnings/0/1").asText(),
-                "The requested non public fields are ignored");
-        assertEquals(node.at("/warnings/0/2").asText(), "snippet");
+        assertEquals("The requested non public fields are ignored",
+            node.at("/warnings/0/1").asText());
+        assertEquals("snippet", node.at("/warnings/0/2").asText());
     }
 
     // EM: The API is disabled
@@ -129,9 +129,9 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
         node = node.at("/operands/1");
         assertEquals("koral:docGroupRef", node.at("/@type").asText());
         assertEquals("system-vc", node.at("/ref").asText());
-//        assertEquals(node.at("/value").asText(), "GOE");
-//        assertEquals(node.at("/match").asText(), "match:eq");
-//        assertEquals(node.at("/key").asText(), "corpusSigle");
+//        assertEquals("GOE", node.at("/value").asText());
+//        assertEquals("match:eq", node.at("/match").asText());
+//        assertEquals("corpusSigle", node.at("/key").asText());
         
     }
 
@@ -148,7 +148,7 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(), "guest");
+        assertEquals("guest", node.at("/errors/0/2").asText());
         deleteVC("dory-vc", "dory", "dory");
         deleteVC("group-vc", "dory", "dory");
     }
