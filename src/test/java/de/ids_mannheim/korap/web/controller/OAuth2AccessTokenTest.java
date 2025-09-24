@@ -40,7 +40,7 @@ public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
         Response response = requestTokenWithDoryPassword(superClientId,
                 clientSecret);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(node.at("/scope").asText(), "all");
+        assertEquals("all", node.at("/scope").asText());
         String accessToken = node.at("/access_token").asText();
         
         createDoryGroup();
@@ -120,8 +120,8 @@ public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Scope vc_info is not authorized");
+        assertEquals("Scope vc_info is not authorized",
+            node.at("/errors/0/1").asText());
     }
 
     private void testScopeNotAuthorize2 (String accessToken)
@@ -135,8 +135,8 @@ public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Scope vc_access_info is not authorized");
+        assertEquals("Scope vc_access_info is not authorized",
+            node.at("/errors/0/1").asText());
     }
 
     @Test
@@ -149,8 +149,8 @@ public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Access token is invalid");
+        assertEquals("Access token is invalid",
+            node.at("/errors/0/1").asText());
     }
 
     @Test
@@ -222,8 +222,8 @@ public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
         node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Scope authorize is not authorized");
+        assertEquals("Scope authorize is not authorized",
+            node.at("/errors/0/1").asText());
 
         revokeToken(userAuthToken, confidentialClientId, clientSecret,
                 ACCESS_TOKEN_TYPE);
