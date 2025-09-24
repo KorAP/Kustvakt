@@ -196,7 +196,7 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
                 .queryParam("page", "5").queryParam("cutoff", "true")
                 .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
                 .request().method("GET");
-        assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals("sentence", node.at("/meta/context").asText());
@@ -217,7 +217,7 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
                 .queryParam("page", "5").queryParam("offset", "2")
                 .queryParam("cutoff", "true").queryParam("q", "[pos=ADJA]")
                 .queryParam("ql", "poliqarp").request().method("GET");
-        assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals("sentence", node.at("/meta/context").asText());
