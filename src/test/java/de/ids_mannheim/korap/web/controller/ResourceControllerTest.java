@@ -27,10 +27,10 @@ public class ResourceControllerTest extends SpringJerseyTest {
 		JsonNode n0 = n.get(0);
 		assertEquals("http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1",
 				n0.at("/resourceId").asText());
-		assertEquals(n0.at("/titles/de").asText(),
-				"Deutsche Wikipedia Artikel 2017");
-		assertEquals(n0.at("/titles/en").asText(),
-				"German Wikipedia Articles 2017");
+		assertEquals("Deutsche Wikipedia Artikel 2017",
+		    n0.at("/titles/de").asText());
+		assertEquals("German Wikipedia Articles 2017",
+		    n0.at("/titles/en").asText());
 		assertEquals(1, n0.at("/languages").size());
 		assertEquals(6, n0.at("/layers").size());
 		assertEquals("IDS Mannheim", n0.at("/institution").asText());
@@ -43,10 +43,10 @@ public class ResourceControllerTest extends SpringJerseyTest {
 		JsonNode n1 = n.get(1);
 		assertEquals("http://hdl.handle.net/10932/00-03B6-558F-5EA0-6301-B",
 				n1.at("/resourceId").asText());
-		assertEquals(n1.at("/titles/de").asText(),
-				"Deutsche Wikipedia-Diskussionskorpus 2017");
-		assertEquals(n1.at("/titles/en").asText(),
-				"German Wikipedia talk corpus 2017");
+		assertEquals("Deutsche Wikipedia-Diskussionskorpus 2017",
+		    n1.at("/titles/de").asText());
+		assertEquals("German Wikipedia talk corpus 2017",
+		    n1.at("/titles/en").asText());
 		assertEquals(1, n1.at("/languages").size());
 		assertEquals(6, n1.at("/layers").size());
 		assertEquals("IDS Mannheim", n1.at("/institution").asText());
@@ -57,10 +57,10 @@ public class ResourceControllerTest extends SpringJerseyTest {
 		JsonNode n3 = n.get(3);
 		assertEquals("Wikipedia-Diskussionsseiten",
 				n3.at("/resourceId").asText());
-		assertEquals(n3.at("/titles/de").asText(),
-				"Wikipedia-Diskussionsseiten");
-		assertEquals(n3.at("/titles/en").asText(),
-				"Wikipedia Talk Pages");
+		assertEquals("Wikipedia-Diskussionsseiten",
+		    n3.at("/titles/de").asText());
+		assertEquals("Wikipedia Talk Pages",
+		    n3.at("/titles/en").asText());
 		assertEquals(1, n3.at("/languages").size());
 		assertEquals(6, n3.at("/layers").size());
 		assertEquals("IDS Mannheim", n3.at("/institution").asText());
