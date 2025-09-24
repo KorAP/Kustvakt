@@ -57,8 +57,8 @@ public class UserGroupMemberTest extends UserGroupTestBase {
                 "Username: nemo exists in the user-group: "
                         + "dory-group",
                 node.at("/errors/0/1").asText());
-        assertEquals(node.at("/errors/0/2").asText(),
-                "[nemo, dory-group]");
+        assertEquals("[nemo, dory-group]",
+            node.at("/errors/0/2").asText());
     }
     
     private void testAddMemberToDeletedGroup () throws KustvaktException {
@@ -153,8 +153,8 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: "+deletedBy);
+        assertEquals("Unauthorized operation for user: "+deletedBy,
+            node.at("/errors/0/1").asText());
     }
     
     private void testDeleteMemberUnauthorizedByMember (String groupName,
@@ -166,8 +166,8 @@ public class UserGroupMemberTest extends UserGroupTestBase {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: "+deletedBy);
+        assertEquals("Unauthorized operation for user: "+deletedBy,
+            node.at("/errors/0/1").asText());
     }
 
     @Test
