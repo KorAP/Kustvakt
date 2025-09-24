@@ -57,7 +57,7 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
         MultiValueMap<String, String> params = UriComponentsBuilder
                 .fromUri(redirectUri).build().getQueryParams();
         assertNotNull(params.getFirst("code"));
-        assertEquals(params.getFirst("state"), "thisIsMyState");
+        assertEquals("thisIsMyState", params.getFirst("state"));
     }
 
     @Test
