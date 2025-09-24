@@ -70,9 +70,9 @@ public class FoundryRewriteTest extends TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/query/wrap/foundry").asText(), "opennlp");
-        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(),
-                "foundry");
+        assertEquals("opennlp", node.at("/query/wrap/foundry").asText());
+        assertEquals("foundry",
+            node.at("/query/wrap/rewrites/0/scope").asText());
     }
 
     @Test
@@ -90,9 +90,9 @@ public class FoundryRewriteTest extends TestBase {
         String result = rewriteHandler.processQuery(s.toJSON(),
                 new KorAPUser(username));
         JsonNode node = JsonUtils.readTree(result);
-        assertEquals(node.at("/query/wrap/foundry").asText(), "corenlp");
-        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(),
-                "foundry");
+        assertEquals("corenlp", node.at("/query/wrap/foundry").asText());
+        assertEquals("foundry",
+            node.at("/query/wrap/rewrites/0/scope").asText());
         
         testRewriteLemmaFoundryWithUserSetting(username);
         testDeleteSetting(username);
@@ -107,9 +107,9 @@ public class FoundryRewriteTest extends TestBase {
         JsonNode node = JsonUtils.readTree(result);
         // EM: only for testing, in fact, opennlp lemma does not
         // exist!
-        assertEquals(node.at("/query/wrap/foundry").asText(), "opennlp");
-        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(),
-                "foundry");
+        assertEquals("opennlp", node.at("/query/wrap/foundry").asText());
+        assertEquals("foundry",
+            node.at("/query/wrap/rewrites/0/scope").asText());
     }
 
     @Test
@@ -132,10 +132,10 @@ public class FoundryRewriteTest extends TestBase {
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
         assertEquals(config.getDefault_lemma(),
                 node.at("/query/wrap/foundry").asText());
-        assertEquals(node.at("/query/wrap/layer").asText(), "lemma");
+        assertEquals("lemma", node.at("/query/wrap/layer").asText());
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
-        assertEquals(node.at("/query/wrap/rewrites/0/@type").asText(),
-                "koral:rewrite");
+        assertEquals("koral:rewrite",
+            node.at("/query/wrap/rewrites/0/@type").asText());
     }
 
     @Test
@@ -149,10 +149,10 @@ public class FoundryRewriteTest extends TestBase {
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
         assertEquals(config.getDefault_pos(),
                 node.at("/query/wrap/foundry").asText());
-        assertEquals(node.at("/query/wrap/layer").asText(), "pos");
+        assertEquals("pos", node.at("/query/wrap/layer").asText());
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
-        assertEquals(node.at("/query/wrap/rewrites/0/@type").asText(),
-                "koral:rewrite");
+        assertEquals("koral:rewrite",
+            node.at("/query/wrap/rewrites/0/@type").asText());
     }
 
     @Test
@@ -163,7 +163,7 @@ public class FoundryRewriteTest extends TestBase {
         String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/@type").asText(), "koral:termGroup");
+        assertEquals("koral:termGroup", node.at("/query/wrap/@type").asText());
         assertFalse(node.at("/query/wrap/operands/0/foundry").isMissingNode());
         assertFalse(node.at("/query/wrap/operands/0/rewrites").isMissingNode());
         assertFalse(node.at("/query/wrap/operands/1/foundry").isMissingNode());
@@ -178,7 +178,7 @@ public class FoundryRewriteTest extends TestBase {
         String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/@type").asText(), "koral:termGroup");
+        assertEquals("koral:termGroup", node.at("/query/wrap/@type").asText());
         assertFalse(node.at("/query/wrap/operands/0/foundry").isMissingNode());
         assertFalse(node.at("/query/wrap/operands/0/rewrites").isMissingNode());
         assertFalse(node.at("/query/wrap/operands/1/foundry").isMissingNode());
@@ -191,7 +191,7 @@ public class FoundryRewriteTest extends TestBase {
         s.setQuery("[orth=laufen]", "poliqarp");
         String result = rewriteHandler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
-        assertEquals(node.at("/query/wrap/@type").asText(), "koral:term");
+        assertEquals("koral:term", node.at("/query/wrap/@type").asText());
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
     }
