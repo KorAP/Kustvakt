@@ -71,8 +71,8 @@ public class OAuth2RClientTest extends OAuth2TestBase {
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();
-        assertEquals(redirectUri.getScheme(), "http");
-        assertEquals(redirectUri.getHost(), "localhost");
+        assertEquals("http", redirectUri.getScheme());
+        assertEquals("localhost", redirectUri.getHost());
         assertEquals(1410, redirectUri.getPort());
         MultiValueMap<String, String> params = UriComponentsBuilder
                 .fromUri(redirectUri).build().getQueryParams();
