@@ -74,14 +74,14 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
             throws IOException, QueryException, KustvaktException {
         vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
         JsonNode n = testRetrieveField("system", "named-vc1", "textSigle");
-        assertEquals(n.at("/@context").asText(),
-                "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld");
-        assertEquals(n.at("/corpus/key").asText(), "textSigle");
+        assertEquals("http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+            n.at("/@context").asText());
+        assertEquals("textSigle", n.at("/corpus/key").asText());
         assertEquals(2, n.at("/corpus/value").size());
         n = testRetrieveField("system", "named-vc1", "author");
         assertEquals(2, n.at("/corpus/value").size());
-        assertEquals(n.at("/corpus/value/0").asText(),
-                "Goethe, Johann Wolfgang von");
+        assertEquals("Goethe, Johann Wolfgang von",
+            n.at("/corpus/value/0").asText());
         testRetrieveUnknownTokens();
         testRetrieveProhibitedField("system", "named-vc1", "tokens");
         testRetrieveProhibitedField("system", "named-vc1", "base");
@@ -91,7 +91,7 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
     private void testRetrieveUnknownTokens ()
             throws ProcessingException, KustvaktException {
         JsonNode n = testRetrieveField("system", "named-vc1", "unknown");
-        assertEquals(n.at("/corpus/key").asText(), "unknown");
+        assertEquals("unknown", n.at("/corpus/key").asText());
         assertEquals(0, n.at("/corpus/value").size());
     }
 
@@ -111,7 +111,7 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
         JsonNode n = testRetrieveField("system", "named-vc3", "textSigle");
         n = n.at("/corpus/value");
         assertEquals(1, n.size());
-        assertEquals(n.get(0).asText(), "GOE/AGI/00000");
+        assertEquals("GOE/AGI/00000", n.get(0).asText());
         testDeleteVC("named-vc3", "system", admin);
     }
 
@@ -131,8 +131,8 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: dory");
+        assertEquals("Unauthorized operation for user: dory",
+            node.at("/errors/0/1").asText());
         testDeleteVC("named-vc3", "system", admin);
     }
 }
