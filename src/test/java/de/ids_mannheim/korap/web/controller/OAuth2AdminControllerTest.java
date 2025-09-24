@@ -165,8 +165,8 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Scope vc_info is not authorized");
+        assertEquals("Scope vc_info is not authorized",
+            node.at("/errors/0/1").asText());
         // search
         response = searchWithAccessToken(accessToken);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -182,7 +182,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Access token is invalid");
+        assertEquals("Access token is invalid",
+            node.at("/errors/0/1").asText());
     }
 }
