@@ -90,8 +90,8 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/errors/0/0").asInt(),
-                de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION);
+        assertEquals(de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION,
+            node.at("/errors/0/0").asInt());
         assertTrue(node.at("/errors/0/1").asText().contains(" is not found"));
     }
 
