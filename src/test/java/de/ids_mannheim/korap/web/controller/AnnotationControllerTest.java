@@ -41,16 +41,16 @@ public class AnnotationControllerTest extends SpringJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity);
         n = n.get(0);
-        assertEquals(n.get("code").asText(), "opennlp");
-        assertEquals(n.get("description").asText(), "OpenNLP");
+        assertEquals("opennlp", n.get("code").asText());
+        assertEquals("OpenNLP", n.get("description").asText());
         assertEquals(1, n.get("layers").size());
         n = n.get("layers").get(0);
-        assertEquals(n.get("code").asText(), "p");
-        assertEquals(n.get("description").asText(), "Part-of-Speech");
+        assertEquals("p", n.get("code").asText());
+        assertEquals("Part-of-Speech", n.get("description").asText());
         assertEquals(52, n.get("keys").size());
         n = n.get("keys").get(0);
-        assertEquals(n.get("code").asText(), "ADJA");
-        assertEquals(n.get("description").asText(), "Attributive Adjective");
+        assertEquals("ADJA", n.get("code").asText());
+        assertEquals("Attributive Adjective", n.get("description").asText());
         assertTrue(n.get("values") == null);
     }
 
@@ -62,21 +62,21 @@ public class AnnotationControllerTest extends SpringJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity);
         n = n.get(0);
-        assertEquals(n.get("code").asText(), "mate");
-        assertEquals(n.get("description").asText(), "Mate");
+        assertEquals("mate", n.get("code").asText());
+        assertEquals("Mate", n.get("description").asText());
         assertEquals(1, n.get("layers").size());
         n = n.get("layers").get(0);
-        assertEquals(n.get("code").asText(), "m");
-        assertEquals(n.get("description").asText(), "Morphology");
+        assertEquals("m", n.get("code").asText());
+        assertEquals("Morphology", n.get("description").asText());
         assertEquals(8, n.get("keys").size());
         n = n.get("keys").get(1);
-        assertEquals(n.get("code").asText(), "case");
-        assertEquals(n.get("description").asText(), "Case");
+        assertEquals("case", n.get("code").asText());
+        assertEquals("Case", n.get("description").asText());
         assertEquals(5, n.get("values").size());
         n = n.get("values");
         Iterator<Entry<String, JsonNode>> fields = n.fields();
         Entry<String, JsonNode> e = fields.next();
-        assertEquals(e.getKey(), "*");
-        assertEquals(e.getValue().asText(), "Undefined");
+        assertEquals("*", e.getKey());
+        assertEquals("Undefined", e.getValue().asText());
     }
 }
