@@ -52,10 +52,10 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/layer").asText(), "orth");
-        assertEquals(node.at("/query/wrap/foundry").asText(), "opennlp");
-        assertEquals(node.at("/meta/context").asText(), "sentence");
-        assertEquals(node.at("/meta/count").asText(), "13");
+        assertEquals("orth", node.at("/query/wrap/layer").asText());
+        assertEquals("opennlp", node.at("/query/wrap/foundry").asText());
+        assertEquals("sentence", node.at("/meta/context").asText());
+        assertEquals("13", node.at("/meta/count").asText());
     }
 
     // EM: The API is disabled
@@ -83,8 +83,8 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         Response response = target().path(API_VERSION).path("").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String message = response.readEntity(String.class);
-        assertEquals(response.getHeaders().getFirst("X-Index-Revision"),
-                "Wes8Bd4h1OypPqbWF5njeQ==");
+        assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getHeaders().getFirst("X-Index-Revision"));
         assertEquals(message, config.getApiWelcomeMessage());
     }
 
@@ -98,9 +98,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/layer").asText(), "orth");
-        assertEquals(node.at("/meta/context").asText(), "base/s:s");
-        assertEquals(node.at("/meta/count").asText(), "13");
+        assertEquals("orth", node.at("/query/wrap/layer").asText());
+        assertEquals("base/s:s", node.at("/meta/context").asText());
+        assertEquals("13", node.at("/meta/count").asText());
         assertNotEquals(0, node.at("/matches").size());
     }
 
@@ -131,8 +131,8 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/layer").asText(), "orth");
-        assertEquals(node.at("/query/wrap/foundry").asText(), "opennlp");
+        assertEquals("orth", node.at("/query/wrap/layer").asText());
+        assertEquals("opennlp", node.at("/query/wrap/foundry").asText());
     }
 
     // EM: The API is disabled
@@ -147,7 +147,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/layer").asText(), "orth");
+        assertEquals("orth", node.at("/query/wrap/layer").asText());
         assertNotEquals(0, node.at("/matches").size());
     }
 
@@ -162,10 +162,10 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/layer").asText(), "orth");
+        assertEquals("orth", node.at("/query/wrap/layer").asText());
         assertNotEquals(0, node.at("/matches").size());
-        assertEquals(node.at("/meta/fields").toString(),
-                "[\"author\",\"docSigle\"]");
+        assertEquals("[\"author\",\"docSigle\"]",
+            node.at("/meta/fields").toString());
     }
 
     @Test
@@ -178,10 +178,10 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(node.at("/textSigle").asText(), "GOE/AGA/01784");
-        assertEquals(node.at("/matchID").asText(),
-                "match-GOE/AGA/01784-p36-46(5)37-45(2)38-42");
-        assertEquals(node.at("/title").asText(), "Belagerung von Mainz");
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("match-GOE/AGA/01784-p36-46(5)37-45(2)38-42",
+            node.at("/matchID").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
     }
 
     @Test
@@ -194,12 +194,12 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(node.at("/snippet").asText(),
-                "<span class=\"context-left\"></span><span class=\"match\">der alte freie Weg nach Mainz war gesperrt, ich mußte über die Schiffbrücke bei Rüsselsheim; in Ginsheim ward <mark>gefüttert; der Ort ist sehr zerschossen; dann über die Schiffbrücke</mark> auf die Nonnenaue, wo viele Bäume niedergehauen lagen, sofort auf dem zweiten Teil der Schiffbrücke über den größern Arm des Rheins.</span><span class=\"context-right\"></span>");
-        assertEquals(node.at("/textSigle").asText(), "GOE/AGA/01784");
-        assertEquals(node.at("/matchID").asText(),
-                "match-GOE/AGA/01784-p36-46(5)37-45(2)38-42");
-        assertEquals(node.at("/title").asText(), "Belagerung von Mainz");
+        assertEquals("<span class=\"context-left\"></span><span class=\"match\">der alte freie Weg nach Mainz war gesperrt, ich mußte über die Schiffbrücke bei Rüsselsheim; in Ginsheim ward <mark>gefüttert; der Ort ist sehr zerschossen; dann über die Schiffbrücke</mark> auf die Nonnenaue, wo viele Bäume niedergehauen lagen, sofort auf dem zweiten Teil der Schiffbrücke über den größern Arm des Rheins.</span><span class=\"context-right\"></span>",
+            node.at("/snippet").asText());
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("match-GOE/AGA/01784-p36-46(5)37-45(2)38-42",
+            node.at("/matchID").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
     }
 
     @Test
@@ -212,12 +212,12 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(node.at("/textSigle").asText(), "GOE/AGA/01784");
-        assertEquals(node.at("/matchID").asText(),
-                "match-GOE/AGA/01784-p36-46(5)37-45(2)38-42");
-        assertEquals(node.at("/snippet").asText(),
-                "<span class=\"context-left\"><span class=\"more\"></span></span><span class=\"match\"><mark>gefüttert; der Ort ist sehr zerschossen; dann über die Schiffbrücke</mark></span><span class=\"context-right\"><span class=\"more\"></span></span>");
-        assertEquals(node.at("/title").asText(), "Belagerung von Mainz");
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("match-GOE/AGA/01784-p36-46(5)37-45(2)38-42",
+            node.at("/matchID").asText());
+        assertEquals("<span class=\"context-left\"><span class=\"more\"></span></span><span class=\"match\"><mark>gefüttert; der Ort ist sehr zerschossen; dann über die Schiffbrücke</mark></span><span class=\"context-right\"><span class=\"more\"></span></span>",
+            node.at("/snippet").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
     }
 
     @Test
@@ -230,7 +230,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(node.at("/textSigle").asText(), "GOE/AGA/01784");
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
         assertEquals(
                 "<span class=\"context-left\"></span><span class=\"match\">"
                         + "der alte freie Weg nach Mainz war gesperrt, ich mußte über die "
@@ -241,9 +241,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                         + "zweiten Teil der Schiffbrücke über den größern Arm des Rheins.</span>"
                         + "<span class=\"context-right\"></span>",
                 node.at("/snippet").asText());
-        assertEquals(node.at("/matchID").asText(),
-                "match-GOE/AGA/01784-p36-46(5)37-45(2)38-42");
-        assertEquals(node.at("/title").asText(), "Belagerung von Mainz");
+        assertEquals("match-GOE/AGA/01784-p36-46(5)37-45(2)38-42",
+            node.at("/matchID").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
     }
 
     @Test
@@ -255,8 +255,8 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(node.at("/textSigle").asText(), "GOE/AGA/01784");
-        assertEquals(node.at("/title").asText(), "Belagerung von Mainz");
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
     }
 
     // EM: The API is disabled
@@ -273,10 +273,10 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/layer").asText(), "orth");
-        assertEquals(node.at("/collection/operands/0/value").asText(),
-                "Politik");
-        assertEquals(node.at("/collection/operands/1/value").asText(), "WPD");
+        assertEquals("orth", node.at("/query/wrap/layer").asText());
+        assertEquals("Politik",
+            node.at("/collection/operands/0/value").asText());
+        assertEquals("WPD", node.at("/collection/operands/1/value").asText());
         response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
@@ -291,10 +291,10 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         query = response.readEntity(String.class);
         node = JsonUtils.readTree(query);
         assertNotNull(node);
-        assertEquals(node.at("/query/wrap/layer").asText(), "orth");
-        assertEquals(node.at("/collection/operands/0/value").asText(),
-                "Politik");
-        assertEquals(node.at("/collection/operands/1/value").asText(), "WPD");
+        assertEquals("orth", node.at("/query/wrap/layer").asText());
+        assertEquals("Politik",
+            node.at("/collection/operands/0/value").asText());
+        assertEquals("WPD", node.at("/collection/operands/1/value").asText());
     }
 
     @Test
@@ -325,7 +325,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertFalse(node.at("/hasSnippet").asBoolean());
         assertTrue(node.at("/hasTokens").asBoolean());
         assertTrue(node.at("/snippet").isMissingNode());
-        assertEquals(node.at("/tokens/match/0").asText(), "die");
+        assertEquals("die", node.at("/tokens/match/0").asText());
         assertTrue(node.at("/tokens/match/1").isMissingNode());
     }
 
@@ -342,32 +342,32 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         while (fieldIter.hasNext()) {
             JsonNode field = (JsonNode) fieldIter.next();
             String key = field.at("/key").asText();
-            assertEquals(field.at("/@type").asText(), "koral:field");
+            assertEquals("koral:field", field.at("/@type").asText());
             switch (key) {
                 case "textSigle":
-                    assertEquals(field.at("/type").asText(), "type:string");
-                    assertEquals(field.at("/value").asText(), "GOE/AGA/01784");
+                    assertEquals("type:string", field.at("/type").asText());
+                    assertEquals("GOE/AGA/01784", field.at("/value").asText());
                     checkC++;
                     break;
                 case "author":
-                    assertEquals(field.at("/type").asText(), "type:text");
-                    assertEquals(field.at("/value").asText(),
-                            "Goethe, Johann Wolfgang von");
+                    assertEquals("type:text", field.at("/type").asText());
+                    assertEquals("Goethe, Johann Wolfgang von",
+                        field.at("/value").asText());
                     checkC++;
                     break;
                 case "docSigle":
-                    assertEquals(field.at("/type").asText(), "type:string");
-                    assertEquals(field.at("/value").asText(), "GOE/AGA");
+                    assertEquals("type:string", field.at("/type").asText());
+                    assertEquals("GOE/AGA", field.at("/value").asText());
                     checkC++;
                     break;
                 case "docTitle":
-                    assertEquals(field.at("/type").asText(), "type:text");
-                    assertEquals(field.at("/value").asText(),
-                            "Goethe: Autobiographische Schriften II, (1817-1825, 1832)");
+                    assertEquals("type:text", field.at("/type").asText());
+                    assertEquals("Goethe: Autobiographische Schriften II, (1817-1825, 1832)",
+                        field.at("/value").asText());
                     checkC++;
                     break;
                 case "pubDate":
-                    assertEquals(field.at("/type").asText(), "type:date");
+                    assertEquals("type:date", field.at("/type").asText());
                     assertEquals(1982, field.at("/value").asInt());
                     checkC++;
                     break;
@@ -383,7 +383,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 .request().accept(MediaType.APPLICATION_JSON).get();
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
-        assertEquals(location.getPath(), "/api/v1.0/search");
+        assertEquals("/api/v1.0/search", location.getPath());
     }
 
     @Test
@@ -393,7 +393,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 .request().accept(MediaType.APPLICATION_JSON).get();
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
-        assertEquals(location.getPath(), "/api/v1.0/search");
+        assertEquals("/api/v1.0/search", location.getPath());
     }
 
     @Test
@@ -444,10 +444,10 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
-        assertEquals(node.at("/matches/0/author").asText(),
-                "Goethe, Johann Wolfgang von");
-        assertEquals(node.at("/matches/0/title").asText(),
-                "Italienische Reise");
+        assertEquals("Goethe, Johann Wolfgang von",
+            node.at("/matches/0/author").asText());
+        assertEquals("Italienische Reise",
+            node.at("/matches/0/title").asText());
         // assertEquals(3, node.at("/matches/0").size());
     }
 
@@ -463,9 +463,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.NON_PUBLIC_FIELD_IGNORED,
                 node.at("/warnings/0/0").asInt());
-        assertEquals(node.at("/warnings/0/1").asText(),
-                "The requested non public fields are ignored");
-        assertEquals(node.at("/warnings/0/2").asText(), "snippet");
+        assertEquals("The requested non public fields are ignored",
+            node.at("/warnings/0/1").asText());
+        assertEquals("snippet", node.at("/warnings/0/2").asText());
     }
 
     @Test
@@ -478,7 +478,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "page must start from 1");
+        assertEquals("page must start from 1", node.at("/errors/0/1").asText());
     }
 
     @Test
