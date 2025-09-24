@@ -31,8 +31,8 @@ public class StatisticsControllerTest extends OAuth2TestBase {
         Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("cq", corpusQuery).request().get();
         assert Status.OK.getStatusCode() == response.getStatus();
-        assertEquals(response.getHeaders().getFirst("X-Index-Revision"),
-                "Wes8Bd4h1OypPqbWF5njeQ==");
+        assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getHeaders().getFirst("X-Index-Revision"));
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(0,node.get("documents").asInt());
@@ -44,7 +44,7 @@ public class StatisticsControllerTest extends OAuth2TestBase {
     	Response response = requestTokenWithDoryPassword(superClientId,
                 clientSecret);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(node.at("/scope").asText(), "all");
+        assertEquals("all", node.at("/scope").asText());
         String accessToken = node.at("/access_token").asText();
         
     	String corpusQuery = "corpusSigle=GOE";
@@ -156,8 +156,8 @@ public class StatisticsControllerTest extends OAuth2TestBase {
                         + "\"koral:doc\", \"key\": \"availability\", \"match\": "
                         + "\"match:eq\", \"type\": \"type:regex\", \"value\": "
                         + "\"CC.*\"} }"));
-        assertEquals(response.getHeaders().getFirst("X-Index-Revision"),
-                "Wes8Bd4h1OypPqbWF5njeQ==");
+        assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getHeaders().getFirst("X-Index-Revision"));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
