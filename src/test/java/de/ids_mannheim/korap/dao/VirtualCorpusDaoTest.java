@@ -73,9 +73,9 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
                             "experimental", false, "system", null, null);
                 });
 
-        assertEquals(exception.getMessage(),
-                "Converting `org.hibernate.exception.GenericJDBCException` "
-                        + "to JPA `PersistenceException` : could not execute statement");
+        assertEquals("Converting `org.hibernate.exception.GenericJDBCException` "
+                        + "to JPA `PersistenceException` : could not execute statement",
+            exception.getMessage());
     }
 
     @Test
