@@ -28,10 +28,10 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
-        assertEquals(node.at("/textSigle").asText(), "GOE/AGA/01784");
-        assertEquals(node.at("/title").asText(), "Belagerung von Mainz");
-        assertEquals(node.at("/author").asText(),
-                "Goethe, Johann Wolfgang von");
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
+        assertEquals("Goethe, Johann Wolfgang von",
+            node.at("/author").asText());
         assertTrue(node.at("/snippet").asText()
                 .startsWith("<span class=\"context-left\"></span>"
                         + "<span class=\"match\">"));
@@ -85,17 +85,17 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
-        assertEquals(node.at("/textSigle").asText(), "GOE/AGI/04846");
-        assertEquals(node.at("/title").asText(),
-                "Zweiter römischer Aufenthalt");
-        assertEquals(node.at("/subTitle").asText(),
-                "vom Juni 1787 bis April 1788");
-        assertEquals(node.at("/author").asText(),
-                "Goethe, Johann Wolfgang von");
+        assertEquals("GOE/AGI/04846", node.at("/textSigle").asText());
+        assertEquals("Zweiter römischer Aufenthalt",
+            node.at("/title").asText());
+        assertEquals("vom Juni 1787 bis April 1788",
+            node.at("/subTitle").asText());
+        assertEquals("Goethe, Johann Wolfgang von",
+            node.at("/author").asText());
         assertTrue(node.at("/snippet").asText()
                 .startsWith("<span class=\"context-left\"></span>"
                         + "<span class=\"match\">"));
-        assertEquals(node.at("/availability").asText(), "QAO-NC-LOC:ids");
+        assertEquals("QAO-NC-LOC:ids", node.at("/availability").asText());
     }
 
     @Test
