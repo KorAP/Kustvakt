@@ -88,9 +88,9 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
                 response.getStatus());
 
         URI redirectUri = response.getLocation();
-        assertEquals(redirectUri.getScheme(), "https");
-        assertEquals(redirectUri.getHost(), "third.party.com");
-        assertEquals(redirectUri.getPath(), "/confidential/redirect");
+        assertEquals("https", redirectUri.getScheme());
+        assertEquals("third.party.com", redirectUri.getHost());
+        assertEquals("/confidential/redirect", redirectUri.getPath());
 
         String[] queryParts = redirectUri.getQuery().split("&");
         assertEquals("error_description=scope+is+required", queryParts[1]);
