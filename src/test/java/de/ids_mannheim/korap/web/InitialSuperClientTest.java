@@ -56,8 +56,8 @@ public class InitialSuperClientTest extends OAuth2TestBase {
         assertTrue(!node.at("/access_token").isMissingNode());
         assertTrue(!node.at("/refresh_token").isMissingNode());
         assertTrue(!node.at("/expires_in").isMissingNode());
-        assertEquals(node.at("/scope").asText(), "all");
-        assertEquals(node.at("/token_type").asText(), "Bearer");
+        assertEquals("all", node.at("/scope").asText());
+        assertEquals("Bearer", node.at("/token_type").asText());
     }
 
     private void removeSuperClientFile () {
