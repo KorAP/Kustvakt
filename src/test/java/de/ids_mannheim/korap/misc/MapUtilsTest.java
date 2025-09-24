@@ -20,8 +20,8 @@ public class MapUtilsTest {
         mm.put("k1", Arrays.asList(new String[] { "a", "b", "c" }));
         mm.put("k2", Arrays.asList(new String[] { "d", "e", "f" }));
         Map<String, String> map = MapUtils.toMap(mm);
-        assertEquals(map.get("k1"), "a b c");
-        assertEquals(map.get("k2"), "d e f");
+        assertEquals("a b c", map.get("k1"));
+        assertEquals("d e f", map.get("k2"));
     }
 
     @Test
