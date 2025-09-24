@@ -68,7 +68,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         // list user VC
         JsonNode node = listVC(testUser);
         assertEquals(2, node.size());
-        assertEquals(node.get(1).get("name").asText(), "new_vc");
+        assertEquals("new_vc", node.get(1).get("name").asText());
         
         testCreateVC_sameName(testUser, "new_vc", ResourceType.PRIVATE);
         
@@ -163,8 +163,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Access token is invalid");
+        assertEquals("Access token is invalid",
+            node.at("/errors/0/1").asText());
         checkWWWAuthenticateHeader(response);
     }
 
@@ -190,8 +190,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Access token is expired");
+        assertEquals("Access token is expired",
+            node.at("/errors/0/1").asText());
         checkWWWAuthenticateHeader(response);
     }
 
@@ -227,8 +227,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "queryName must contain at least 3 characters");
+        assertEquals("queryName must contain at least 3 characters",
+            node.at("/errors/0/1").asText());
     }
 
     @Test
@@ -244,8 +244,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: guest");
+        assertEquals("Unauthorized operation for user: guest",
+            node.at("/errors/0/1").asText());
         checkWWWAuthenticateHeader(response);
     }
 
@@ -264,8 +264,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "corpusQuery is null");
-        assertEquals(node.at("/errors/0/2").asText(), "corpusQuery");
+        assertEquals("corpusQuery is null", node.at("/errors/0/1").asText());
+        assertEquals("corpusQuery", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -280,8 +280,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "request entity is null");
-        assertEquals(node.at("/errors/0/2").asText(), "request entity");
+        assertEquals("request entity is null", node.at("/errors/0/1").asText());
+        assertEquals("request entity", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -299,8 +299,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "type is null");
-        assertEquals(node.at("/errors/0/2").asText(), "type");
+        assertEquals("type is null", node.at("/errors/0/1").asText());
+        assertEquals("type", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -413,13 +413,13 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         editVC("dory", "dory", "dory-vc", json);
         // check VC
         JsonNode node = retrieveVCInfo("dory", "dory", "dory-vc");
-        assertEquals(node.at("/description").asText(), "edited vc");
+        assertEquals("edited vc", node.at("/description").asText());
         // 2nd edit
         json = "{\"description\": \"test vc\"}";
         editVC("dory", "dory", "dory-vc", json);
         // check VC
         node = retrieveVCInfo("dory", "dory", "dory-vc");
-        assertEquals(node.at("/description").asText(), "test vc");
+        assertEquals("test vc", node.at("/description").asText());
         deleteVC("dory-vc", "dory", "dory");
     }
 
@@ -444,30 +444,30 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             throws ProcessingException, KustvaktException {
     	createDoryVC();
         JsonNode node = testRetrieveKoralQuery("dory", "dory-vc");
-        assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
-        assertEquals(node.at("/collection/operation").asText(),
-                "operation:and");
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("operation:and",
+            node.at("/collection/operation").asText());
         assertEquals(2, node.at("/collection/operands").size());
         String json = "{\"corpusQuery\": \"corpusSigle=WPD17\"}";
         editVC("dory", "dory", "dory-vc", json);
         node = testRetrieveKoralQuery("dory", "dory-vc");
-        assertEquals(node.at("/collection/@type").asText(), "koral:doc");
-        assertEquals(node.at("/collection/key").asText(), "corpusSigle");
-        assertEquals(node.at("/collection/value").asText(), "WPD17");
+        assertEquals("koral:doc", node.at("/collection/@type").asText());
+        assertEquals("corpusSigle", node.at("/collection/key").asText());
+        assertEquals("WPD17", node.at("/collection/value").asText());
         
         json = "{\"corpusQuery\": \"corpusSigle=GOE AND creationDate since "
                 + "1820\"}";
         editVC("dory", "dory", "dory-vc", json);
         node = testRetrieveKoralQuery("dory", "dory-vc");
-        assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
-        assertEquals(node.at("/collection/operation").asText(),
-                "operation:and");
-        assertEquals(node.at("/collection/operands/0/key").asText(),
-                "corpusSigle");
-        assertEquals(node.at("/collection/operands/0/value").asText(), "GOE");
-        assertEquals(node.at("/collection/operands/1/key").asText(),
-                "creationDate");
-        assertEquals(node.at("/collection/operands/1/value").asText(), "1820");
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("operation:and",
+            node.at("/collection/operation").asText());
+        assertEquals("corpusSigle",
+            node.at("/collection/operands/0/key").asText());
+        assertEquals("GOE", node.at("/collection/operands/0/value").asText());
+        assertEquals("creationDate",
+            node.at("/collection/operands/1/key").asText());
+        assertEquals("1820", node.at("/collection/operands/1/value").asText());
         
         deleteVC("dory-vc", "dory", "dory");
     }
