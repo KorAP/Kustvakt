@@ -23,7 +23,7 @@ public class KoralNodeTest {
         ObjectNode node = JsonUtils.createObjectNode();
         KoralNode knode = KoralNode.wrapNode(node);
         knode.put("value_1", "setting_1");
-        assertEquals(knode.rawNode().toString(), "{\"value_1\":\"setting_1\"}");
+        assertEquals("{\"value_1\":\"setting_1\"}", knode.rawNode().toString());
     }
 
     @Test
@@ -33,7 +33,7 @@ public class KoralNodeTest {
         KoralNode knode = KoralNode.wrapNode(node);
         knode.remove("value_1",
                 new RewriteIdentifier("value_1", "", "settings_1"));
-        assertEquals(knode.rawNode().toString(), "{}");
+        assertEquals("{}", knode.rawNode().toString());
     }
 
     @Test
@@ -43,8 +43,8 @@ public class KoralNodeTest {
         KoralNode knode = KoralNode.wrapNode(node);
         knode.replace("value_1", "settings_2",
                 new RewriteIdentifier("value_1", "setting_1", ""));
-        assertEquals(knode.rawNode().toString(),
-                "{\"value_1\":\"settings_2\"}");
+        assertEquals("{\"value_1\":\"settings_2\"}",
+            knode.rawNode().toString());
     }
 
     // todo: 21.10.15 --> if a node is injected, that node must contain a "rewrites" reference?!
