@@ -122,6 +122,10 @@
 				</prop>
 				<prop key="hibernate.cache.provider_class">${hibernate.cache.provider}</prop>
 				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory}</prop>
+				<!-- JCache / Ehcache 3 settings -->
+				<prop key="hibernate.javax.cache.provider">${hibernate.javax.cache.provider}</prop>
+				<prop key="hibernate.javax.cache.uri">${hibernate.javax.cache.uri}</prop>
+				<prop key="hibernate.javax.cache.missing_cache_strategy">${hibernate.javax.cache.missing_cache_strategy}</prop>
 				<prop key="hibernate.jdbc.time_zone">${hibernate.jdbc.time_zone}</prop>
 			</props>
 		</property>
