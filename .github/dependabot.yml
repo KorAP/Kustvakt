@@ -9,9 +9,4 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
-    ignore:
-      # Hibernate >=6.2 is incompatible
-      - dependency-name: "org.hibernate.orm:hibernate-*"
-        versions:
-          - ">= 6.2.0"
     open-pull-requests-limit: 50

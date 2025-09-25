@@ -111,7 +111,23 @@ public class UserGroupDao {
                     "groupId: " + groupId);
         }
 
-        // EM: this seems weird
+        // Before deleting the group, detach role associations from members to
+        // avoid transient role references during flush
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserGroupMember> cq = cb.createQuery(UserGroupMember.class);
+        Root<UserGroupMember> memberRoot = cq.from(UserGroupMember.class);
+        cq.select(memberRoot);
+        cq.where(cb.equal(memberRoot.get(UserGroupMember_.group).get("id"), groupId));
+        @SuppressWarnings("unchecked")
+        List<UserGroupMember> members = entityManager.createQuery(cq).getResultList();
+        for (UserGroupMember m : members) {
+            if (!entityManager.contains(m)) {
+                m = entityManager.merge(m);
+            }
+            m.setRoles(new HashSet<>());
+            entityManager.merge(m);
+        }
+
         if (!entityManager.contains(group)) {
             group = entityManager.merge(group);
         }
