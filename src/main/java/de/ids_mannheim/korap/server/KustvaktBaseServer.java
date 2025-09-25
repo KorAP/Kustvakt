@@ -19,8 +19,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ShutdownHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -39,7 +39,7 @@ import lombok.Setter;
 public abstract class KustvaktBaseServer {
 
     private Logger log = LogManager.getLogger(KustvaktBaseServer.class);
-    
+
     protected static KustvaktConfiguration config;
     protected static String springConfig = "default-config.xml";
 

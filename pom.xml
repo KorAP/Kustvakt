@@ -15,7 +15,7 @@
 		<!-- spring6.version is used in jersey and defined here 
 		to make sure that jersey uses the correct spring version-->
 		<spring6.version>${spring.version}</spring6.version>
-		<jetty.version>11.0.25</jetty.version>
+		<jetty.version>12.1.1</jetty.version>
 		<flyway.version>11.13.1</flyway.version>
 		<log4j.version>2.25.2</log4j.version>
 		<krill.version>[0.64.2,)</krill.version>
@@ -446,13 +446,13 @@
 			<version>${jetty.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlet</artifactId>
+			<groupId>org.eclipse.jetty.ee10</groupId>
+			<artifactId>jetty-ee10-servlet</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-webapp</artifactId>
+			<groupId>org.eclipse.jetty.ee10</groupId>
+			<artifactId>jetty-ee10-webapp</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
 
