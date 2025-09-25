@@ -178,10 +178,29 @@ public class QueryService extends BasicService {
         else if (query.getCreatedBy().equals(deletedBy)
                 || adminDao.isAdmin(deletedBy)) {
 
-            if (query.getType().equals(ResourceType.PUBLISHED)) {
-                UserGroup group = userGroupDao
-                        .retrieveHiddenGroupByQueryName(queryName);
-                userGroupDao.deleteGroup(group.getId(), deletedBy);
+            // If published, fetch the hidden group BEFORE deleting roles, so we can remove
+            // it later
+            UserGroup hiddenGroup = null;
+            boolean isPublished = query.getType().equals(ResourceType.PUBLISHED);
+            if (isPublished) {
+                hiddenGroup = userGroupDao.retrieveHiddenGroupByQueryName(queryName);
+            }
+
+            // Detach member-role links and delete all roles linked to the query
+            List<Role> queryRoles = roleDao.retrieveRolesByQueryIdWithMembers(query.getId());
+            for (Role role : queryRoles) {
+                if (role.getUserGroupMembers() != null) {
+                    for (UserGroupMember m : role.getUserGroupMembers()) {
+                        if (m.getRoles() != null && m.getRoles().remove(role)) {
+                            memberDao.updateMember(m);
+                        }
+                    }
+                }
+            }
+            roleDao.deleteRolesByQueryId(query.getId());
+
+            if (isPublished && hiddenGroup != null) {
+                userGroupDao.deleteGroup(hiddenGroup.getId(), deletedBy);
             }
             if (type.equals(QueryType.VIRTUAL_CORPUS)
                     && VirtualCorpusCache.contains(queryName)) {

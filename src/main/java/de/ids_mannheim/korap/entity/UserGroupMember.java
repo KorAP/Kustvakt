@@ -4,6 +4,7 @@ import java.util.Set;
 
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -50,7 +51,7 @@ public class UserGroupMember {
      * describe a member.
      * 
      */
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
     @JoinTable(name = "group_member_role", joinColumns = @JoinColumn(name = "group_member_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
             "group_member_id", "role_id" }))
     private Set<Role> roles;

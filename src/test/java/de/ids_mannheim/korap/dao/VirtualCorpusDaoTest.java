@@ -73,9 +73,14 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
                             "experimental", false, "system", null, null);
                 });
 
-        assertEquals("Converting `org.hibernate.exception.GenericJDBCException` "
-                        + "to JPA `PersistenceException` : could not execute statement",
-            exception.getMessage());
+        String msg = exception.getMessage();
+        // Hibernate 7 exposes provider/DB-specific message; assert key parts
+        org.junit.jupiter.api.Assertions.assertTrue(
+                msg.contains("could not execute statement"),
+                () -> "Unexpected message: " + msg);
+        org.junit.jupiter.api.Assertions.assertTrue(
+                msg.contains("UNIQUE") || msg.contains("constraint"),
+                () -> "Expected unique constraint error in message: " + msg);
     }
 
     @Test

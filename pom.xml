@@ -9,8 +9,7 @@
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jersey.version>3.1.11</jersey.version>
-		<hibernate.ehcache.version>6.0.0.Alpha7</hibernate.ehcache.version>
-		<hibernate.version>6.1.7.Final</hibernate.version>
+		<hibernate.version>7.1.1.Final</hibernate.version>
 		<spring.version>6.2.11</spring.version>
 		<!-- spring6.version is used in jersey and defined here 
 		to make sure that jersey uses the correct spring version-->
@@ -523,17 +522,7 @@
 			<artifactId>hibernate-jpamodelgen</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-ehcache</artifactId>
-			<version>${hibernate.ehcache.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.hibernate</groupId>
-					<artifactId>hibernate-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		<!-- Remove hibernate-ehcache (Ehcache 2 integration removed in modern Hibernate) -->
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-c3p0</artifactId>
@@ -586,6 +575,11 @@
 		</dependency>
 
 		<!-- Utilities -->
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>2.10.6</version>
+		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>

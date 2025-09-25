@@ -42,12 +42,38 @@ public class UserGroupMemberDao {
 
     public void addMember (UserGroupMember member) throws KustvaktException {
         ParameterChecker.checkObjectValue(member, "userGroupMember");
+        if (member.getRoles() != null) {
+            java.util.Set<Role> normalized = new java.util.HashSet<Role>();
+            for (Role role : member.getRoles()) {
+                if (role.getId() == 0) {
+                    entityManager.persist(role);
+                    normalized.add(role);
+                } else {
+                    Role attached = entityManager.contains(role) ? role : entityManager.merge(role);
+                    normalized.add(attached);
+                }
+            }
+            member.setRoles(normalized);
+        }
         entityManager.persist(member);
         entityManager.flush();
     }
 
     public void updateMember (UserGroupMember member) throws KustvaktException {
         ParameterChecker.checkObjectValue(member, "UserGroupMember");
+        if (member.getRoles() != null) {
+            java.util.Set<Role> normalized = new java.util.HashSet<Role>();
+            for (Role role : member.getRoles()) {
+                if (role.getId() == 0) {
+                    entityManager.persist(role);
+                    normalized.add(role);
+                } else {
+                    Role attached = entityManager.contains(role) ? role : entityManager.merge(role);
+                    normalized.add(attached);
+                }
+            }
+            member.setRoles(normalized);
+        }
         entityManager.merge(member);
     }
 
@@ -76,7 +102,7 @@ public class UserGroupMemberDao {
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
 
         Predicate predicate = criteriaBuilder.and(
-                criteriaBuilder.equal(root.get(UserGroupMember_.group),
+                criteriaBuilder.equal(root.get(UserGroupMember_.group).get("id"),
                         groupId),
                 criteriaBuilder.equal(root.get(UserGroupMember_.userId),
                         userId));
@@ -108,7 +134,7 @@ public class UserGroupMemberDao {
         Join<UserGroupMember, Role> memberRole = root.join("roles");
 
         Predicate predicate = criteriaBuilder.and(
-                criteriaBuilder.equal(root.get(UserGroupMember_.group),
+                criteriaBuilder.equal(root.get(UserGroupMember_.group).get("id"),
                         groupId),
                 criteriaBuilder.equal(memberRole.get(Role_.NAME), role));
 
@@ -136,7 +162,7 @@ public class UserGroupMemberDao {
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
 
         Predicate predicate = criteriaBuilder.and(criteriaBuilder
-                .equal(root.get(UserGroupMember_.group), groupId));
+                .equal(root.get(UserGroupMember_.group).get("id"), groupId));
 
         query.select(root);
         query.where(predicate);
