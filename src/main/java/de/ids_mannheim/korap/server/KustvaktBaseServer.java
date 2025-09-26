@@ -17,7 +17,6 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ShutdownHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
@@ -159,14 +158,27 @@ public abstract class KustvaktBaseServer {
         connector.getConnectionFactory(HttpConnectionFactory.class)
                 .getHttpConfiguration().setRequestHeaderSize(64000);
 
-        ShutdownHandler shutdownHandler = new ShutdownHandler(adminToken, true,
-                false);
+        // Jetty 12: Use ShutdownHandler as a wrapper instead of building a HandlerList.
+        // Older code (Jetty 11):
+        // ShutdownHandler shutdownHandler = new ShutdownHandler(adminToken, true, false);
+        // HandlerList handlers = new HandlerList();
+        // handlers.addHandler(shutdownHandler);
+        // handlers.addHandler(contextHandler);
+        // server.setHandler(handlers);
 
-        HandlerList handlers = new HandlerList();
-        handlers.addHandler(shutdownHandler);
-        handlers.addHandler(contextHandler);
+        // Try the simplest available constructor first; adapt if Jetty's signature differs.
+        ShutdownHandler shutdownHandler;
+        try {
+            // Preferred (if available): token + graceful flag
+            shutdownHandler = new ShutdownHandler(adminToken, true);
+        }
+        catch (NoSuchMethodError e) {
+            // Fallback: only token constructor
+            shutdownHandler = new ShutdownHandler(adminToken);
+        }
+        shutdownHandler.setHandler(contextHandler);
+        server.setHandler(shutdownHandler);
 
-        server.setHandler(handlers);
 
         server.setConnectors(new Connector[] { connector });
         try {
