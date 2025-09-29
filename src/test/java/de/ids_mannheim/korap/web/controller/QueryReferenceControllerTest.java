@@ -37,7 +37,6 @@ public class QueryReferenceControllerTest extends TestBase {
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .get();
         String entity = response.readEntity(String.class);
-        // System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(qName, node.at("/name").asText());

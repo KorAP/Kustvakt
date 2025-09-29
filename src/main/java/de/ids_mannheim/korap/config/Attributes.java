@@ -120,22 +120,22 @@ public class Attributes {
     public static final String RIGHT_CONTEXT_ITEM_FOR_EXPORT = "rightContextItemForExport";
     public static final String RIGHT_CONTEXT_SIZE = "rightContextSize";
     public static final String RIGHT_CONTEXT_SIZE_FOR_EXPORT = "rightContextSizeForExport";
-    public static final String SELECTED_COLLECTION = "selectedCollection";
+//    public static final String SELECTED_COLLECTION = "selectedCollection";
     public static final String QUERY_LANGUAGE = "queryLanguage";
     public static final String PAGE_LENGTH = "pageLength";
     public static final String METADATA_QUERY_EXPERT_MODUS = "metadataQueryExpertModus";
-    @Deprecated
-    public static final String SEARCH_SETTINGS_TAB = "searchSettingsTab";
-    @Deprecated
-    public static final String SELECTED_BROWSER_PROPERTY = "selectedBrowserProperty";
-    @Deprecated
-    public static final String SELECTED_CONTEXT_ITEM = "selectedContextItem";
-    @Deprecated
-    public static final String SELECTED_GRAPH_TYPE = "selectedGraphType";
-    @Deprecated
-    public static final String SELECTED_SORT_TYPE = "selectedSortType";
-    @Deprecated
-    public static final String SELECTED_VIEW_FOR_SEARCH_RESULTS = "selectedViewForSearchResults";
+//    @Deprecated
+//    public static final String SEARCH_SETTINGS_TAB = "searchSettingsTab";
+//    @Deprecated
+//    public static final String SELECTED_BROWSER_PROPERTY = "selectedBrowserProperty";
+//    @Deprecated
+//    public static final String SELECTED_CONTEXT_ITEM = "selectedContextItem";
+//    @Deprecated
+//    public static final String SELECTED_GRAPH_TYPE = "selectedGraphType";
+//    @Deprecated
+//    public static final String SELECTED_SORT_TYPE = "selectedSortType";
+//    @Deprecated
+//    public static final String SELECTED_VIEW_FOR_SEARCH_RESULTS = "selectedViewForSearchResults";
     public static final String COLLECT_AUDITING_DATA = "collectData";
 
     /**
