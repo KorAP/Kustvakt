@@ -146,14 +146,17 @@ public class QueryService extends BasicService {
         Iterator<QueryDO> i = queryList.iterator();
         while (i.hasNext()) {
             query = i.next();
-            String statistics = computeStatisticsForVC(query, queryType);
+            String statistics = computeStatisticsForVC(query, queryType, 
+            		apiVersion);
 			QueryDto dto = converter.createQueryDto(query, statistics);
 			dtos.add(dto);
 		}
 		return dtos;
     }
     
-	private String computeStatisticsForVC (QueryDO query, QueryType queryType)
+    
+	private String computeStatisticsForVC (QueryDO query, QueryType queryType, 
+			double apiVersion)
 			throws KustvaktException {
 		if (config.includeStatisticsInVCList() && 
 				queryType.equals(QueryType.VIRTUAL_CORPUS)) {		
@@ -161,7 +164,7 @@ public class QueryService extends BasicService {
     		if (query.isCached()) {
     			List<String> cqList = new ArrayList<>(1);
     			cqList.add("referTo " + query.getName());
-    			json = buildKoralQueryFromCorpusQuery(cqList);
+    			json = buildKoralQueryFromCorpusQuery(cqList, apiVersion);
     		}
     		else {
     			json = query.getKoralQuery();
