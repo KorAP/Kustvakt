@@ -13,13 +13,16 @@ import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.CustomRequestLog;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.RequestLog;
+import org.eclipse.jetty.server.RequestLogWriter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ShutdownHandler;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -158,6 +161,7 @@ public abstract class KustvaktBaseServer {
         connector.getConnectionFactory(HttpConnectionFactory.class)
                 .getHttpConfiguration().setRequestHeaderSize(64000);
 
+        // MK:
         // Jetty 12: Use ShutdownHandler as a wrapper instead of building a HandlerList.
         // Older code (Jetty 11):
         // ShutdownHandler shutdownHandler = new ShutdownHandler(adminToken, true, false);
@@ -178,8 +182,12 @@ public abstract class KustvaktBaseServer {
         }
         shutdownHandler.setHandler(contextHandler);
         server.setHandler(shutdownHandler);
-
-
+        
+        // setup request log 
+        if (config.isRequestLogEnabled()) {
+        	server.setRequestLog(createRequestLog());
+        }
+        
         server.setConnectors(new Connector[] { connector });
         try {
             log.info("Starting server on port: " + kargs.port);
@@ -194,6 +202,18 @@ public abstract class KustvaktBaseServer {
         }
     }
 
+    private RequestLog createRequestLog() {
+    	RequestLogWriter logWriter = new RequestLogWriter();
+    	logWriter.setFilename("data/logs/jetty-requests.log");
+    	logWriter.setAppend(true);
+    	logWriter.setRetainDays(30);
+
+        // format: time, client IP, method + URI, status, bytes
+        String logFormat = "%{yyyy-MM-dd HH:mm:ss}t %{client}a \"%r\" %s %O";
+        RequestLog requestLog = new CustomRequestLog(logWriter, logFormat);
+        return requestLog;
+	}
+    
     @Setter
     public static class KustvaktArgs {
 
