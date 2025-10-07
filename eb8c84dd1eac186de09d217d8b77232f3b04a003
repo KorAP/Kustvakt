@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68c57ade_f19675e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2025-10-07T08:29:35Z",
+      "side": 1,
+      "message": "If it can log X-Forwarded-For after all, please add commented out configurations to kustvakt-lite.conf, kustvakt.conf, kustvakt.info.\nAnd to some of these files, please also add a comment in the beginning (maybe in a different commit):\n\n```\n# Copy this file to data/kustvakt-lite.conf and adjust settings\n```\n\nWhen I tested the change, my Kustvakt was reading two different configurations, the first and strongest one from the JAR (!). As the logging on this circumstance is also not misleading, it took me a while to figure out why logging was not in effect.\n\nI guess others might have the problems, too.",
+      "revId": "eb8c84dd1eac186de09d217d8b77232f3b04a003",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
