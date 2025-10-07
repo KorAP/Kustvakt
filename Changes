@@ -3,6 +3,7 @@
 - Bug fixes & Spring 6.2.11 upgrade (kupietz)
 - Migrate to Hibernate 7x (kupietz)
 - Make statistics in VC list configurable (default: false)
+- Add request log using jetty. (default: disabled)
 
 # version 0.79
 
