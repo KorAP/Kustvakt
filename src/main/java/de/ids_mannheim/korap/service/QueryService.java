@@ -146,24 +146,32 @@ public class QueryService extends BasicService {
         Iterator<QueryDO> i = queryList.iterator();
         while (i.hasNext()) {
             query = i.next();
-            String json = "";
-            String statistics = null;
-			if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
-				if (query.isCached()) {
-					List<String> cqList = new ArrayList<>(1);
-					cqList.add("referTo " + query.getName());
-					json = buildKoralQueryFromCorpusQuery(cqList);
-				}
-				else {
-					json = query.getKoralQuery();
-				}
-				statistics = krill.getStatistics(json);
-			}
+            String statistics = computeStatisticsForVC(query, queryType);
 			QueryDto dto = converter.createQueryDto(query, statistics);
 			dtos.add(dto);
 		}
 		return dtos;
     }
+    
+	private String computeStatisticsForVC (QueryDO query, QueryType queryType)
+			throws KustvaktException {
+		if (config.isVcListStatisticsEnabled() && 
+				queryType.equals(QueryType.VIRTUAL_CORPUS)) {		
+    		String json = "";
+    		if (query.isCached()) {
+    			List<String> cqList = new ArrayList<>(1);
+    			cqList.add("referTo " + query.getName());
+    			json = buildKoralQueryFromCorpusQuery(cqList);
+    		}
+    		else {
+    			json = query.getKoralQuery();
+    		}
+    		return krill.getStatistics(json);
+		}
+		else {
+			return null;
+		}
+	}
 
     public void deleteQueryByName (String deletedBy, String queryName,
             String createdBy, QueryType type) throws KustvaktException {
