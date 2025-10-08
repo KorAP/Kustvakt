@@ -15,6 +15,7 @@
 - Add API version to NamedVCLoader (#806)
 - Add corpus support at VirtualCorpusRewrite (#806)
 - Add apiVersion to rewrite (#806)
+- Fix authorization with POST tests.
 
 # version 0.79.1
 

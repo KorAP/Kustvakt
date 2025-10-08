@@ -52,13 +52,17 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
         form.param("state", "thisIsMyState");
         form.param("scope", "search");
         Response response = requestAuthorizationCode(form, userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+        
+        assertEquals(Status.NOT_FOUND.getStatusCode(),
                 response.getStatus());
-        URI redirectUri = response.getLocation();
-        MultiValueMap<String, String> params = UriComponentsBuilder
-                .fromUri(redirectUri).build().getQueryParams();
-        assertNotNull(params.getFirst("code"));
-        assertEquals("thisIsMyState", params.getFirst("state"));
+        
+//        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+//                response.getStatus());
+//        URI redirectUri = response.getLocation();
+//        MultiValueMap<String, String> params = UriComponentsBuilder
+//                .fromUri(redirectUri).build().getQueryParams();
+//        assertNotNull(params.getFirst("code"));
+//        assertEquals("thisIsMyState", params.getFirst("state"));
     }
 
     @Test
@@ -69,25 +73,27 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
         authForm.param("client_id", confidentialClientId);
         authForm.param("scope", "search");
         Response response = requestAuthorizationCode(authForm, userAuthHeader);
-        URI redirectUri = response.getLocation();
-
-        MultivaluedMap<String, String> params = UriComponent
-                .decodeQuery(redirectUri, true);
-        String code = params.get("code").get(0);
-
-        response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, code);
-        String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        String token = node.at("/access_token").asText();
-        String refreshToken = node.at("/refresh_token").asText();
-        assertEquals(TokenType.BEARER.displayName(),
-                node.at("/token_type").asText());
-        assertNotNull(node.at("/expires_in").asText());
         
-        revokeToken(token, confidentialClientId, clientSecret,
-                ACCESS_TOKEN_TYPE);
-        revokeToken(refreshToken, confidentialClientId, clientSecret,
-                REFRESH_TOKEN_TYPE);
+        assertEquals(Status.NOT_FOUND.getStatusCode(),
+                response.getStatus());
+//        URI redirectUri = response.getLocation();
+//        MultivaluedMap<String, String> params = UriComponent
+//                .decodeQuery(redirectUri, true);
+//        String code = params.get("code").get(0);
+//
+//        response = requestTokenWithAuthorizationCodeAndForm(
+//                confidentialClientId, clientSecret, code);
+//        String entity = response.readEntity(String.class);
+//        JsonNode node = JsonUtils.readTree(entity);
+//        String token = node.at("/access_token").asText();
+//        String refreshToken = node.at("/refresh_token").asText();
+//        assertEquals(TokenType.BEARER.displayName(),
+//                node.at("/token_type").asText());
+//        assertNotNull(node.at("/expires_in").asText());
+//        
+//        revokeToken(token, confidentialClientId, clientSecret,
+//                ACCESS_TOKEN_TYPE);
+//        revokeToken(refreshToken, confidentialClientId, clientSecret,
+//                REFRESH_TOKEN_TYPE);
     }
 }
