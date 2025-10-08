@@ -64,7 +64,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
                 node.at("/errors/0/0").asInt());
         // assertEquals("User-group name must only contains letters, numbers, "
         // + "underscores, hypens and spaces", node.at("/errors/0/1").asText());
-        assertEquals(node.at("/errors/0/2").asText(), "invalid-group-name$");
+        assertEquals("invalid-group-name$", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -76,9 +76,9 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "groupName must contain at least 3 characters");
-        assertEquals(node.at("/errors/0/2").asText(), "groupName");
+        assertEquals("groupName must contain at least 3 characters",
+            node.at("/errors/0/1").asText());
+        assertEquals("groupName", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         JsonNode node = listUserGroups(username);
         assertEquals(1, node.size());
         node = node.get(0);
-        assertEquals(node.get("name").asText(), "new-user-group");
+        assertEquals("new-user-group", node.get("name").asText());
         assertEquals(description, node.get("description").asText());
         assertEquals(username, node.get("owner").asText());
         assertEquals(1, node.get("members").size());
@@ -144,8 +144,8 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: dory");
+        assertEquals("Unauthorized operation for user: dory",
+            node.at("/errors/0/1").asText());
         
         deleteGroupByName(marlinGroupName, "marlin");
     }
@@ -175,8 +175,8 @@ public class UserGroupControllerTest extends UserGroupTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.NOT_ALLOWED, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Operation 'delete group owner'is not allowed.");
+        assertEquals("Operation 'delete group owner'is not allowed.",
+            node.at("/errors/0/1").asText());
         deleteGroupByName(marlinGroupName, "marlin");
     }
 }

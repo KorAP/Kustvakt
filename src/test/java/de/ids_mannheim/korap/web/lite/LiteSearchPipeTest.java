@@ -92,7 +92,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
         assertEquals(200, connection.getResponseCode());
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(connection.getInputStream(), "utf-8"));
-        assertEquals(br.readLine(), "{test}");
+        assertEquals("{test}", br.readLine());
     }
 
     @Test

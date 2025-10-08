@@ -32,7 +32,7 @@ public class UserdataTest {
         Userdata userData = new UserSettingProcessor();
         userData.read(new HashMap<>(), false);
         String jsonSettings = userData.serialize();
-        assertEquals(jsonSettings, "{}");
+        assertEquals("{}", jsonSettings);
     }
 
     @Test
@@ -40,7 +40,7 @@ public class UserdataTest {
         Userdata userData = new UserSettingProcessor();
         userData.read(null, false);
         String jsonSettings = userData.serialize();
-        assertEquals(jsonSettings, "{}");
+        assertEquals("{}", jsonSettings);
     }
 
     // EM: based on MH code, supposedly to validate entries like email
@@ -114,12 +114,12 @@ public class UserdataTest {
         settings.read(m, true);
         assertNotEquals(m.size(), settings.size());
         assertEquals(settings.defaultFields().length, settings.size());
-        assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_RELATION),
-                "rel_1");
-        assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_POS), "pos_1");
-        assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_LEMMA), "lemma_1");
-        assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_CONSTITUENT),
-                "const_1");
+        assertEquals("rel_1",
+            settings.get(Attributes.DEFAULT_FOUNDRY_RELATION));
+        assertEquals("pos_1", settings.get(Attributes.DEFAULT_FOUNDRY_POS));
+        assertEquals("lemma_1", settings.get(Attributes.DEFAULT_FOUNDRY_LEMMA));
+        assertEquals("const_1",
+            settings.get(Attributes.DEFAULT_FOUNDRY_CONSTITUENT));
         assertEquals(10, settings.get(Attributes.PAGE_LENGTH));
     }
 
@@ -134,7 +134,7 @@ public class UserdataTest {
             details.setData(JsonUtils.toJSON(m));
             String[] missing = details.findMissingFields();
             assertEquals(1, missing.length);
-            assertEquals(missing[0], "email");
+            assertEquals("email", missing[0]);
             details.checkRequired();
         });
     }
@@ -153,7 +153,7 @@ public class UserdataTest {
         array.add("message");
         details.setField("errors", array);
         assertEquals(100, details.get("/errors/0"));
-        assertEquals(details.get("/errors/1"), "message");
+        assertEquals("message", details.get("/errors/1"));
     }
 
     @Test
@@ -166,7 +166,7 @@ public class UserdataTest {
         UserDetails details2 = new UserDetails(-1);
         details2.setField(Attributes.COUNTRY, "Germany");
         details.update(details2);
-        assertEquals(details.get(Attributes.FIRSTNAME), "first");
-        assertEquals(details.get(Attributes.COUNTRY), "Germany");
+        assertEquals("first", details.get(Attributes.FIRSTNAME));
+        assertEquals("Germany", details.get(Attributes.COUNTRY));
     }
 }

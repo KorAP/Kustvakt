@@ -146,7 +146,7 @@ public class UserGroupControllerAdminTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
-        assertEquals(entity, "[]");
+        assertEquals("[]", entity);
     }
 
     private void testListByStatusAll ()
@@ -282,7 +282,7 @@ public class UserGroupControllerAdminTest extends VirtualCorpusTestBase {
         JsonNode node = listGroup(testUser);
         node = node.get(0);
         assertEquals(3, node.get("members").size());
-        assertEquals(node.at("/members/1/userId").asText(), "nemo");
+        assertEquals("nemo", node.at("/members/1/userId").asText());
     }
 
     private void testAddMember (String groupName)
@@ -301,7 +301,7 @@ public class UserGroupControllerAdminTest extends VirtualCorpusTestBase {
         JsonNode node = listGroup(testUser);
         node = node.get(0);
         assertEquals(4, node.get("members").size());
-        assertEquals(node.at("/members/3/userId").asText(), "darla");
+        assertEquals("darla", node.at("/members/3/userId").asText());
         assertEquals(1, node.at("/members/1/privileges").size());
     }
 }

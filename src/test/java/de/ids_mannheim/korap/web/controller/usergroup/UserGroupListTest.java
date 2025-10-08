@@ -24,18 +24,18 @@ public class UserGroupListTest extends UserGroupTestBase{
         
         JsonNode node = listUserGroups("dory");
         JsonNode group = node.get(0);
-        assertEquals(group.at("/name").asText(), "dory-group");
-        assertEquals(group.at("/owner").asText(), "dory");
+        assertEquals("dory-group", group.at("/name").asText());
+        assertEquals("dory", group.at("/owner").asText());
         assertEquals(3, group.at("/members").size());
         
-        assertEquals(group.at("/members/0/userId").asText(), "dory");
-        assertEquals(group.at("/members/0/roles").size(), 1);
-        assertEquals(group.at("/members/0/roles/0").asText(), "GROUP_ADMIN");
-        assertEquals(group.at("/members/0/privileges").size(), 5);
+        assertEquals("dory", group.at("/members/0/userId").asText());
+        assertEquals(1, group.at("/members/0/roles").size());
+        assertEquals("GROUP_ADMIN", group.at("/members/0/roles/0").asText());
+        assertEquals(5, group.at("/members/0/privileges").size());
         
-        assertEquals(group.at("/members/1/userId").asText(), "marlin");
-        assertEquals(group.at("/members/1/roles").size(), 1);
-        assertEquals(group.at("/members/1/roles/0").asText(), "GROUP_MEMBER");
+        assertEquals("marlin", group.at("/members/1/userId").asText());
+        assertEquals(1, group.at("/members/1/roles").size());
+        assertEquals("GROUP_MEMBER", group.at("/members/1/roles/0").asText());
         
         testListNemoGroups();
         testListMarlinGroups();
@@ -46,8 +46,8 @@ public class UserGroupListTest extends UserGroupTestBase{
     
     public void testListNemoGroups () throws KustvaktException {
         JsonNode node = listUserGroups("nemo");
-        assertEquals(node.at("/0/name").asText(), "dory-group");
-        assertEquals(node.at("/0/owner").asText(), "dory");
+        assertEquals("dory-group", node.at("/0/name").asText());
+        assertEquals("dory", node.at("/0/owner").asText());
         // group members are not allowed to see other members
         assertTrue(node.at("/0/members").isMissingNode());
 //        System.out.println(node.toPrettyString());
@@ -69,7 +69,7 @@ public class UserGroupListTest extends UserGroupTestBase{
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: guest");
+        assertEquals("Unauthorized operation for user: guest",
+            node.at("/errors/0/1").asText());
     }
 }

@@ -47,9 +47,9 @@ public class EmbeddedLdapServer {
         final SSLUtil clientSslUtil = new SSLUtil(new TrustAllTrustManager());
 
         config.setListenerConfigs(
-                InMemoryListenerConfig.createLDAPConfig("LDAP", // Listener name
-                        InetAddress.getByName("localhost"), // Listen address. (null = listen on all interfaces)
-                        ldapConfig.port, // Listen port (0 = automatically choose an available port)
+                InMemoryListenerConfig.createLDAPConfig("LDAP",
+                        InetAddress.getLoopbackAddress(),
+                        ldapConfig.port,
                         clientSslUtil.createSSLSocketFactory()));
         server = new InMemoryDirectoryServer(config);
 

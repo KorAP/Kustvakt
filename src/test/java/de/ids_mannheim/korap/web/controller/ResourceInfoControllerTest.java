@@ -62,9 +62,9 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
-        assertEquals(node.path("name").asText(), "Goethe Virtual Collection");
-        assertEquals(node.path("description").asText(),
-                "Goethe works from 1810");
+        assertEquals("Goethe Virtual Collection", node.path("name").asText());
+        assertEquals("Goethe works from 1810",
+            node.path("description").asText());
     }
 
     @Test
@@ -78,8 +78,8 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(),
-                "[Cannot found public VirtualCollection with ids: [WPD15-VC]]");
+        assertEquals("[Cannot found public VirtualCollection with ids: [WPD15-VC]]",
+            node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
-        assertEquals(node.path("id").asText(), "WPD13");
+        assertEquals("WPD13", node.path("id").asText());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
-        assertEquals(node.path("id").asText(), "GOE");
+        assertEquals("GOE", node.path("id").asText());
     }
 
     @Test
@@ -152,8 +152,8 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(),
-                "[Cannot found public Corpus with ids: [ZUW19]]");
+        assertEquals("[Cannot found public Corpus with ids: [ZUW19]]",
+            node.at("/errors/0/2").asText());
     }
 
     // EM: queries for an unauthorized corpus get the same responses /
@@ -170,7 +170,7 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(),
-                "[Cannot found public Corpus with ids: [BRZ10]]");
+        assertEquals("[Cannot found public Corpus with ids: [BRZ10]]",
+            node.at("/errors/0/2").asText());
     }
 }

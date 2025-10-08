@@ -83,7 +83,7 @@ public abstract class UserGroupTestBase extends OAuth2TestBase {
         JsonNode node = listUserGroups(username);
         node = node.get(0);
         assertEquals(2, node.get("members").size());
-        assertEquals(node.at("/members/1/userId").asText(), memberUsername);
+        assertEquals(memberUsername, node.at("/members/1/userId").asText());
         assertEquals(1, node.at("/members/1/privileges").size());
     }
 

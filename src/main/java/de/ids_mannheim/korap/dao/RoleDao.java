@@ -165,7 +165,36 @@ public class RoleDao {
         return new HashSet<Role>(resultList);
     }
 
-    public Role retrieveRoleByGroupIdQueryIdPrivilege (int groupId, int queryId,
+    /**
+     * Retrieve all roles associated with a given query id, including their members.
+     */
+    public List<Role> retrieveRolesByQueryIdWithMembers(int queryId) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Role> cq = cb.createQuery(Role.class);
+
+        Root<Role> role = cq.from(Role.class);
+        role.fetch(Role_.userGroupMembers, JoinType.LEFT);
+        role.fetch(Role_.userGroup, JoinType.INNER);
+        // query is optional for some roles, but we filter roles linked to the query
+        cq.select(role);
+        cq.where(cb.equal(role.get(Role_.query).get(QueryDO_.id), queryId));
+
+        TypedQuery<Role> q = entityManager.createQuery(cq);
+        return q.getResultList();
+    }
+
+    /**
+     * Bulk delete all roles associated with a given query id.
+     */
+    public void deleteRolesByQueryId(int queryId) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<Role> delete = cb.createCriteriaDelete(Role.class);
+        Root<Role> role = delete.from(Role.class);
+        delete.where(cb.equal(role.get(Role_.query).get(QueryDO_.id), queryId));
+        entityManager.createQuery(delete).executeUpdate();
+    }
+
+    public Role retrieveRoleByGroupIdQueryIdPrivilege(int groupId, int queryId,
             PrivilegeType p) throws KustvaktException {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();

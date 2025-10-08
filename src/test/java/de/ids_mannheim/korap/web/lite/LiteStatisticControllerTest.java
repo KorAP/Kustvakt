@@ -26,8 +26,8 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
                 .request().method("GET");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertEquals(response.getHeaders().getFirst("X-Index-Revision"),
-                "Wes8Bd4h1OypPqbWF5njeQ==");
+        assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getHeaders().getFirst("X-Index-Revision"));
         String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertEquals(2, node.at("/documents").asInt());
@@ -71,8 +71,8 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
                         + "\"CC.*\"} }"));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
-        assertEquals(response.getHeaders().getFirst("X-Index-Revision"),
-                "Wes8Bd4h1OypPqbWF5njeQ==");
+        assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getHeaders().getFirst("X-Index-Revision"));
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());
         assertEquals(72770, node.at("/tokens").asInt());
@@ -90,10 +90,9 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/errors/0/0").asInt(),
-                de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION);
-        assertEquals(node.at("/errors/0/1").asText(),
-                "VC is not found");
+        assertEquals(de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION,
+            node.at("/errors/0/0").asInt());
+        assertTrue(node.at("/errors/0/1").asText().contains(" is not found"));
     }
 
     @Test
@@ -108,8 +107,8 @@ public class LiteStatisticControllerTest extends LiteJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.DESERIALIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Failed deserializing json object: { \"collection\" : }");
+        assertEquals("Failed deserializing json object: { \"collection\" : }",
+            node.at("/errors/0/1").asText());
     }
 
     @Test

@@ -147,6 +147,8 @@
 	<!-- Initialization -->
 	<!-- <bean id="annotationParser" class="de.ids_mannheim.korap.annotation.AnnotationParser" 
 		scope="singleton" /> -->
+	<!-- Provide a no-op VC loader to satisfy SearchController's Runnable dependency in lite mode -->
+	<bean id="vcLoader" class="de.ids_mannheim.korap.init.DummyNamedVCLoaderImpl" />
 	<!-- Search Engine -->
 	<bean id="search_krill"
 		class="de.ids_mannheim.korap.web.SearchKrill">

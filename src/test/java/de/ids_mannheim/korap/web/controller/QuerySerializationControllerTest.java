@@ -35,8 +35,8 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(node.at("/collection/key").asText(), "corpusSigle");
-        assertEquals(node.at("/collection/value").asText(), "WPD13");
+        assertEquals("corpusSigle", node.at("/collection/key").asText());
+        assertEquals("WPD13", node.at("/collection/value").asText());
     }
 
     @Test
@@ -50,8 +50,8 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(),
-                "[Cannot found public Corpus with ids: [ZUW19]]");
+        assertEquals("[Cannot found public Corpus with ids: [ZUW19]]",
+            node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -65,8 +65,8 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(),
-                "[Cannot found public Corpus with ids: [BRZ10]]");
+        assertEquals("[Cannot found public Corpus with ids: [BRZ10]]",
+            node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -84,9 +84,9 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(node.at("/collection/@type").asText(), "koral:doc");
-        assertEquals(node.at("/collection/key").asText(), "corpusSigle");
-        assertEquals(node.at("/collection/value").asText(), "BRZ10");
+        assertEquals("koral:doc", node.at("/collection/@type").asText());
+        assertEquals("corpusSigle", node.at("/collection/key").asText());
+        assertEquals("BRZ10", node.at("/collection/value").asText());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
-        assertEquals(node.path("name").asText(), "Weimarer Werke");
+        assertEquals("Weimarer Werke", node.path("name").asText());
         // Get virtual collections
         response = target().path(API_VERSION).path("collection").request()
                 .header(Attributes.AUTHORIZATION,
@@ -146,23 +146,23 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         node = JsonUtils.readTree(ent);
         assertNotNull(node);
         // System.out.println("NODE " + ent);
-        assertEquals(node.at("/collection/@type").asText(), "koral:docGroup");
-        assertEquals(node.at("/collection/operands/0/@type").asText(),
-                "koral:doc");
-        assertEquals(node.at("/collection/operands/0/key").asText(),
-                "creationDate");
-        assertEquals(node.at("/collection/operands/0/value").asText(), "1775");
-        assertEquals(node.at("/collection/operands/0/type").asText(),
-                "type:date");
-        assertEquals(node.at("/collection/operands/0/match").asText(),
-                "match:geq");
-        assertEquals(node.at("/collection/operands/1/@type").asText(),
-                "koral:doc");
-        assertEquals(node.at("/collection/operands/1/key").asText(),
-                "corpusSigle");
-        assertEquals(node.at("/collection/operands/1/value").asText(), "GOE");
-        assertEquals(node.at("/collection/operands/1/match").asText(),
-                "match:eq");
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("koral:doc",
+            node.at("/collection/operands/0/@type").asText());
+        assertEquals("creationDate",
+            node.at("/collection/operands/0/key").asText());
+        assertEquals("1775", node.at("/collection/operands/0/value").asText());
+        assertEquals("type:date",
+            node.at("/collection/operands/0/type").asText());
+        assertEquals("match:geq",
+            node.at("/collection/operands/0/match").asText());
+        assertEquals("koral:doc",
+            node.at("/collection/operands/1/@type").asText());
+        assertEquals("corpusSigle",
+            node.at("/collection/operands/1/key").asText());
+        assertEquals("GOE", node.at("/collection/operands/1/value").asText());
+        assertEquals("match:eq",
+            node.at("/collection/operands/1/match").asText());
     }
 
     @Test
@@ -176,17 +176,17 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(node.at("/collection/operands/0/@type").asText(),
-                "koral:doc");
-        assertEquals(node.at("/collection/operands/0/key").asText(),
-                "corpusSigle");
-        assertEquals(node.at("/collection/operands/0/value").asText(), "GOE");
-        assertEquals(node.at("/collection/operands/1/@type").asText(),
-                "koral:doc");
-        assertEquals(node.at("/collection/operands/1/key").asText(),
-                "creationDate");
-        assertEquals(node.at("/collection/operands/1/value").asText(),
-                "1810-01-01");
+        assertEquals("koral:doc",
+            node.at("/collection/operands/0/@type").asText());
+        assertEquals("corpusSigle",
+            node.at("/collection/operands/0/key").asText());
+        assertEquals("GOE", node.at("/collection/operands/0/value").asText());
+        assertEquals("koral:doc",
+            node.at("/collection/operands/1/@type").asText());
+        assertEquals("creationDate",
+            node.at("/collection/operands/1/key").asText());
+        assertEquals("1810-01-01",
+            node.at("/collection/operands/1/value").asText());
     }
 
     @Test
@@ -196,17 +196,17 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
                 .queryParam("page", "5").queryParam("cutoff", "true")
                 .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
                 .request().method("GET");
-        assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/meta/context").asText(), "sentence");
+        assertEquals("sentence", node.at("/meta/context").asText());
         assertEquals(20, node.at("/meta/count").asInt());
         assertEquals(5, node.at("/meta/startPage").asInt());
         assertEquals(true, node.at("/meta/cutOff").asBoolean());
-        assertEquals(node.at("/query/wrap/@type").asText(), "koral:term");
-        assertEquals(node.at("/query/wrap/layer").asText(), "pos");
-        assertEquals(node.at("/query/wrap/match").asText(), "match:eq");
-        assertEquals(node.at("/query/wrap/key").asText(), "ADJA");
+        assertEquals("koral:term", node.at("/query/wrap/@type").asText());
+        assertEquals("pos", node.at("/query/wrap/layer").asText());
+        assertEquals("match:eq", node.at("/query/wrap/match").asText());
+        assertEquals("ADJA", node.at("/query/wrap/key").asText());
     }
 
     @Test
@@ -217,10 +217,10 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
                 .queryParam("page", "5").queryParam("offset", "2")
                 .queryParam("cutoff", "true").queryParam("q", "[pos=ADJA]")
                 .queryParam("ql", "poliqarp").request().method("GET");
-        assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/meta/context").asText(), "sentence");
+        assertEquals("sentence", node.at("/meta/context").asText());
         assertEquals(20, node.at("/meta/count").asInt());
         assertEquals(2, node.at("/meta/startIndex").asInt());
         assertEquals(true, node.at("/meta/cutOff").asBoolean());
