@@ -461,12 +461,13 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 + "1820\"}";
         editVC("dory", "dory", "dory-vc", json);
         node = testRetrieveKoralQuery("dory", "dory-vc");
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        node = node.at("/"+COLLECTION_NODE_NAME);
+        assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("operation:and",
             node.at("/operation").asText());
         assertEquals("corpusSigle",
             node.at("/operands/0/key").asText());
-        assertEquals("GOE", node.at("/collection/operands/0/value").asText());
+        assertEquals("GOE", node.at("/operands/0/value").asText());
         assertEquals("creationDate",
             node.at("/operands/1/key").asText());
         assertEquals("1820", node.at("/operands/1/value").asText());
