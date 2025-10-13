@@ -105,9 +105,16 @@ public class StatisticController {
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response getStatisticsFromKoralQuery (
             @Context SecurityContext context, @Context Locale locale,
+            @Context ContainerRequestContext requestContext,
             String koralQuery) {
+    	List<PathSegment> pathSegments = requestContext.getUriInfo()
+    			.getPathSegments();
+        String version = pathSegments.get(0).getPath();
+        double apiVersion = Double.parseDouble(version.substring(1));
+        
         try {
-            String stats = service.retrieveStatisticsForKoralQuery(koralQuery);
+            String stats = service.retrieveStatisticsForKoralQuery(koralQuery,
+            		apiVersion);
             return Response.ok(stats)
                     .header("X-Index-Revision", service.getIndexFingerprint())
                     .build();

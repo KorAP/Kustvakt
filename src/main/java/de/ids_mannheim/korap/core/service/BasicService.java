@@ -63,14 +63,15 @@ public class BasicService {
 		}
 
 		if (json != null) {
-			checkVC(json);
+			checkVC(json, apiVersion);
 		}
 		return json;
 	}
 	
-    protected void checkVC (String json) throws KustvaktException {
+    protected void checkVC (String json, double apiVersion) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
-        node = node.at("/collection");
+		String nodeName = (apiVersion >= 1.1) ? "corpus" : "collection";
+        node = node.at("/"+nodeName);
         if (node.has("ref")) {
             String vcName = node.path("ref").asText();
             if (vcName.contains("/")) {

@@ -148,15 +148,34 @@ public class StatisticsControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testGetStatisticsWithKoralQuery ()
+    public void testGetStatisticsWithKoralQueryV1_0 ()
             throws IOException, KustvaktException {
-        Response response = target().path(API_VERSION).path("statistics")
+        Response response = target().path(API_VERSION_V1_0).path("statistics")
                 .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .post(Entity.json("{ \"collection\" : {\"@type\": "
                         + "\"koral:doc\", \"key\": \"availability\", \"match\": "
                         + "\"match:eq\", \"type\": \"type:regex\", \"value\": "
                         + "\"CC.*\"} }"));
+        assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getHeaders().getFirst("X-Index-Revision"));
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String ent = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(2, node.at("/documents").asInt());
+        assertEquals(72770, node.at("/tokens").asInt());
+        assertEquals(2985, node.at("/sentences").asInt());
+        assertEquals(128, node.at("/paragraphs").asInt());
+    }
+    
+    @Test
+    public void testGetStatisticsWithKoralQuery ()
+            throws IOException, KustvaktException {
+        Response response = target().path(API_VERSION).path("statistics")
+                .request()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .post(Entity.json("{ \"corpus\" : {\"@type\": "
+                        + "\"koral:docGroupRef\", \"ref\": \"system-vc\"} }"));
         assertEquals("Wes8Bd4h1OypPqbWF5njeQ==",
             response.getHeaders().getFirst("X-Index-Revision"));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());

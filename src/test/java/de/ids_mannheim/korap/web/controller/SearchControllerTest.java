@@ -108,6 +108,8 @@ public class SearchControllerTest extends SpringJerseyTest {
                 node.at("/meta/fields").toString());
     }
 
+    // Kustvakt sends query with only corpus, but Krill returns both corpus and 
+    // collection
     @Test
     public void testSearchQueryPublicCorpora () throws KustvaktException {
         Response response = target().path(API_VERSION).path("search")
@@ -117,13 +119,13 @@ public class SearchControllerTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals("koral:doc", node.at("/collection/@type").asText());
-        assertEquals("availability", node.at("/collection/key").asText());
-        assertEquals("CC.*", node.at("/collection/value").asText());
+        assertEquals("koral:doc", node.at("/corpus/@type").asText());
+        assertEquals("availability", node.at("/corpus/key").asText());
+        assertEquals("CC.*", node.at("/corpus/value").asText());
         assertEquals(freeCorpusAccess,
-                node.at("/collection/rewrites/0/_comment").asText());
+                node.at("/corpus/rewrites/0/_comment").asText());
         assertEquals("operation:injection",
-                node.at("/collection/rewrites/0/operation").asText());
+                node.at("/corpus/rewrites/0/operation").asText());
     }
 
     @Test
