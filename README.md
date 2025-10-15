@@ -22,7 +22,7 @@ Recent changes on the project are described in the change logs (Changes files).
 # Setup
 
 
-#### Prerequisites: Jdk 17, Git, Maven 3
+#### Prerequisites: Jdk 21, Git, Maven 3
 
 Clone the latest version of Kustvakt
 ```
