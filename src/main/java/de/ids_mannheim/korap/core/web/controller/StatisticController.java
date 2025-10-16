@@ -63,9 +63,9 @@ public class StatisticController {
      * @param locale
      *            Locale
      * @param cq
-     *            a collection query specifying a virtual corpus
+     *            a corpus query specifying a virtual corpus
      * @param corpusQuery
-     *            (DEPRECATED) a collection query specifying a virtual
+     *            (DEPRECATED) a corpus query specifying a virtual
      *            corpus
      * @return statistics of the virtual corpus defined by the given
      *         corpusQuery parameter.

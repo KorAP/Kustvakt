@@ -28,8 +28,8 @@ public abstract class SpringJerseyTest extends JerseyTest {
     
     protected final static double API_VERSION_DOUBLE = 
     		Double.parseDouble(API_VERSION.substring(1));
-    protected final static String COLLECTION_NODE_NAME = 
-    		(API_VERSION_DOUBLE >= 1.1) ? "corpus" : "collection";
+    protected final static String CORPUS_NODE_PATH = 
+    		(API_VERSION_DOUBLE >= 1.1) ? "/corpus" : "/collection";
 
     protected final static String allCorpusAccess = "All corpus access policy "
 			+ "has been added.";

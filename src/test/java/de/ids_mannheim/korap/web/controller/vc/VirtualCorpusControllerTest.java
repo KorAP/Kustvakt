@@ -444,7 +444,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             throws ProcessingException, KustvaktException {
     	createDoryVC();
         JsonNode node = testRetrieveKoralQuery("dory", "dory-vc");
-        node = node.at("/"+COLLECTION_NODE_NAME);
+        node = node.at(CORPUS_NODE_PATH);
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("operation:and", node.at("/operation").asText());
         assertEquals(2, node.at("/operands").size());
@@ -452,7 +452,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         editVC("dory", "dory", "dory-vc", json);
         
         node = testRetrieveKoralQuery("dory", "dory-vc");
-        node = node.at("/"+COLLECTION_NODE_NAME);
+        node = node.at(CORPUS_NODE_PATH);
         assertEquals("koral:doc", node.at("/@type").asText());
         assertEquals("corpusSigle", node.at("/key").asText());
         assertEquals("WPD17", node.at("/value").asText());
@@ -461,7 +461,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 + "1820\"}";
         editVC("dory", "dory", "dory-vc", json);
         node = testRetrieveKoralQuery("dory", "dory-vc");
-        node = node.at("/"+COLLECTION_NODE_NAME);
+        node = node.at(CORPUS_NODE_PATH);
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("operation:and",
             node.at("/operation").asText());

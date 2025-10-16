@@ -29,22 +29,21 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
     @Autowired
     private QueryService queryService;
 
+    private String determineCorpusPath (double apiVersion) {
+    	return (apiVersion >= 1.1) ? "/corpus" : 
+			"/collection"; // EM: legacy
+	}
+    
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user, double apiVersion) throws KustvaktException {
-    	if (node.has("corpus")) {
-            node = node.at("/corpus");
-            findVCRef(user.getUsername(), node);
-        }
-    	// EM: legacy
-    	else if (node.has("collection")) {
-            node = node.at("/collection");
-            findVCRef(user.getUsername(), node);
-        }
+    		node = node.at(determineCorpusPath(apiVersion));
+            findVCRef(user.getUsername(), node, apiVersion);
         return node;
     }
 
-    private void findVCRef (String username, KoralNode koralNode)
+    private void findVCRef (String username, KoralNode koralNode, 
+    		double apiVersion)
             throws KustvaktException {
         if (koralNode.has("@type")
                 && koralNode.get("@type").equals("koral:docGroupRef")) {
@@ -77,7 +76,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                 QueryDO vc = queryService.searchQueryByName(username, vcName,
                         vcOwner, QueryType.VIRTUAL_CORPUS);
                 if (!vc.isCached()) {
-                    rewriteVC(vc, koralNode);
+                    rewriteVC(vc, koralNode, apiVersion);
                 }
                 // required for named-vc since they are stored by filenames in the cache
                 else if (ownerExist) {
@@ -91,7 +90,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
 
             for (int i = 0; i < operands.size(); i++) {
                 KoralNode operand = operands.get(i);
-                findVCRef(username, operand);
+                findVCRef(username, operand,apiVersion);
                 operand.buildRewrites();
             }
 
@@ -108,17 +107,13 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         		+ "the original property."));
     }
 
-    protected void rewriteVC (QueryDO vc, KoralNode koralNode)
+    protected void rewriteVC (QueryDO vc, KoralNode koralNode, double apiVersion)
             throws KustvaktException {
         String koralQuery = vc.getKoralQuery();
-        JsonNode queryNode = JsonUtils.readTree(koralQuery);
         JsonNode newKoralQuery;
-        if (queryNode.has("collection")) {
-        	newKoralQuery = JsonUtils.readTree(koralQuery).at("/collection");
-        }
-        else {
-        	newKoralQuery = JsonUtils.readTree(koralQuery).at("/corpus");
-        }
+        String corpusNodePath = determineCorpusPath(apiVersion);
+        newKoralQuery = JsonUtils.readTree(koralQuery).at(corpusNodePath);
+        
         String source = koralNode.rawNode().toString();
         JsonNode sourceNode = JsonUtils.readTree(source);
         
