@@ -66,6 +66,7 @@ public class FullConfiguration extends KustvaktConfiguration {
     private String namedVCPath;
 
     private boolean createInitialSuperClient;
+    private boolean vcListStatisticsEnabled;
 
     public FullConfiguration (Properties properties) throws Exception {
         super(properties);
@@ -96,6 +97,8 @@ public class FullConfiguration extends KustvaktConfiguration {
 
         setMaxNumberOfUserQueries(Integer.parseInt(
                 properties.getProperty("max.user.persistent.queries", "20")));
+		setVcListStatisticsEnabled(Boolean.valueOf(properties.getProperty(
+				"vc.list.statistics.enabled", "false")));
     }
 
     private void setSecurityConfiguration (Properties properties)
@@ -426,5 +429,15 @@ public class FullConfiguration extends KustvaktConfiguration {
     public void setMaxNumberOfUserQueries (int maxNumberOfUserQueries) {
         this.maxNumberOfUserQueries = maxNumberOfUserQueries;
     }
+
+	public boolean isVcListStatisticsEnabled () {
+		return vcListStatisticsEnabled;
+	}
+
+	public void setVcListStatisticsEnabled (boolean vcListStatisticsEnabled) {
+		this.vcListStatisticsEnabled = vcListStatisticsEnabled;
+	}
+
+	
 
 }

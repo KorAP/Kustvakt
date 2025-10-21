@@ -44,7 +44,7 @@ public class QueryReferenceControllerTest extends TestBase {
         assertEquals(resourceType.displayName(), node.at("/type").asText());
         assertEquals(queryCreator, node.at("/createdBy").asText());
         assertEquals(query, node.at("/query").asText());
-        assertEquals(node.at("/queryLanguage").asText(), "poliqarp");
+        assertEquals("poliqarp", node.at("/queryLanguage").asText());
     }
 
     private void testUpdateQuery (String qName, String qCreator,
@@ -191,8 +191,8 @@ public class QueryReferenceControllerTest extends TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "queryLanguage is null");
-        assertEquals(node.at("/errors/0/2").asText(), "queryLanguage");
+        assertEquals("queryLanguage is null", node.at("/errors/0/1").asText());
+        assertEquals("queryLanguage", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -211,8 +211,8 @@ public class QueryReferenceControllerTest extends TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "query is null");
-        assertEquals(node.at("/errors/0/2").asText(), "query");
+        assertEquals("query is null", node.at("/errors/0/1").asText());
+        assertEquals("query", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -231,8 +231,8 @@ public class QueryReferenceControllerTest extends TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "type is null");
-        assertEquals(node.at("/errors/0/2").asText(), "type");
+        assertEquals("type is null", node.at("/errors/0/1").asText());
+        assertEquals("type", node.at("/errors/0/2").asText());
     }
 
     private void testDeleteQueryByName (String qName, String qCreator,
@@ -294,10 +294,10 @@ public class QueryReferenceControllerTest extends TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Query dory/non-existing-query is not found.");
-        assertEquals(node.at("/errors/0/2").asText(),
-                "dory/non-existing-query");
+        assertEquals("Query dory/non-existing-query is not found.",
+            node.at("/errors/0/1").asText());
+        assertEquals("dory/non-existing-query",
+            node.at("/errors/0/2").asText());
     }
 
     public void testListAvailableQueryForDory ()
@@ -311,11 +311,11 @@ public class QueryReferenceControllerTest extends TestBase {
             throws ProcessingException, KustvaktException {
         JsonNode node = testListAvailableQuery("pearl");
         assertEquals(1, node.size());
-        assertEquals(node.at("/0/name").asText(), "system-q");
+        assertEquals("system-q", node.at("/0/name").asText());
         assertEquals(ResourceType.SYSTEM.displayName(),
                 node.at("/0/type").asText());
-        assertEquals(node.at("/0/description").asText(), "\"system\" query");
-        assertEquals(node.at("/0/query").asText(), "[]");
+        assertEquals("\"system\" query", node.at("/0/description").asText());
+        assertEquals("[]", node.at("/0/query").asText());
         // assertEquals("koral:token", node.at("/0/koralQuery/@type").asText());
     }
 

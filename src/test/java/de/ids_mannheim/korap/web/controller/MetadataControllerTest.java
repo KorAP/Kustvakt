@@ -27,7 +27,7 @@ public class MetadataControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(node.at("/document/fields/0/key").asText(), "author");
+        assertEquals("author", node.at("/document/fields/0/key").asText());
     }
 
     @Test
@@ -39,8 +39,8 @@ public class MetadataControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(node.at("/document/fields/0/key").asText(), "author");
-        assertEquals(node.at("/document/fields/1/key").asText(), "title");
+        assertEquals("author", node.at("/document/fields/0/key").asText());
+        assertEquals("title", node.at("/document/fields/1/key").asText());
     }
 
     @Test

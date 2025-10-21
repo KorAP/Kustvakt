@@ -118,6 +118,7 @@ public class KustvaktConfiguration {
     // another variable might be needed to define which metadata fields are restricted 
     private boolean isMetadataRestricted = false;
     private boolean totalResultCacheEnabled;
+    private boolean requestLogEnabled = false;
     
     private int guestTimeout;
     private int loginTimeout;
@@ -146,6 +147,8 @@ public class KustvaktConfiguration {
                 properties.getProperty("security.secure.random.algorithm", ""));
         setMessageDigestAlgorithm(
                 properties.getProperty("security.md.algorithm", "MD5"));
+        requestLogEnabled = Boolean.valueOf(properties.getProperty(
+                "log.request.enabled","false"));
     }
 
     /**

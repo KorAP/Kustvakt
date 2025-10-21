@@ -27,8 +27,8 @@ public class StringUtilsTest {
     public void testBasicHttpSplit () throws KustvaktException {
         String s2 = new String(Base64.encodeBase64("test:testPass".getBytes()));
         String[] f2 = TransferEncoding.decodeBase64(s2);
-        assertEquals(f2[0], "test");
-        assertEquals(f2[1], "testPass");
+        assertEquals("test", f2[0]);
+        assertEquals("testPass", f2[1]);
         HttpAuthorizationHandler handler = new HttpAuthorizationHandler();
         String s1 = "basic "
                 + new String(Base64.encodeBase64("test:testPass".getBytes()));

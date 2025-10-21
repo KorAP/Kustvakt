@@ -146,24 +146,34 @@ public class QueryService extends BasicService {
         Iterator<QueryDO> i = queryList.iterator();
         while (i.hasNext()) {
             query = i.next();
-            String json = "";
-            String statistics = null;
-			if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
-				if (query.isCached()) {
-					List<String> cqList = new ArrayList<>(1);
-					cqList.add("referTo " + query.getName());
-					json = buildKoralQueryFromCorpusQuery(cqList, apiVersion);
-				}
-				else {
-					json = query.getKoralQuery();
-				}
-				statistics = krill.getStatistics(json);
-			}
+            String statistics = computeStatisticsForVC(query, queryType,
+            		apiVersion);
 			QueryDto dto = converter.createQueryDto(query, statistics);
 			dtos.add(dto);
 		}
 		return dtos;
     }
+    
+	private String computeStatisticsForVC (QueryDO query, QueryType queryType, 
+			double apiVersion)
+			throws KustvaktException {
+		if (config.isVcListStatisticsEnabled() && 
+				queryType.equals(QueryType.VIRTUAL_CORPUS)) {		
+    		String json = "";
+    		if (query.isCached()) {
+    			List<String> cqList = new ArrayList<>(1);
+    			cqList.add("referTo " + query.getName());
+    			json = buildKoralQueryFromCorpusQuery(cqList, apiVersion);
+    		}
+    		else {
+    			json = query.getKoralQuery();
+    		}
+    		return krill.getStatistics(json);
+		}
+		else {
+			return null;
+		}
+	}
 
     public void deleteQueryByName (String deletedBy, String queryName,
             String createdBy, QueryType type) throws KustvaktException {
@@ -178,10 +188,29 @@ public class QueryService extends BasicService {
         else if (query.getCreatedBy().equals(deletedBy)
                 || adminDao.isAdmin(deletedBy)) {
 
-            if (query.getType().equals(ResourceType.PUBLISHED)) {
-                UserGroup group = userGroupDao
-                        .retrieveHiddenGroupByQueryName(queryName);
-                userGroupDao.deleteGroup(group.getId(), deletedBy);
+            // If published, fetch the hidden group BEFORE deleting roles, so we can remove
+            // it later
+            UserGroup hiddenGroup = null;
+            boolean isPublished = query.getType().equals(ResourceType.PUBLISHED);
+            if (isPublished) {
+                hiddenGroup = userGroupDao.retrieveHiddenGroupByQueryName(queryName);
+            }
+
+            // Detach member-role links and delete all roles linked to the query
+            List<Role> queryRoles = roleDao.retrieveRolesByQueryIdWithMembers(query.getId());
+            for (Role role : queryRoles) {
+                if (role.getUserGroupMembers() != null) {
+                    for (UserGroupMember m : role.getUserGroupMembers()) {
+                        if (m.getRoles() != null && m.getRoles().remove(role)) {
+                            memberDao.updateMember(m);
+                        }
+                    }
+                }
+            }
+            roleDao.deleteRolesByQueryId(query.getId());
+
+            if (isPublished && hiddenGroup != null) {
+                userGroupDao.deleteGroup(hiddenGroup.getId(), deletedBy);
             }
             if (type.equals(QueryType.VIRTUAL_CORPUS)
                     && VirtualCorpusCache.contains(queryName)) {

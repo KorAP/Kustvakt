@@ -96,7 +96,7 @@ public class SearchPipeTest extends SpringJerseyTest {
         assertEquals(200, connection.getResponseCode());
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(connection.getInputStream(), "utf-8"));
-        assertEquals(br.readLine(), "{test}");
+        assertEquals("{test}", br.readLine());
     }
 
     @Test
@@ -120,8 +120,8 @@ public class SearchPipeTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.at("/query/wrap/key").size());
         assertEquals(1, node.at("/collection/rewrites").size());
-        assertEquals(node.at("/collection/rewrites/0/operation").asText(),
-                "operation:injection");
+        assertEquals("operation:injection",
+            node.at("/collection/rewrites/0/operation").asText());
 		assertEquals(freeCorpusAccess,
 				node.at("/collection/rewrites/0/_comment").asText());
 		node = node.at("/query/wrap/rewrites");

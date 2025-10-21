@@ -25,16 +25,16 @@ public class MultipleCorpusQueryTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        node = node.at("/corpus/operands/1");
-        assertEquals(node.at("/@type").asText(), "koral:docGroup");
-        assertEquals(node.at("/operation").asText(), "operation:and");
+        node = node.at("/collection/operands/1");
+        assertEquals("koral:docGroup", node.at("/@type").asText());
+        assertEquals("operation:and", node.at("/operation").asText());
         assertEquals(2, node.at("/operands").size());
-        assertEquals(node.at("/operands/0/@type").asText(), "koral:doc");
-        assertEquals(node.at("/operands/0/match").asText(), "match:eq");
-        assertEquals(node.at("/operands/0/key").asText(), "pubPlace");
-        assertEquals(node.at("/operands/0/value").asText(), "München");
-        assertEquals(node.at("/operands/1/key").asText(), "textSigle");
-        assertEquals(node.at("/operands/1/value").asText(), "GOE/AGA/01784");
+        assertEquals("koral:doc", node.at("/operands/0/@type").asText());
+        assertEquals("match:eq", node.at("/operands/0/match").asText());
+        assertEquals("pubPlace", node.at("/operands/0/key").asText());
+        assertEquals("München", node.at("/operands/0/value").asText());
+        assertEquals("textSigle", node.at("/operands/1/key").asText());
+        assertEquals("GOE/AGA/01784", node.at("/operands/1/value").asText());
     }
 
     @Test

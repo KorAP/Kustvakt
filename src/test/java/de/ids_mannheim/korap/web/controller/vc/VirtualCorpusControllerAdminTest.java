@@ -123,7 +123,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
                 .put(Entity.json(json));
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
         JsonNode node = testAdminListVC(testUser);
-        assertEquals(node.at("/0/description").asText(), "edited vc");
+        assertEquals("edited vc", node.at("/0/description").asText());
     }
 
     private void testDeletePrivateVC (String vcCreator, String vcName)

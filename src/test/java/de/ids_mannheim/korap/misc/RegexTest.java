@@ -14,7 +14,7 @@ public class RegexTest {
         String s = "ah[\"-\"]";
         Matcher m = AnnotationParser.quotePattern.matcher(s);
         if (m.find()) {
-            assertEquals(m.group(1), "-");
+            assertEquals("-", m.group(1));
         }
     }
 }

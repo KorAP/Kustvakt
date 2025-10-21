@@ -64,6 +64,6 @@ public class APIAuthenticationTest extends OAuth2TestBase {
         context = auth.getTokenContext(authToken);
         TokenType tokenType = context.getTokenType();
         assertEquals(TokenType.API, tokenType);
-        assertEquals(context.getUsername(), "testUser");
+        assertEquals("testUser", context.getUsername());
     }
 }

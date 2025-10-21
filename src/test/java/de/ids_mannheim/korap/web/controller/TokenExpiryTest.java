@@ -68,8 +68,8 @@ public class TokenExpiryTest extends SpringJerseyTest {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Access token is expired");
+        assertEquals("Access token is expired",
+            node.at("/errors/0/1").asText());
     }
 
     // cannot be tested dynamically

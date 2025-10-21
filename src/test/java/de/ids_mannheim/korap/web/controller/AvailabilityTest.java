@@ -303,19 +303,19 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String json = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(json);
-        assertEquals(node.at("/collection/operation").asText(),
-                "operation:and");
-        assertEquals(node.at("/collection/operands/0/match").asText(),
-                "match:eq");
-        assertEquals(node.at("/collection/operands/0/type").asText(),
-                "type:regex");
-        assertEquals(node.at("/collection/operands/0/key").asText(),
-                "availability");
-        assertEquals(node.at("/collection/operands/0/value").asText(),
-                "CC.*");
-        assertEquals(node.at("/collection/operands/1/match").asText(),
-                "match:eq");
-        assertEquals(node.at("/collection/operands/1/value").asText(), "ACA.*");
+        assertEquals("operation:and",
+            node.at("/collection/operation").asText());
+        assertEquals("match:eq",
+            node.at("/collection/operands/0/match").asText());
+        assertEquals("type:regex",
+            node.at("/collection/operands/0/type").asText());
+        assertEquals("availability",
+            node.at("/collection/operands/0/key").asText());
+        assertEquals("CC.*",
+            node.at("/collection/operands/0/value").asText());
+        assertEquals("match:eq",
+            node.at("/collection/operands/1/match").asText());
+        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
     }
 
     
@@ -620,7 +620,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         String json = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(json);
         assertTrue(node.at("/collection/rewrites").isMissingNode());
-        assertEquals(node.at("/collection/operation").asText(), "operation:or");
+        assertEquals("operation:or", node.at("/collection/operation").asText());
     }
 
     @Test

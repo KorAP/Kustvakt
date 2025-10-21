@@ -51,8 +51,8 @@ public class SearchKrillTest extends SpringJerseyTest {
         String matchinfo = krill.getMatch("WPD/AAA.00002/p169-197",
                 config.getFreeLicensePattern());
         JsonNode node = JsonUtils.readTree(matchinfo);
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Invalid match identifier");
+        assertEquals("Invalid match identifier",
+            node.at("/errors/0/1").asText());
     }
 
     @Test

@@ -85,8 +85,8 @@ public class LdapOAuth2Test extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2023, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "LDAP Authentication failed due to unknown user or password!");
+        assertEquals("LDAP Authentication failed due to unknown user or password!",
+            node.at("/errors/0/1").asText());
     }
 
     @Test

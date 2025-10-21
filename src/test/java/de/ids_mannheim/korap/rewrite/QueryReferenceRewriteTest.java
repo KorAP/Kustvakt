@@ -61,8 +61,8 @@ public class QueryReferenceRewriteTest extends TestBase {
                 .get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/query/operands/1/@type").asText(),
-                "koral:token");
+        assertEquals("koral:token",
+            node.at("/query/operands/1/@type").asText());
 
         node = node.at("/query/operands/1/rewrites");
         assertEquals(1, node.size());

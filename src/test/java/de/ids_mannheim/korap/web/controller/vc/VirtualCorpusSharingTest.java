@@ -315,8 +315,8 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
         JsonNode node = listRolesByGroup("nemo", "dory-group");
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unauthorized operation for user: nemo");
+        assertEquals("Unauthorized operation for user: nemo",
+            node.at("/errors/0/1").asText());
         deleteGroupByName(doryGroupName, "dory");
     }
 }
