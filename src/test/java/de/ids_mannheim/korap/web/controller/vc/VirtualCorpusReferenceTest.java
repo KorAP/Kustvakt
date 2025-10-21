@@ -195,14 +195,14 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
         assertEquals("CC.*",
-            node.at("/collection/operands/0/value").asText());
+            node.at(CORPUS_PATH+"/operands/0/value").asText());
         assertEquals("koral:doc",
-            node.at("/collection/operands/1/@type").asText());
-        assertEquals("GOE", node.at("/collection/operands/1/value").asText());
+            node.at(CORPUS_PATH+"/operands/1/@type").asText());
+        assertEquals("GOE", node.at(CORPUS_PATH+"/operands/1/value").asText());
         assertEquals("corpusSigle",
-            node.at("/collection/operands/1/key").asText());
+            node.at(CORPUS_PATH+"/operands/1/key").asText());
 
-        node = node.at("/collection/operands/1");
+        node = node.at(CORPUS_PATH+"/operands/1");
         assertEquals("operation:override",
             node.at("/rewrites/0/operation").asText());
         assertEquals("koral:docGroupRef",
@@ -227,7 +227,7 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
 
-		node = node.at("/collection/rewrites/0");
+		node = node.at(CORPUS_PATH+"/rewrites/0");
 		assertEquals("operation:override", node.at("/operation").asText());
 		assertEquals("marlin/published-vc",
 				node.at("/original/ref").asText());

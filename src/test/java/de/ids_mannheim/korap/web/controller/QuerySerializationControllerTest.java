@@ -35,8 +35,8 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals("corpusSigle", node.at("/collection/key").asText());
-        assertEquals("WPD13", node.at("/collection/value").asText());
+        assertEquals("corpusSigle", node.at(CORPUS_PATH+"/key").asText());
+        assertEquals("WPD13", node.at(CORPUS_PATH+"/value").asText());
     }
 
     @Test
@@ -84,9 +84,9 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals("koral:doc", node.at("/collection/@type").asText());
-        assertEquals("corpusSigle", node.at("/collection/key").asText());
-        assertEquals("BRZ10", node.at("/collection/value").asText());
+        assertEquals("koral:doc", node.at(CORPUS_PATH+"/@type").asText());
+        assertEquals("corpusSigle", node.at(CORPUS_PATH+"/key").asText());
+        assertEquals("BRZ10", node.at(CORPUS_PATH+"/value").asText());
     }
 
     @Test
@@ -146,23 +146,23 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         node = JsonUtils.readTree(ent);
         assertNotNull(node);
         // System.out.println("NODE " + ent);
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("koral:docGroup", node.at(CORPUS_PATH+"/@type").asText());
         assertEquals("koral:doc",
-            node.at("/collection/operands/0/@type").asText());
+            node.at(CORPUS_PATH+"/operands/0/@type").asText());
         assertEquals("creationDate",
-            node.at("/collection/operands/0/key").asText());
-        assertEquals("1775", node.at("/collection/operands/0/value").asText());
+            node.at(CORPUS_PATH+"/operands/0/key").asText());
+        assertEquals("1775", node.at(CORPUS_PATH+"/operands/0/value").asText());
         assertEquals("type:date",
-            node.at("/collection/operands/0/type").asText());
+            node.at(CORPUS_PATH+"/operands/0/type").asText());
         assertEquals("match:geq",
-            node.at("/collection/operands/0/match").asText());
+            node.at(CORPUS_PATH+"/operands/0/match").asText());
         assertEquals("koral:doc",
-            node.at("/collection/operands/1/@type").asText());
+            node.at(CORPUS_PATH+"/operands/1/@type").asText());
         assertEquals("corpusSigle",
-            node.at("/collection/operands/1/key").asText());
-        assertEquals("GOE", node.at("/collection/operands/1/value").asText());
+            node.at(CORPUS_PATH+"/operands/1/key").asText());
+        assertEquals("GOE", node.at(CORPUS_PATH+"/operands/1/value").asText());
         assertEquals("match:eq",
-            node.at("/collection/operands/1/match").asText());
+            node.at(CORPUS_PATH+"/operands/1/match").asText());
     }
 
     @Test
@@ -177,16 +177,16 @@ public class QuerySerializationControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:doc",
-            node.at("/collection/operands/0/@type").asText());
+            node.at(CORPUS_PATH+"/operands/0/@type").asText());
         assertEquals("corpusSigle",
-            node.at("/collection/operands/0/key").asText());
-        assertEquals("GOE", node.at("/collection/operands/0/value").asText());
+            node.at(CORPUS_PATH+"/operands/0/key").asText());
+        assertEquals("GOE", node.at(CORPUS_PATH+"/operands/0/value").asText());
         assertEquals("koral:doc",
-            node.at("/collection/operands/1/@type").asText());
+            node.at(CORPUS_PATH+"/operands/1/@type").asText());
         assertEquals("creationDate",
-            node.at("/collection/operands/1/key").asText());
+            node.at(CORPUS_PATH+"/operands/1/key").asText());
         assertEquals("1810-01-01",
-            node.at("/collection/operands/1/value").asText());
+            node.at(CORPUS_PATH+"/operands/1/value").asText());
     }
 
     @Test

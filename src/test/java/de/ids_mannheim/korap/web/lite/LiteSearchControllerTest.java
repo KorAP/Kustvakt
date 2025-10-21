@@ -278,8 +278,8 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
         assertEquals("Politik",
-            node.at("/collection/operands/0/value").asText());
-        assertEquals("WPD", node.at("/collection/operands/1/value").asText());
+            node.at("/collection"+"/operands/0/value").asText());
+        assertEquals("WPD", node.at("/collection"+"/operands/1/value").asText());
         response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
@@ -296,8 +296,8 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
         assertEquals("Politik",
-            node.at("/collection/operands/0/value").asText());
-        assertEquals("WPD", node.at("/collection/operands/1/value").asText());
+            node.at("/collection"+"/operands/0/value").asText());
+        assertEquals("WPD", node.at("/collection"+"/operands/1/value").asText());
     }
 
     @Test

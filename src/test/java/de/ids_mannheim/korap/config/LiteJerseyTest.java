@@ -20,8 +20,7 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
 @ContextConfiguration("classpath:test-config-lite.xml")
 public abstract class LiteJerseyTest extends JerseyTest {
 
-    public static final String API_VERSION = "v1.0";
-
+	public final static String API_VERSION = "v1.0";
 	protected final static String freeCorpusAccess = "Free corpus access policy "
 			+ "has been added.";
     

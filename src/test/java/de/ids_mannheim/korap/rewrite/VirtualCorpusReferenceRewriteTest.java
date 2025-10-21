@@ -39,7 +39,7 @@ public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
                 .queryParam("cq", "referTo named-vc1").request().get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("koral:docGroup", node.at(CORPUS_PATH+"/@type").asText());
         assertTrue(node.at("/operands/1/rewrites").isMissingNode());
         
         testRefCachedVCWithUsername();
@@ -55,7 +55,7 @@ public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size()>0);
-        node = node.at("/collection");
+        node = node.at(CORPUS_PATH+"");
         assertEquals("koral:docGroup", node.at("/@type").asText());
         node = node.at("/operands/1/rewrites");
         
@@ -75,7 +75,7 @@ public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
                 .queryParam("cq", "referTo \"system-vc\"").request().get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        node = node.at("/collection");
+        node = node.at(CORPUS_PATH+"");
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("operation:and", node.at("/operation").asText());
         
@@ -106,7 +106,7 @@ public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        node = node.at("/collection");
+        node = node.at(CORPUS_PATH+"");
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("operation:and", node.at("/operation").asText());
         assertEquals(2, node.at("/operands").size());
@@ -149,7 +149,7 @@ public class VirtualCorpusReferenceRewriteTest extends VirtualCorpusTestBase {
                 .get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        node = node.at("/collection");
+        node = node.at(CORPUS_PATH);
         
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("operation:and", node.at("/operation").asText());

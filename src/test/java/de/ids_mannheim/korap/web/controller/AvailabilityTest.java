@@ -27,7 +27,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 
 	private void checkAndFree (String json, JsonNode original)
 			throws KustvaktException {
-		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		JsonNode node = JsonUtils.readTree(json).at(CORPUS_PATH+"");
 		assertEquals("availability", node.at("/operands/0/key").asText());
 		assertEquals("CC.*", node.at("/operands/0/value").asText());
 		assertEquals("operation:override",
@@ -39,7 +39,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 
 	private void checkAndPublic (String json, JsonNode original)
 			throws KustvaktException {
-		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		JsonNode node = JsonUtils.readTree(json).at(CORPUS_PATH+"");
 		assertNotNull(node);
 		assertEquals("operation:and", node.at("/operation").asText());
 		assertEquals("koral:rewrite", node.at("/rewrites/0/@type").asText());
@@ -66,7 +66,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     private void checkAndAllWithACA (String json, JsonNode original)
 			throws KustvaktException {
-		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		JsonNode node = JsonUtils.readTree(json).at(CORPUS_PATH+"");
 		assertEquals("operation:and", node.at("/operation").asText());
 		assertEquals("operation:and", node.at("/operation").asText());
 		assertEquals("koral:rewrite", node.at("/rewrites/0/@type").asText());
@@ -121,7 +121,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 		
 		String json = response.readEntity(String.class);
-		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		JsonNode node = JsonUtils.readTree(json).at(CORPUS_PATH+"");
 		assertEquals("availability", node.at("/key").asText());
 		assertEquals("CC.*", node.at("/value").asText());
 		assertEquals("operation:injection",
@@ -141,7 +141,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 		
 		String json = response.readEntity(String.class);
-		JsonNode node = JsonUtils.readTree(json).at("/collection");
+		JsonNode node = JsonUtils.readTree(json).at(CORPUS_PATH+"");
 		
 		String expected = """
 			{
@@ -195,7 +195,7 @@ public class AvailabilityTest extends SpringJerseyTest {
    		assertEquals(Status.OK.getStatusCode(), response.getStatus());
    		
    		String json = response.readEntity(String.class);
-   		JsonNode node = JsonUtils.readTree(json).at("/collection");
+   		JsonNode node = JsonUtils.readTree(json).at(CORPUS_PATH+"");
    		String expected = """
    			{
               "operands" : [ {
@@ -293,7 +293,7 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String json = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(json);
-        assertTrue(node.at("/collection/rewrite").isMissingNode());
+        assertTrue(node.at(CORPUS_PATH+"/rewrite").isMissingNode());
     }
     
     @Test
@@ -304,18 +304,18 @@ public class AvailabilityTest extends SpringJerseyTest {
         String json = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(json);
         assertEquals("operation:and",
-            node.at("/collection/operation").asText());
+            node.at(CORPUS_PATH+"/operation").asText());
         assertEquals("match:eq",
-            node.at("/collection/operands/0/match").asText());
+            node.at(CORPUS_PATH+"/operands/0/match").asText());
         assertEquals("type:regex",
-            node.at("/collection/operands/0/type").asText());
+            node.at(CORPUS_PATH+"/operands/0/type").asText());
         assertEquals("availability",
-            node.at("/collection/operands/0/key").asText());
+            node.at(CORPUS_PATH+"/operands/0/key").asText());
         assertEquals("CC.*",
-            node.at("/collection/operands/0/value").asText());
+            node.at(CORPUS_PATH+"/operands/0/value").asText());
         assertEquals("match:eq",
-            node.at("/collection/operands/1/match").asText());
-        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
+            node.at(CORPUS_PATH+"/operands/1/match").asText());
+        assertEquals("ACA.*", node.at(CORPUS_PATH+"/operands/1/value").asText());
     }
 
     
@@ -619,8 +619,8 @@ public class AvailabilityTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String json = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(json);
-        assertTrue(node.at("/collection/rewrites").isMissingNode());
-        assertEquals("operation:or", node.at("/collection/operation").asText());
+        assertTrue(node.at(CORPUS_PATH+"/rewrites").isMissingNode());
+        assertEquals("operation:or", node.at(CORPUS_PATH+"/operation").asText());
     }
 
     @Test

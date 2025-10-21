@@ -25,7 +25,7 @@ public class MultipleCorpusQueryTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        node = node.at("/collection/operands/1");
+        node = node.at(CORPUS_PATH+"/operands/1");
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("operation:and", node.at("/operation").asText());
         assertEquals(2, node.at("/operands").size());

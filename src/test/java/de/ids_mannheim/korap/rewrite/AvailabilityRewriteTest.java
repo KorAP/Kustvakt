@@ -25,8 +25,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
     public KustvaktConfiguration config;
     
     private double apiVersion = Double.parseDouble(API_VERSION.substring(1));
-    private String collectionNodeName = (apiVersion >= 1.1) ? "corpus"
-			: "collection";
+    
 
     @Disabled
     @Test
@@ -41,7 +40,7 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
-        assertEquals(1, node.at("/"+collectionNodeName+"/operands").size());
+        assertEquals(1, node.at(CORPUS_PATH+"/operands").size());
     }
 
     @Test
@@ -60,9 +59,9 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
-        assertEquals(0, node.at("/collection/operands").size());
+        assertEquals(0, node.at(CORPUS_PATH+"/operands").size());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
     }
     
     @Disabled
@@ -80,11 +79,11 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
         assertEquals("koral:docGroup",
-            node.at("/collection/operands/0/@type").asText());
+            node.at(CORPUS_PATH+"/operands/0/@type").asText());
         assertEquals("textClass",
-            node.at("/collection/operands/0/operands/0/key").asText());
+            node.at(CORPUS_PATH+"/operands/0/operands/0/key").asText());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
     }
 
     // fixme: will probably fail when one doc groups are being refactored
@@ -103,14 +102,14 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals(2, node.at("/collection/operands").size());
+        assertEquals("koral:docGroup", node.at(CORPUS_PATH+"/@type").asText());
+        assertEquals(2, node.at(CORPUS_PATH+"/operands").size());
         assertEquals("textClass",
-            node.at("/collection/operands/0/key").asText());
+            node.at(CORPUS_PATH+"/operands/0/key").asText());
         assertEquals("textClass",
-            node.at("/collection/operands/1/key").asText());
+            node.at(CORPUS_PATH+"/operands/1/key").asText());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
     }
 
     @Disabled
@@ -127,11 +126,11 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
-        assertEquals("koral:doc", node.at("/collection/@type").asText());
-        assertEquals("textClass", node.at("/collection/key").asText());
-        assertEquals("wissenschaft", node.at("/collection/value").asText());
+        assertEquals("koral:doc", node.at(CORPUS_PATH+"/@type").asText());
+        assertEquals("textClass", node.at(CORPUS_PATH+"/key").asText());
+        assertEquals("wissenschaft", node.at(CORPUS_PATH+"/value").asText());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
     }
 
     @Disabled
@@ -149,10 +148,10 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
-        assertEquals("koral:doc", node.at("/collection/@type").asText());
-        assertEquals("textClass", node.at("/collection/key").asText());
+        assertEquals("koral:doc", node.at(CORPUS_PATH+"/@type").asText());
+        assertEquals("textClass", node.at(CORPUS_PATH+"/key").asText());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
     }
 
     @Disabled
@@ -170,14 +169,14 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals(2, node.at("/collection/operands").size());
+        assertEquals("koral:docGroup", node.at(CORPUS_PATH+"/@type").asText());
+        assertEquals(2, node.at(CORPUS_PATH+"/operands").size());
         assertEquals("koral:doc",
-            node.at("/collection/operands/0/@type").asText());
+            node.at(CORPUS_PATH+"/operands/0/@type").asText());
         assertEquals("koral:doc",
-            node.at("/collection/operands/1/@type").asText());
+            node.at(CORPUS_PATH+"/operands/1/@type").asText());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
     }
 
     @Test
@@ -192,18 +191,18 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
-        assertEquals(2, node.at("/collection/operands").size());
+        assertEquals(2, node.at(CORPUS_PATH+"/operands").size());
         assertEquals("availability",
-            node.at("/collection/operands/0/key").asText());
+            node.at(CORPUS_PATH+"/operands/0/key").asText());
         assertEquals("CC.*",
-            node.at("/collection/operands/0/value").asText());
+            node.at(CORPUS_PATH+"/operands/0/value").asText());
         assertEquals("docSigle",
-            node.at("/collection/operands/1/operands/0/key").asText());
+            node.at(CORPUS_PATH+"/operands/1/operands/0/key").asText());
         assertEquals("textClass",
-            node.at("/collection/operands/1/operands/1/key").asText());
+            node.at(CORPUS_PATH+"/operands/1/operands/1/key").asText());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
-//        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
+//        assertEquals(node.at(CORPUS_PATH+"/rewrites/0/scope").asText(),
 //                "availability(FREE)");
     }
     
@@ -218,12 +217,12 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
-        assertEquals(node.at("/"+collectionNodeName+"/key").asText(), "availability");
-        assertEquals(node.at("/"+collectionNodeName+"/value").asText(), "CC.*");
-        assertEquals(node.at("/"+collectionNodeName+"/rewrites/0/@type").asText(),
+        assertEquals(node.at(CORPUS_PATH+"/key").asText(), "availability");
+        assertEquals(node.at(CORPUS_PATH+"/value").asText(), "CC.*");
+        assertEquals(node.at(CORPUS_PATH+"/rewrites/0/@type").asText(),
                 "koral:rewrite");
         assertEquals(freeCorpusAccess,
-        		node.at("/"+collectionNodeName+"/rewrites/0/_comment").asText());
+        		node.at(CORPUS_PATH+"/rewrites/0/_comment").asText());
     }
 
 
@@ -242,16 +241,16 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
 
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals(2, node.at("/collection/operands").size());
+        assertEquals("koral:docGroup", node.at(CORPUS_PATH+"/@type").asText());
+        assertEquals(2, node.at(CORPUS_PATH+"/operands").size());
         assertEquals("koral:docGroup",
-            node.at("/collection/operands/0/@type").asText());
+            node.at(CORPUS_PATH+"/operands/0/@type").asText());
         assertEquals("koral:docGroup",
-            node.at("/collection/operands/1/@type").asText());
-        assertEquals(1, node.at("/collection/operands/0/operands").size());
-        assertEquals(1, node.at("/collection/operands/1/operands").size());
+            node.at(CORPUS_PATH+"/operands/1/@type").asText());
+        assertEquals(1, node.at(CORPUS_PATH+"/operands/0/operands").size());
+        assertEquals(1, node.at(CORPUS_PATH+"/operands/1/operands").size());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
     }
 
     @Disabled
@@ -271,23 +270,23 @@ public class AvailabilityRewriteTest extends SpringJerseyTest {
                 User.UserFactory.getUser("test_user"), API_VERSION_DOUBLE));
         assertNotNull(node);
 
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals(2, node.at("/collection/operands").size());
+        assertEquals("koral:docGroup", node.at(CORPUS_PATH+"/@type").asText());
+        assertEquals(2, node.at(CORPUS_PATH+"/operands").size());
         assertEquals("koral:doc",
-            node.at("/collection/operands/0/@type").asText());
+            node.at(CORPUS_PATH+"/operands/0/@type").asText());
         assertEquals("koral:doc",
-            node.at("/collection/operands/0/@type").asText());
+            node.at(CORPUS_PATH+"/operands/0/@type").asText());
         assertEquals("textClass",
-            node.at("/collection/operands/0/key").asText());
+            node.at(CORPUS_PATH+"/operands/0/key").asText());
         assertEquals("wissenschaft",
-            node.at("/collection/operands/0/value").asText());
+            node.at(CORPUS_PATH+"/operands/0/value").asText());
         assertEquals("koral:doc",
-            node.at("/collection/operands/1/@type").asText());
+            node.at(CORPUS_PATH+"/operands/1/@type").asText());
         assertEquals("textClass",
-            node.at("/collection/operands/1/key").asText());
+            node.at(CORPUS_PATH+"/operands/1/key").asText());
         assertEquals("freizeit",
-            node.at("/collection/operands/1/value").asText());
+            node.at(CORPUS_PATH+"/operands/1/value").asText());
         assertEquals("koral:rewrite",
-            node.at("/collection/rewrites/0/@type").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/@type").asText());
     }
 }

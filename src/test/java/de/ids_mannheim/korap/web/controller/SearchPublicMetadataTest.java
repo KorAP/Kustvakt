@@ -34,7 +34,7 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertTrue(node.at("/meta/snippet").isMissingNode());
         assertEquals(allCorpusAccess,
-        		node.at("/collection/rewrites/0/_comment").asText());
+        		node.at(CORPUS_PATH+"/rewrites/0/_comment").asText());
         assertFalse(node.at("/matches/0/snippet").asBoolean());
         assertFalse(node.at("/matches/0/tokens").asBoolean());
     }
@@ -49,7 +49,7 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("All corpus access policy has been added.",
-        		node.at("/collection/rewrites/0/_comment").asText());
+        		node.at(CORPUS_PATH+"/rewrites/0/_comment").asText());
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
     }
 
@@ -64,7 +64,7 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 		assertEquals(allCorpusAccess,
-				node.at("/collection/rewrites/0/_comment").asText());
+				node.at(CORPUS_PATH+"/rewrites/0/_comment").asText());
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
         assertEquals("Goethe, Johann Wolfgang von",
             node.at("/matches/0/author").asText());
@@ -107,7 +107,7 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(allCorpusAccess,
-        		node.at("/collection/rewrites/0/_comment").asText());
+        		node.at(CORPUS_PATH+"/rewrites/0/_comment").asText());
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
     }
 
@@ -120,7 +120,7 @@ public class SearchPublicMetadataTest extends VirtualCorpusTestBase {
                 .queryParam("access-rewrite-disabled", "true").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity).at("/collection");
+        JsonNode node = JsonUtils.readTree(entity).at(CORPUS_PATH+"");
         assertEquals("operation:and",node.at("/operation").asText());
         
         assertEquals("operation:override", node.at("/rewrites/0/operation").asText());

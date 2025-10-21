@@ -119,11 +119,11 @@ public class SearchPipeTest extends SpringJerseyTest {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.at("/query/wrap/key").size());
-        assertEquals(1, node.at("/collection/rewrites").size());
+        assertEquals(1, node.at(CORPUS_PATH+"/rewrites").size());
         assertEquals("operation:injection",
-            node.at("/collection/rewrites/0/operation").asText());
+            node.at(CORPUS_PATH+"/rewrites/0/operation").asText());
 		assertEquals(freeCorpusAccess,
-				node.at("/collection/rewrites/0/_comment").asText());
+				node.at(CORPUS_PATH+"/rewrites/0/_comment").asText());
 		node = node.at("/query/wrap/rewrites");
 		assertEquals(2, node.size());
 		assertEquals("Glemm", node.at("/0/src").asText());
