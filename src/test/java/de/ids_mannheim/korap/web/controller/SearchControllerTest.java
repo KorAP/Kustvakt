@@ -108,6 +108,8 @@ public class SearchControllerTest extends SpringJerseyTest {
                 node.at("/meta/fields").toString());
     }
 
+    // Kustvakt sends query with only corpus, but Krill returns both corpus and 
+    // collection
     @Test
     public void testSearchQueryPublicCorpora () throws KustvaktException {
         Response response = target().path(API_VERSION).path("search")

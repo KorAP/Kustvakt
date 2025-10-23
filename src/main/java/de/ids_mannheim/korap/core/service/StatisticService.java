@@ -36,11 +36,12 @@ public class StatisticService extends BasicService {
 		return stats;
 	}
 
-    public String retrieveStatisticsForKoralQuery (String koralQuery)
+    public String retrieveStatisticsForKoralQuery (String koralQuery, 
+    		double apiVersion)
             throws KustvaktException {
         String stats = null;
         if (koralQuery != null && !koralQuery.isEmpty()) {
-            checkVC(koralQuery);
+            checkVC(koralQuery, apiVersion);
             stats = searchKrill.getStatistics(koralQuery);
         }
         else {
