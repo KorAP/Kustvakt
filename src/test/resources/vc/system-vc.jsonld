@@ -1,1 +1,1 @@
-{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}
+{"corpus":{"@type":"koral:doc","value":"1810","match":"match:geq","type":"type:date","key":"creationDate"}}

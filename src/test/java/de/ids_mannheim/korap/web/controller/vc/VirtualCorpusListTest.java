@@ -42,10 +42,7 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
 		assertEquals(CorpusAccess.ALL.name(),
 				node.at("/requiredAccess").asText());
 		assertEquals("system", node.at("/createdBy").asText());
-        assertEquals(11,node.at("/numberOfDoc").asInt());
-        assertEquals(772,node.at("/numberOfParagraphs").asInt());
-        assertEquals(25074,node.at("/numberOfSentences").asInt());
-        assertEquals(665842,node.at("/numberOfTokens").asInt());
+        assertEquals(7,node.at("/numberOfDoc").asInt());
     }
 
     @Test

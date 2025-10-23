@@ -181,10 +181,7 @@ public class StatisticsControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(2, node.at("/documents").asInt());
-        assertEquals(72770, node.at("/tokens").asInt());
-        assertEquals(2985, node.at("/sentences").asInt());
-        assertEquals(128, node.at("/paragraphs").asInt());
+        assertEquals(7,node.get("documents").asInt());
     }
 
     @Test

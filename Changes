@@ -18,6 +18,7 @@
 - Fix collection/corpus paths in the test suite (#806)
 - Fix authorization with POST tests.
 - Add apiVersion for checking VC in caching process (#806)
+- Update system-vc and fix get statistics with VC reference test.
 
 # version 0.79.1
 
