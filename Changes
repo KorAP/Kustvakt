@@ -19,6 +19,8 @@
 - Fix authorization with POST tests.
 - Add apiVersion for checking VC in caching process (#806)
 - Update system-vc and fix get statistics with VC reference test.
+- Merge full and lite profiles and create one jar for both. 
+
 
 # version 0.79.1
 

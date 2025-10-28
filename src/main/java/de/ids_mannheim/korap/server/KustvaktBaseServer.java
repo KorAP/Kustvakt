@@ -48,7 +48,7 @@ public abstract class KustvaktBaseServer {
     protected static String springConfig = "default-config.xml";
 
     protected static String rootPackages;
-    protected static KustvaktArgs kargs;
+    public static KustvaktArgs kargs;
 
     public KustvaktBaseServer () {
         rootPackages = "de.ids_mannheim.korap.core.web;"
@@ -66,6 +66,14 @@ public abstract class KustvaktBaseServer {
         KustvaktArgs kargs = new KustvaktArgs();
         for (int i = 0; i < args.length; i++) {
             switch ((args[i])) {
+            	case "--lite":
+                    kargs.setLite(true);     
+                    springConfig = "default-lite-config.xml";
+                    rootPackages = "de.ids_mannheim.korap.core.web; "
+                            + "de.ids_mannheim.korap.web.filter; "
+                            + "de.ids_mannheim.korap.web.utils; "
+                            + "com.fasterxml.jackson.jaxrs.json;";
+                    break;
                 case "--spring-config":
                     kargs.setSpringConfig(args[i + 1]);
                     break;
@@ -231,10 +239,21 @@ public abstract class KustvaktBaseServer {
         @Getter
         private String springConfig;
         private int port;
+        private boolean isLite;
 
         public KustvaktArgs () {
             this.port = -1;
             this.springConfig = null;
+            this.isLite = false;
         }
+        
+        public boolean isLite () {
+			return isLite;
+		}
+        
+        public void setLite (boolean isLite) {
+			this.isLite = isLite;
+
+		}
     }
 }

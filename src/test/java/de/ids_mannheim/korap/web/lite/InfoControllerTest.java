@@ -35,7 +35,7 @@ public class InfoControllerTest extends LiteJerseyTest {
                 node.at("/latest_api_version").asText());
         assertEquals(config.getSupportedVersions().size(),
                 node.at("/supported_api_versions").size());
-        assertEquals(ServiceInfo.getInfo().getVersion(),
+        assertEquals("lite-"+ServiceInfo.getInfo().getVersion(),
                 node.at("/kustvakt_version").asText());
         assertEquals(krill.getIndex().getVersion(),
                 node.at("/krill_version").asText());

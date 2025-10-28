@@ -16,6 +16,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 
+import de.ids_mannheim.korap.server.KustvaktBaseServer;
+import de.ids_mannheim.korap.server.KustvaktBaseServer.KustvaktArgs;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration("classpath:test-config-lite.xml")
 public abstract class LiteJerseyTest extends JerseyTest {
@@ -51,10 +54,15 @@ public abstract class LiteJerseyTest extends JerseyTest {
 
     @Override
     protected DeploymentContext configureDeployment () {
+    	 KustvaktArgs ka = new KustvaktArgs();
+    	 ka.setLite(true);
+    	 KustvaktBaseServer.kargs = ka;
+    	
         return ServletDeploymentContext
                 .forServlet(new ServletContainer(
                         new ResourceConfig().packages(classPackages)))
                 .addListener(StaticContextLoaderListener.class)
-                .contextParam("adminToken", "secret").build();
+                .contextParam("adminToken", "secret")
+                .build();
     }
 }

@@ -17,7 +17,12 @@ public class KustvaktServer extends KustvaktBaseServer {
         if (kargs == null)
             System.exit(0);
 
-        server.loadProperties("data/kustvakt.conf", "kustvakt.conf");
+        if (kargs.isLite()) {
+        	server.loadProperties("data/kustvakt-lite.conf", "kustvakt-lite.conf");
+        }
+        else {
+        	server.loadProperties("data/kustvakt.conf", "kustvakt.conf");
+        }
         server.start();
     }
 }
