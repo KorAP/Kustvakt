@@ -22,6 +22,7 @@
 		<!-- Align JBoss Logging with Hibernate Validator 9 requirements -->
 		<jboss.logging.version>3.6.1.Final</jboss.logging.version>
 	</properties>
+	<!--
 	<profiles>
 		<profile>
 			<id>full</id>
@@ -34,7 +35,6 @@
 						<artifactId>maven-shade-plugin</artifactId>
 						<version>3.6.1</version>
 						<executions>
-							<!-- option 1 -->
 							<execution>
 								<id>full</id>
 								<phase>package</phase>
@@ -42,7 +42,7 @@
 									<goal>shade</goal>
 								</goals>
 								<configuration>
-									<finalName>Kustvakt-full-${project.version}</finalName>
+									<finalName>Kustvakt-${project.version}</finalName>
 									<transformers>
 										<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
 										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -97,7 +97,7 @@
 						<artifactId>maven-shade-plugin</artifactId>
 						<version>3.6.1</version>
 						<executions>
-							<!--option 2 -->
+							
 							<execution>
 								<id>lite</id>
 								<phase>package</phase>
@@ -133,7 +133,7 @@
 										<filter>
 											<artifact>*:*</artifact>
 											<excludes>
-												<exclude>db/mysql/**</exclude>
+												<Bodenrichtwert laut Quelle: ≈ 390 €/m² für Baugrundstück in Breitenbach (erschlossen) laut 2025-Angabeexclude>db/mysql/**</exclude>
 												<exclude>db/predefined/**</exclude>
 												<exclude>db/sqlite/**</exclude>
 												<exclude>com.novell.ldap</exclude>
@@ -154,6 +154,7 @@
 		</profile>
 
 	</profiles>
+	-->
 	<build>
 		<resources>
 			<resource>
@@ -180,6 +181,60 @@
 			</testResource>
 		</testResources>
 		<plugins>
+			<plugin>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.6.1</version>
+				<executions>
+					<!-- option 1 -->
+					<execution>
+						<!--<id>full</id>-->
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>Kustvakt-${project.version}</finalName>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>
+										de.ids_mannheim.korap.server.KustvaktServer
+									</mainClass>
+									<manifestEntries>
+										<Multi-Release>true</Multi-Release>
+									</manifestEntries>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/spring.handlers</resource>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/spring.schemas</resource>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/spring/aot.factories</resource>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/hk2-locator/default</resource>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/spring.tooling</resource>
+								</transformer>
+							</transformers>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<!--<exclude>db/lite/**</exclude>-->
+										<exclude>META-INF/*.SF</exclude>
+						                <exclude>META-INF/*.DSA</exclude>
+						                <exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- Formatter plugin for Eclipse based coding conventions http://maven-java-formatter-plugin.googlecode.com/svn/site/0.4/usage.html -->
 			<plugin>
 				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
