@@ -18,6 +18,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 
+import de.ids_mannheim.korap.server.KustvaktBaseServer;
+import de.ids_mannheim.korap.server.KustvaktBaseServer.KustvaktArgs;
+
 @DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration("classpath:test-config.xml")
@@ -63,6 +66,9 @@ public abstract class SpringJerseyTest extends JerseyTest {
 
     @Override
     protected DeploymentContext configureDeployment () {
+    	KustvaktArgs ka = new KustvaktArgs();
+       	ka.setLite(false);
+       	KustvaktBaseServer.kargs = ka;
         return ServletDeploymentContext
                 .forServlet(new ServletContainer(
                         new ResourceConfig().packages(classPackages)))

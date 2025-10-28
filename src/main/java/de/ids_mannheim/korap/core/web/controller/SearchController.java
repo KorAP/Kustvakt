@@ -20,6 +20,7 @@ import de.ids_mannheim.korap.core.service.SearchService;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.server.KustvaktBaseServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
@@ -89,10 +90,15 @@ public class SearchController {
     @Path("{version}/info")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response info () {
+    	String kustvaktVersion = "full";
+    	if (KustvaktBaseServer.kargs != null && KustvaktBaseServer.kargs.isLite())
+    		kustvaktVersion = "lite";
+    		
         Map<String, Object> m = new HashMap<>();
         m.put("latest_api_version", config.getCurrentVersion());
         m.put("supported_api_versions", config.getSupportedVersions());
-        m.put("kustvakt_version", ServiceInfo.getInfo().getVersion());
+        m.put("kustvakt_version", kustvaktVersion + "-" + 
+        		ServiceInfo.getInfo().getVersion());
         m.put("krill_version", searchService.getKrillVersion());
         m.put("koral_version", ServiceInfo.getInfo().getKoralVersion());
         try {
