@@ -26,7 +26,14 @@ RUN curl -I https://github.com/KorAP/Koral/releases/latest | \
     mvn clean install
 
 RUN rm -r Koral-* v*.zip
-
+    
+#RUN curl -L -o koral-head.zip https://github.com/KorAP/Koral/archive/HEAD.zip && \
+#    unzip koral-head.zip && \
+#    cd Koral-* && \
+#    mvn clean install && \
+#    cd /kustvakt && \
+#    rm -rf Koral-* koral-head.zip
+    
 RUN mkdir built
 
 # Install Krill
@@ -42,18 +49,15 @@ RUN curl -I https://github.com/KorAP/Krill/releases/latest | \
 
 RUN rm -r Krill-* v*.zip
 
-# Package lite
-RUN mvn clean package -P lite && \
-    find target/Kustvakt-lite-*.jar -exec mv {} /kustvakt/built/Kustvakt-lite.jar ';'
 
-RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' src/main/resources/kustvakt-lite.conf \
+# Kustvakt
+RUN mvn clean package && \
+    find target/Kustvakt-*.jar -exec mv {} /kustvakt/built/Kustvakt.jar ';'
+
+ RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' src/main/resources/kustvakt-lite.conf \
     > built/kustvakt-lite.conf
 
-# Package full
-RUN mvn clean package -DskipTests=true && \
-    find target/Kustvakt-full-*.jar -exec mv {} /kustvakt/built/Kustvakt-full.jar ';'
-
-RUN cat src/main/resources/kustvakt.conf | \
+ RUN cat src/main/resources/kustvakt.conf | \
     sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' | \
     sed 's!\(ldap\.config\s*=\).\+!\1\/kustvakt\/ldap\/ldap\.conf!' | \
     sed 's!\(oauth2\.initial\.super\.client\s*=\).\+!\1\/true!' | \
@@ -90,11 +94,7 @@ RUN addgroup -S korap && \
 
 COPY --from=builder /kustvakt/sample-index /kustvakt/index
 
-USER kustvakt
-
-CMD ["sh"]
-
-FROM eclipse-temurin:22-jre-alpine AS kustvakt-lite
+FROM eclipse-temurin:22-jre-alpine AS kustvakt
 
 RUN addgroup -S korap && \
     adduser -S kustvakt -G korap && \
@@ -103,43 +103,22 @@ RUN addgroup -S korap && \
 
 WORKDIR /kustvakt
 
-COPY --from=builder /kustvakt/built/Kustvakt-lite.jar /kustvakt/
-COPY --from=builder /kustvakt/built/kustvakt-lite.conf /kustvakt/
-COPY --from=builder /kustvakt/built/Krill-Indexer.jar /kustvakt/
-
 USER kustvakt
 
-EXPOSE 8089
+RUN mkdir ./ldap && \
+    mkdir ./client && \
+    mkdir ./data
 
-ENTRYPOINT [ "java", "-jar" ]
-
-CMD [ "Kustvakt-lite.jar" ]
-
-FROM eclipse-temurin:22-jre-alpine AS kustvakt-full
-
-RUN addgroup -S korap && \
-    adduser -S kustvakt -G korap && \
-    mkdir kustvakt && \
-    chown -R kustvakt.korap /kustvakt
-
-WORKDIR /kustvakt
-
-RUN mkdir ./ldap \
-    mkdir ./client
-
-COPY --from=builder /kustvakt/built/Kustvakt-full.jar /kustvakt/
-COPY --from=builder /kustvakt/built/kustvakt.conf /kustvakt/
+COPY --from=builder /kustvakt/built/Kustvakt.jar /kustvakt/
+COPY --from=builder /kustvakt/built/kustvakt.conf /kustvakt/data/
+COPY --from=builder /kustvakt/built/kustvakt-lite.conf /kustvakt/data/
 COPY --from=builder /kustvakt/built/ldap.* /kustvakt/ldap/
 COPY --from=builder /kustvakt/built/Krill-Indexer.jar /kustvakt/
 
-USER kustvakt
-
 EXPOSE 8089
 
-ENTRYPOINT [ "java", "-jar" ]
+ENTRYPOINT [ "java", "-jar",  "/kustvakt/Kustvakt.jar"]
 
-CMD [ "Kustvakt-full.jar" ]
-
-# docker build -f Dockerfile -t korap/kustvakt:{nr}-full --target kustvakt-full .
-# docker build -f Dockerfile -t korap/kustvakt:{nr} --target kustvakt-lite .
+# docker build -f Dockerfile -t korap/kustvakt:{nr} .
 # docker build -f Dockerfile -t korap/example-index:{nr} --target example-index .
+# docker run --rm --net host -v [absolute-path-sample-index]:/kustvakt/index -it korap/kustvakt:{nr} --lite
