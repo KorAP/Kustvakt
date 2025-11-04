@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d70ea130_762cea7d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-11-04T08:52:30Z",
+      "side": 1,
+      "message": "I made some changes and left some questions.",
+      "revId": "df15a8ec904a165456674385afc108400162df8b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "650a02c9_f05e4201",
+        "filename": "Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-11-04T08:52:30Z",
+      "side": 1,
+      "message": "What is the benefit of removing the command (i.e. making it irreplacable)? I would say that makes debugging harder.",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 55
+      },
+      "revId": "df15a8ec904a165456674385afc108400162df8b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
