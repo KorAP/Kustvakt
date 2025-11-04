@@ -39,6 +39,30 @@
       },
       "revId": "df15a8ec904a165456674385afc108400162df8b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1ad6430_712f3c0b",
+        "filename": "Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-11-04T08:56:50Z",
+      "side": 1,
+      "message": "How do you run the indexer?",
+      "parentUuid": "650a02c9_f05e4201",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 55
+      },
+      "revId": "df15a8ec904a165456674385afc108400162df8b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
