@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d60f77c2_6691cf82",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-11-04T08:40:33Z",
+      "side": 1,
+      "message": "Replacing busybox for the example index with eclipse seems to be useless - sure, the layer is already in existence, but the resulting image (if transfered) is way larger ... we only need the volume provision, so busybox was in my opinion the best choice (scratch didn\u0027t work).",
+      "revId": "3b044c82a7d7af12974aa589cc89251fbcd73322",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
