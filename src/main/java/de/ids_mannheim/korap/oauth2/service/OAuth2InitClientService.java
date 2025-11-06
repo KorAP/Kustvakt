@@ -16,7 +16,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
-import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
@@ -50,11 +49,7 @@ public class OAuth2InitClientService {
         if (!f.exists()) {
             OAuth2ClientJson json = readOAuth2ClientJsonFile();
             OAuth2ClientDto clientDto = clientService.registerClient(json,
-                    "system");
-            String clientId = clientDto.getClient_id();
-            OAuth2Client client = clientService.retrieveClient(clientId);
-            client.setSuper(true);
-            clientDao.updateClient(client);
+                    "system",true);
             JsonUtils.writeFile(path, clientDto);
 
             log.info(
@@ -76,14 +71,8 @@ public class OAuth2InitClientService {
                 log.info("Super client info file exists but the client "
                         + "doesn't exist in the database.");
                 OAuth2ClientJson json = readOAuth2ClientJsonFile();
-                OAuth2ClientDto clientDto = clientService.registerClient(json,
-                        "system");
-                String clientId = clientDto.getClient_id();
-                OAuth2Client client = clientService.retrieveClient(clientId);
-                client.setSuper(true);
-                client.setId(existingClientId);
-                client.setSecret(secretHashcode);
-                clientDao.updateClient(client);
+                clientService.registerExistingClient(json,
+                        "system", true, existingClientId, secretHashcode);
             }
         }
     }

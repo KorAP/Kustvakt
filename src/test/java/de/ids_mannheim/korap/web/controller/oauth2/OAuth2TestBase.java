@@ -100,14 +100,14 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 					"super confidential client", OAuth2ClientType.CONFIDENTIAL,
 					"http://korap.ids-mannheim.de/confidential",
 					"https://korap.ids-mannheim.de/confidential/redirect",
-					"system", "Super confidential client.", 0, null, false);
+					"system", "Super confidential client.", 0, null);
 		}
 		
 		try {
 			clientDao.retrieveClientById(publicClientId);
 		}
 		catch (KustvaktException e) {
-			clientDao.registerClient(publicClientId, null,
+			clientDao.registerClient(false, publicClientId, null,
 					"public client plugin with redirect uri",
 					OAuth2ClientType.PUBLIC, "https://third.party.client.com",
 					"https://third.party.client.com/redirect", "system",
@@ -119,7 +119,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 			clientDao.retrieveClientById(publicClientId2);
 		}
 		catch (KustvaktException e) {
-			clientDao.registerClient(publicClientId2, null,
+			clientDao.registerClient(false, publicClientId2, null,
 					"test public client", OAuth2ClientType.PUBLIC,
 					"http://korap.ids-mannheim.de/public", null, "system",
 					"Public client without redirect uri", 0, null);
@@ -129,7 +129,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 			clientDao.retrieveClientById(confidentialClientId);
 		}
 		catch (KustvaktException e) {
-			clientDao.registerClient(confidentialClientId,
+			clientDao.registerClient(false, confidentialClientId,
 					"$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
 					"non super confidential client",
 					OAuth2ClientType.CONFIDENTIAL,
@@ -148,7 +148,10 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 					"confidential client 2", OAuth2ClientType.CONFIDENTIAL,
 					"http://example.client.de", null, "system",
 					"Nonsuper confidential client plugin without redirect URI",
-					0, source, true);
+					0, source);
+			OAuth2Client client = clientDao.retrieveClientById(confidentialClientId2);
+			client.setPermitted(true);
+			clientDao.updateClient(client);
 		}
 	}
     

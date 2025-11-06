@@ -25,17 +25,19 @@ public class InitialSuperClientTest extends OAuth2TestBase {
 
     @Autowired
     private FullConfiguration config;
-
     @Autowired
     private OAuth2ClientDao clientDao;
+    @Autowired
+	private OAuth2InitClientService clientService;
 
     private String path = KustvaktConfiguration.DATA_FOLDER + "/"
             + OAuth2InitClientService.TEST_OUTPUT_FILENAME;
-
+    
     @Test
     public void testCreatingInitialSuperClient ()
             throws IOException, KustvaktException {
-        assertTrue(config.createInitialSuperClient());
+    	assertTrue(config.createInitialSuperClient());
+    	// The file was created during server start
         File f = new File(path);
         assertTrue(f.exists());
         JsonNode node = JsonUtils.readFile(path, JsonNode.class);
@@ -44,6 +46,27 @@ public class InitialSuperClientTest extends OAuth2TestBase {
         OAuth2Client superClient = clientDao.retrieveClientById(superClientId);
         assertTrue(superClient.isSuper());
         testLogin(superClientId, superClientSecret);
+        assertEquals(2,clientDao.retrieveSuperClients());
+        
+        clientDao.deregisterClient(superClient);
+        assertEquals(1,clientDao.retrieveSuperClients());
+        
+        testRegisterFromExistingFile();
+    }
+    
+    private void testRegisterFromExistingFile ()
+            throws IOException, KustvaktException {
+    	
+    	clientService.createInitialTestSuperClient();
+        assertEquals(2,clientDao.retrieveSuperClients());
+        
+        JsonNode node = JsonUtils.readFile(path, JsonNode.class);
+        String superClientId = node.at("/client_id").asText();
+        OAuth2Client superClient = clientDao.retrieveClientById(superClientId);
+        assertTrue(superClient.isSuper());
+
+        clientDao.deregisterClient(superClient);
+        assertEquals(1,clientDao.retrieveSuperClients());
         removeSuperClientFile();
     }
 

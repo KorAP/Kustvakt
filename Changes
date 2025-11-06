@@ -21,6 +21,7 @@
 - Update system-vc and fix get statistics with VC reference test.
 - Merge full and lite profiles and create one jar for both. 
 - Merge full and lite version in dockerfile and CI tests
+- Fix redundant initial-super-client generation.
 
 
 # version 0.79.1

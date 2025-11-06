@@ -1,9 +1,5 @@
 package de.ids_mannheim.korap.oauth2.service;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.nimbusds.oauth2.sdk.OAuth2Error;
 
-import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dto.InstalledPluginDto;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
@@ -88,12 +83,10 @@ public class OAuth2ClientService {
     private EncryptionIface encryption;
     @Autowired
     private RandomCodeGenerator codeGenerator;
-    @Autowired
-    private FullConfiguration config;
-
-    public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
-            String registeredBy) throws KustvaktException {
-        try {
+    
+    private void checkClientJson (OAuth2ClientJson clientJson) 
+    		throws KustvaktException {
+    	try {
             ParameterChecker.checkNameValue(clientJson.getName(),
                     "client_name");
             ParameterChecker.checkObjectValue(clientJson.getType(),
@@ -127,8 +120,53 @@ public class OAuth2ClientService {
             throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                     "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
         }
+	}
+    
+    private void throwRegistrationException (Exception e) throws KustvaktException {
+    	Throwable cause = e;
+        Throwable lastCause = null;
+        while ((cause = cause.getCause()) != null
+                && !cause.equals(lastCause)) {
+            if (cause instanceof SQLException) {
+                break;
+            }
+            lastCause = cause;
+        }
+        throw new KustvaktException(StatusCodes.CLIENT_REGISTRATION_FAILED,
+                cause.getMessage(), OAuth2Error.INVALID_REQUEST);
+	}
+    
+    public void registerExistingClient (OAuth2ClientJson clientJson,
+            String registeredBy, boolean isSuper, String clientId, 
+            String clientSecret) throws KustvaktException {
+    	ParameterChecker.checkStringValue(clientId,
+                "client_id");
+    	ParameterChecker.checkStringValue(clientSecret,
+                "client_secret");
+    	
+    	checkClientJson(clientJson);
+    	
+    	try {
+			clientDao.registerClient(isSuper, clientId, clientSecret,
+					clientJson.getName(), clientJson.getType(),
+					clientJson.getUrl(), clientJson.getRedirectURI(),
+					registeredBy, clientJson.getDescription(),
+					clientJson.getRefreshTokenExpiry(), clientJson.getSource());
+        }
+        catch (KustvaktException e) {
+            throw new KustvaktException(e.getStatusCode(), e.getMessage(),
+                    OAuth2Error.INVALID_REQUEST);
+        }
+        catch (Exception e) {
+            throwRegistrationException(e);
+        }
+    	
+    }
 
-        // boolean isNative = isNativeClient(url, redirectURI);
+    public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
+            String registeredBy, boolean isSuper) throws KustvaktException {
+        
+    	checkClientJson(clientJson);
 
         String secret = null;
         String secretHashcode = null;
@@ -153,70 +191,61 @@ public class OAuth2ClientService {
         id = codeGenerator.filterRandomCode(id);
 
         try {
-            clientDao.registerClient(id, secretHashcode, clientJson.getName(),
-                    clientJson.getType(), url, redirectURI, registeredBy,
-                    clientJson.getDescription(),
-                    clientJson.getRefreshTokenExpiry(), clientJson.getSource());
+			clientDao.registerClient(isSuper, id, secretHashcode,
+					clientJson.getName(), clientJson.getType(),
+					clientJson.getUrl(), clientJson.getRedirectURI(),
+					registeredBy, clientJson.getDescription(),
+					clientJson.getRefreshTokenExpiry(), clientJson.getSource());
         }
         catch (KustvaktException e) {
             throw new KustvaktException(e.getStatusCode(), e.getMessage(),
                     OAuth2Error.INVALID_REQUEST);
         }
         catch (Exception e) {
-            Throwable cause = e;
-            Throwable lastCause = null;
-            while ((cause = cause.getCause()) != null
-                    && !cause.equals(lastCause)) {
-                if (cause instanceof SQLException) {
-                    break;
-                }
-                lastCause = cause;
-            }
-            throw new KustvaktException(StatusCodes.CLIENT_REGISTRATION_FAILED,
-                    cause.getMessage(), OAuth2Error.INVALID_REQUEST);
+            throwRegistrationException(e);
         }
 
         return new OAuth2ClientDto(id, secret);
     }
 
-    @Deprecated
-    private boolean isNativeClient (String url, String redirectURI)
-            throws KustvaktException {
-        if (url == null || url.isEmpty() || redirectURI == null
-                || redirectURI.isEmpty()) {
-            return false;
-        }
-
-        String nativeHost = config.getNativeClientHost();
-        String urlHost = null;
-        try {
-            urlHost = new URL(url).getHost();
-        }
-        catch (MalformedURLException e) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "Invalid url :" + e.getMessage(),
-                    OAuth2Error.INVALID_REQUEST);
-        }
-
-        if (!urlHost.equals(nativeHost)) {
-            return false;
-        }
-
-        String uriHost = null;
-        try {
-            uriHost = new URI(redirectURI).getHost();
-        }
-        catch (URISyntaxException e) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "Invalid redirectURI: " + e.getMessage(),
-                    OAuth2Error.INVALID_REQUEST);
-        }
-        if (!uriHost.equals(nativeHost)) {
-            return false;
-        }
-
-        return true;
-    }
+//    @Deprecated
+//    private boolean isNativeClient (String url, String redirectURI)
+//            throws KustvaktException {
+//        if (url == null || url.isEmpty() || redirectURI == null
+//                || redirectURI.isEmpty()) {
+//            return false;
+//        }
+//
+//        String nativeHost = config.getNativeClientHost();
+//        String urlHost = null;
+//        try {
+//            urlHost = new URL(url).getHost();
+//        }
+//        catch (MalformedURLException e) {
+//            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+//                    "Invalid url :" + e.getMessage(),
+//                    OAuth2Error.INVALID_REQUEST);
+//        }
+//
+//        if (!urlHost.equals(nativeHost)) {
+//            return false;
+//        }
+//
+//        String uriHost = null;
+//        try {
+//            uriHost = new URI(redirectURI).getHost();
+//        }
+//        catch (URISyntaxException e) {
+//            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+//                    "Invalid redirectURI: " + e.getMessage(),
+//                    OAuth2Error.INVALID_REQUEST);
+//        }
+//        if (!uriHost.equals(nativeHost)) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     public void deregisterClient (String clientId, String username)
             throws KustvaktException {

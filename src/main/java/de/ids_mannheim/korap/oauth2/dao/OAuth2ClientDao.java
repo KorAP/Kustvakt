@@ -52,8 +52,8 @@ public class OAuth2ClientDao {
 	public void registerClient (boolean isSuper, String id,
 			String secretHashcode, String name, OAuth2ClientType type,
 			String url, String redirectURI, String registeredBy,
-			String description, int refreshTokenExpiry, JsonNode source,
-			boolean isPermitted) throws KustvaktException {
+			String description, int refreshTokenExpiry, JsonNode source) 
+			throws KustvaktException {
 		
 		ParameterChecker.checkStringValue(id, "client_id");
         ParameterChecker.checkStringValue(name, "client_name");
@@ -83,9 +83,7 @@ public class OAuth2ClientDao {
                 client.setSource(source.toString());
                 // setting permit for plugin, used in OAuth2TestBase
                 // this should be an admin function
-                if (isPermitted) { 
-                	client.setPermitted(isPermitted);
-                }
+            	client.setPermitted(false);
             }
             else {
                 throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
@@ -115,14 +113,6 @@ public class OAuth2ClientDao {
         entityManager.persist(client);
 	}
     
-	public void registerClient (String id, String secretHashcode, String name,
-			OAuth2ClientType type, String url, String redirectURI,
-			String registeredBy, String description, int refreshTokenExpiry,
-			JsonNode source) throws KustvaktException {
-		registerClient(false, id, secretHashcode, name, type, url, redirectURI,
-				registeredBy, description, refreshTokenExpiry, source, false);
-	}
-
     public OAuth2Client retrieveClientById (String clientId)
             throws KustvaktException {
 
@@ -143,6 +133,32 @@ public class OAuth2ClientDao {
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
                     "Unknown client: " + clientId, "invalid_client");
+        }
+        catch (Exception e) {
+            throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
+                    e.getMessage(), "invalid_client");
+        }
+    }
+    
+    // EM: used for testing only
+    public int retrieveSuperClients ()
+            throws KustvaktException {
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OAuth2Client> query = builder
+                .createQuery(OAuth2Client.class);
+
+        Root<OAuth2Client> root = query.from(OAuth2Client.class);
+        query.select(root);
+        query.where(builder.equal(root.get(OAuth2Client_.isSuper), true));
+
+        Query q = entityManager.createQuery(query);
+        try {
+            return q.getResultList().size();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
+                    "No super client found.");
         }
         catch (Exception e) {
             throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
