@@ -103,7 +103,7 @@ public class OAuthClientController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.REGISTER_CLIENT);
             return clientService.registerClient(clientJson,
-                    context.getUsername());
+                    context.getUsername(),false);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
