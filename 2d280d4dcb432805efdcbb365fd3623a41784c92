@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57adf15b_60d8cb5b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-11-07T09:58:55Z",
+      "side": 1,
+      "message": "I think it\u0027s important to emphasize that this will break existing docker compose deployments, especially, if this is pushed as a `latest` to docker hub. Please carefully decide, how you could keep existing behaviour, maybe by adding aliases to the old jars.",
+      "revId": "2d280d4dcb432805efdcbb365fd3623a41784c92",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
