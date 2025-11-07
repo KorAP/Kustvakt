@@ -63,6 +63,30 @@
       },
       "revId": "df15a8ec904a165456674385afc108400162df8b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bda0e199_0b237cdc",
+        "filename": "Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-11-07T09:47:35Z",
+      "side": 1,
+      "message": "I would like to run with \"--lite\". Is there any need to replace the jar name?\n\nI have updated the Dockerfile. now with \nCMD [\"/kustvakt/Kustvakt.jar\", \"\"]\n\nso to run the lite version, we need to add the command:\n/kustvakt/Kustvakt.jar --lite",
+      "parentUuid": "d1ad6430_712f3c0b",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 55
+      },
+      "revId": "df15a8ec904a165456674385afc108400162df8b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }

@@ -22,6 +22,30 @@
       },
       "revId": "be37d7b70ee466b2047e982c54ce53a07072d2c2",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bc48e84_7c7525fe",
+        "filename": "Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2025-11-07T09:47:35Z",
+      "side": 0,
+      "message": "Thanks for re-enable busybox. There was errors, but I can\u0027t remember exactly so I switched to eclipse, but busybox is definitely better.",
+      "parentUuid": "bdb4bf50_a60344df",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 10
+      },
+      "revId": "be37d7b70ee466b2047e982c54ce53a07072d2c2",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
