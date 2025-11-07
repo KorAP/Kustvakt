@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44738e8d_79fb346b",
+        "filename": "Dockerfile",
+        "patchSetId": 9
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-11-07T11:46:38Z",
+      "side": 1,
+      "message": "Does that work? Shouldn\u0027t it be /kustvakt/ ?",
+      "range": {
+        "startLine": 87,
+        "startChar": 49,
+        "endLine": 87,
+        "endChar": 58
+      },
+      "revId": "092b1998cc724b6af3ce93f0848486e4744bd31d",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
