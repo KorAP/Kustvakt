@@ -23,7 +23,7 @@ build-docker:
     - apk update
     - apk add --no-cache git
   script:
-    - docker build -f Dockerfile -t korap/kustvakt:$VID -t korap/kustvakt:latest .
+    - docker build -f Dockerfile -t korap/kustvakt:$VID .
     - docker save korap/kustvakt:$VID | xz -T0 -M16G -9 > kustvakt.tar.xz
   artifacts:
     paths:
