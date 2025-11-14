@@ -75,7 +75,7 @@ public class QueryService extends BasicService {
     public static boolean DEBUG = false;
 
     public static Pattern queryNamePattern = Pattern
-            .compile("[a-zA-Z0-9]+[a-zA-Z_0-9-.]+");
+            .compile("[a-zA-Z0-9]+[a-zA-Z_0-9-.]*");
 
     @Autowired
     private QueryDao queryDao;
@@ -377,8 +377,10 @@ public class QueryService extends BasicService {
             String definition, String description, String status,
             boolean isCached, String queryCreator, String query,
             String queryLanguage, double apiVersion) throws KustvaktException {
-        ParameterChecker.checkNameValue(queryName, "queryName");
-        ParameterChecker.checkObjectValue(type, "type");
+    	ParameterChecker.checkObjectValue(type, "type");
+    	if (!type.equals(ResourceType.SYSTEM)) {
+    		ParameterChecker.checkNameValue(queryName, "queryName");
+    	}
 
         if (!queryNamePattern.matcher(queryName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, queryType

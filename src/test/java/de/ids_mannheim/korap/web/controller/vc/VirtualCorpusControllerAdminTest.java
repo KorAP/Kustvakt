@@ -75,7 +75,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         JsonNode node = testAdminListVC_UsingAdminToken("system",
                 ResourceType.SYSTEM);
-        System.out.println(node.toPrettyString());
+//        System.out.println(node.toPrettyString());
         assertEquals(2, node.size());
         testDeleteSystemVC(admin, "new-system-vc");
     }

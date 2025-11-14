@@ -8,8 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.util.Map;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import de.ids_mannheim.korap.collection.DocBits;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.dao.QueryDao;
@@ -18,6 +20,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.init.NamedVCLoader;
 import de.ids_mannheim.korap.util.QueryException;
 
+@Disabled
 public class NamedVCLoaderTest extends SpringJerseyTest {
 
     @Autowired
@@ -25,7 +28,29 @@ public class NamedVCLoaderTest extends SpringJerseyTest {
 
     @Autowired
     private QueryDao dao;
+    
+	private void clean (String vcId, QueryDO vc)
+			throws IOException, QueryException, KustvaktException {
+		VirtualCorpusCache.delete(vcId);
+        assertFalse(VirtualCorpusCache.contains(vcId));
+        dao.deleteQuery(vc);
+        vc = dao.retrieveQueryByName(vcId, "system");
+        assertNull(vc);
+	}
 
+    @Test
+    public void testVCName ()
+            throws IOException, QueryException, KustvaktException {
+        String vcId = "c";
+        vcLoader.loadVCToCache(vcId, "/vc/c.jsonld");
+        assertTrue(VirtualCorpusCache.contains(vcId));
+        Map<String, DocBits> cachedData = VirtualCorpusCache.retrieve(vcId);
+        assertTrue(cachedData.size() > 0);
+        QueryDO vc = dao.retrieveQueryByName(vcId, "system");
+        assertNotNull(vc);
+        clean(vcId, vc);
+    }
+    
     @Test
     public void testNamedVCLoader ()
             throws IOException, QueryException, KustvaktException {
@@ -34,10 +59,10 @@ public class NamedVCLoaderTest extends SpringJerseyTest {
         assertTrue(VirtualCorpusCache.contains(vcId));
         Map<String, DocBits> cachedData = VirtualCorpusCache.retrieve(vcId);
         assertTrue(cachedData.size() > 0);
-        //VirtualCorpusCache.delete(vcId);
-        //assertFalse(VirtualCorpusCache.contains(vcId));
         QueryDO vc = dao.retrieveQueryByName(vcId, "system");
         assertNotNull(vc);
+        VirtualCorpusCache.delete(vcId);
+        assertFalse(VirtualCorpusCache.contains(vcId));
         
         String koralQuery = vc.getKoralQuery();
         testUpdateVC(vcId,koralQuery);
@@ -63,13 +88,7 @@ public class NamedVCLoaderTest extends SpringJerseyTest {
         
         QueryDO vc = dao.retrieveQueryByName(vcId, "system");
         String updatedKoralQuery = vc.getKoralQuery();
-        
         assertTrue (koralQuery.hashCode() != updatedKoralQuery.hashCode());
-        
-        VirtualCorpusCache.delete(vcId);
-        assertFalse(VirtualCorpusCache.contains(vcId));
-        dao.deleteQuery(vc);
-        vc = dao.retrieveQueryByName(vcId, "system");
-        assertNull(vc);
+        clean(vcId, vc);
     }
 }

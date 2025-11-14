@@ -22,7 +22,8 @@
 - Merge full and lite profiles and create one jar for both. 
 - Merge full and lite version in dockerfile and CI tests
 - Fix redundant initial-super-client generation.
-
+- Allow system VC to have names with less than 3 characters (support for existing 
+  C2 VC, #788)
 
 # version 0.79.1
 
