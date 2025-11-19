@@ -24,6 +24,8 @@
 - Fix redundant initial-super-client generation.
 - Allow system VC to have names with less than 3 characters (support for existing 
   C2 VC, #788)
+- Switch Kustvakt Server to run the lite version by default.  
+  
 
 # version 0.79.1
 

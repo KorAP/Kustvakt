@@ -45,16 +45,16 @@ public abstract class KustvaktBaseServer {
     private Logger log = LogManager.getLogger(KustvaktBaseServer.class);
 
     protected static KustvaktConfiguration config;
-    protected static String springConfig = "default-config.xml";
+    protected static String springConfig = "default-lite-config.xml";
 
     protected static String rootPackages;
     public static KustvaktArgs kargs;
 
     public KustvaktBaseServer () {
-        rootPackages = "de.ids_mannheim.korap.core.web;"
-                + "de.ids_mannheim.korap.web;"
-//                + "com.fasterxml.jackson.jaxrs.json;"
-                ;
+    	rootPackages = "de.ids_mannheim.korap.core.web; "
+                + "de.ids_mannheim.korap.web.filter; "
+                + "de.ids_mannheim.korap.web.utils; "
+                + "com.fasterxml.jackson.jaxrs.json;";
 
         File d = new File(KustvaktConfiguration.DATA_FOLDER);
         if (!d.exists()) {
@@ -63,16 +63,14 @@ public abstract class KustvaktBaseServer {
     }
 
     protected KustvaktArgs readAttributes (String[] args) {
-        KustvaktArgs kargs = new KustvaktArgs();
+        kargs = new KustvaktArgs();
         for (int i = 0; i < args.length; i++) {
             switch ((args[i])) {
-            	case "--lite":
-                    kargs.setLite(true);     
-                    springConfig = "default-lite-config.xml";
-                    rootPackages = "de.ids_mannheim.korap.core.web; "
-                            + "de.ids_mannheim.korap.web.filter; "
-                            + "de.ids_mannheim.korap.web.utils; "
-                            + "com.fasterxml.jackson.jaxrs.json;";
+            	case "--full":
+                    kargs.setLite(false);     
+                    springConfig = "default-config.xml";
+                    rootPackages = "de.ids_mannheim.korap.core.web;"
+                            + "de.ids_mannheim.korap.web;";
                     break;
                 case "--spring-config":
                     kargs.setSpringConfig(args[i + 1]);
@@ -244,7 +242,7 @@ public abstract class KustvaktBaseServer {
         public KustvaktArgs () {
             this.port = -1;
             this.springConfig = null;
-            this.isLite = false;
+            this.isLite = true;
         }
         
         public boolean isLite () {

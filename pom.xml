@@ -22,13 +22,75 @@
 		<!-- Align JBoss Logging with Hibernate Validator 9 requirements -->
 		<jboss.logging.version>3.6.1.Final</jboss.logging.version>
 	</properties>
-	<!--
+	
 	<profiles>
 		<profile>
-			<id>full</id>
+			<id>all</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.6.1</version>
+						<executions>
+							<execution>
+								<id>all</id>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<finalName>Kustvakt-${project.version}</finalName>
+									<transformers>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<mainClass>
+												de.ids_mannheim.korap.server.KustvaktServer
+											</mainClass>
+											<manifestEntries>
+												<Multi-Release>true</Multi-Release>
+											</manifestEntries>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/spring.handlers</resource>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/spring.schemas</resource>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/spring/aot.factories</resource>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/hk2-locator/default</resource>
+										</transformer>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/spring.tooling</resource>
+										</transformer>
+									</transformers>
+									<filters>
+										<filter>
+											<artifact>*:*</artifact>
+											<excludes>
+												<!--<exclude>db/lite/**</exclude>-->
+												<exclude>META-INF/*.SF</exclude>
+								                <exclude>META-INF/*.DSA</exclude>
+								                <exclude>META-INF/*.RSA</exclude>
+											</excludes>
+										</filter>
+									</filters>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+
+		<profile>
+			<id>full</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -42,12 +104,12 @@
 									<goal>shade</goal>
 								</goals>
 								<configuration>
-									<finalName>Kustvakt-${project.version}</finalName>
+									<finalName>Kustvakt-full-${project.version}</finalName>
 									<transformers>
 										<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
 										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 											<mainClass>
-												de.ids_mannheim.korap.server.KustvaktServer
+												de.ids_mannheim.korap.server.KustvaktFullServer
 											</mainClass>
 											<manifestEntries>
 												<Multi-Release>true</Multi-Release>
@@ -88,73 +150,8 @@
 			</build>
 		</profile>
 
-
-		<profile>
-			<id>lite</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.6.1</version>
-						<executions>
-							
-							<execution>
-								<id>lite</id>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<finalName>
-										Kustvakt-lite-${project.version}
-									</finalName>
-									<transformers>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-											<mainClass>
-												de.ids_mannheim.korap.server.KustvaktLiteServer
-											</mainClass>
-											<manifestEntries>
-												<Multi-Release>true</Multi-Release>
-											</manifestEntries>
-										</transformer>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-											<resource>META-INF/spring.handlers
-											</resource>
-										</transformer>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-											<resource>META-INF/spring.schemas
-											</resource>
-										</transformer>
-									</transformers>
-									<filters>
-										<filter>
-											<artifact>*:*</artifact>
-											<excludes>
-												<exclude>db/mysql/**</exclude>
-												<exclude>db/predefined/**</exclude>
-												<exclude>db/sqlite/**</exclude>
-												<exclude>com.novell.ldap</exclude>
-												<exclude>com.unboundid</exclude>
-												<exclude>org.glassfish.jersey.test-framework*</exclude>
-												<exclude>META-INF/*.SF</exclude>
-								                <exclude>META-INF/*.DSA</exclude>
-								                <exclude>META-INF/*.RSA</exclude>
-											</excludes>
-										</filter>
-									</filters>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
 	</profiles>
-	-->
+	
 	<build>
 		<resources>
 			<resource>

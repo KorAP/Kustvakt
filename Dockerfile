@@ -97,7 +97,7 @@ CMD ["Kustvakt.jar"]
 
 # docker build -f Dockerfile -t korap/kustvakt:{nr} .
 # docker build -f Dockerfile -t korap/example-index:{nr} --target example-index .
-# run full version
+# run lite version (default)
 # docker run --rm --net host -v [absolute-path-sample-index]:/kustvakt/index korap/kustvakt:{nr}
-# run lite version 
-# docker run --rm --net host -v [absolute-path-sample-index]:/kustvakt/index korap/kustvakt:{nr} Kustvakt.jar --lite
+# run full version 
+# docker run --rm --net host -v [absolute-path-sample-index]:/kustvakt/index korap/kustvakt:{nr} Kustvakt.jar --full
