@@ -1,4 +1,5 @@
 # *** WARNING *** This Dockerfile has been updated to build one image that can run both full and lite versions. The changes require updating existing docker compose files accordingly.
+# Backward compatilibity is added to support older docker compose deployments
 
 # Use alpine linux as base image
 FROM eclipse-temurin:22-jdk-alpine AS builder
@@ -38,6 +39,10 @@ RUN curl -I https://github.com/KorAP/Krill/releases/latest | \
 RUN rm -r Krill-* v*.zip
 
 # Kustvakt
+# --legacy-start
+RUN mvn clean package -P full && \
+    find target/Kustvakt-full-*.jar -exec mv {} /kustvakt/built/Kustvakt-full.jar ';'
+# --legacy-end
 RUN mvn clean package && \
     find target/Kustvakt-*.jar -exec mv {} /kustvakt/built/Kustvakt.jar ';'
 RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' src/main/resources/kustvakt-lite.conf \
@@ -101,3 +106,22 @@ CMD ["Kustvakt.jar"]
 # docker run --rm --net host -v [absolute-path-sample-index]:/kustvakt/index korap/kustvakt:{nr}
 # run full version 
 # docker run --rm --net host -v [absolute-path-sample-index]:/kustvakt/index korap/kustvakt:{nr} Kustvakt.jar --full
+
+# backward compatibility with older docker compose
+FROM eclipse-temurin:22-jre-alpine AS kustvakt-full
+RUN addgroup -S korap && \
+    adduser -S kustvakt -G korap && \
+    mkdir kustvakt && \
+    chown -R kustvakt.korap /kustvakt
+WORKDIR /kustvakt
+USER kustvakt
+RUN mkdir ./data 
+COPY --from=builder /kustvakt/built/Kustvakt-full.jar /kustvakt/
+COPY --from=builder /kustvakt/built/Kustvakt.jar /kustvakt
+COPY --from=builder /kustvakt/built/kustvakt.conf /kustvakt/data/
+COPY --from=builder /kustvakt/built/ldap.* /kustvakt/ldap/
+COPY --from=builder /kustvakt/built/Krill-Indexer.jar /kustvakt/
+EXPOSE 8089
+ENTRYPOINT [ "java", "-jar" ]
+CMD [ "Kustvakt-full.jar" ]
+# docker build -f Dockerfile -t korap/kustvakt:{version} --target kustvakt-full .

@@ -25,6 +25,7 @@
 - Allow system VC to have names with less than 3 characters (support for existing 
   C2 VC, #788)
 - Switch Kustvakt Server to run the lite version by default.  
+- Add backward compatibility for docker compose legacy-full
   
 
 # version 0.79.1
