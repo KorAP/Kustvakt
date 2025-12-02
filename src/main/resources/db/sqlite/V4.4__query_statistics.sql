@@ -1,0 +1,2 @@
+ALTER TABLE query
+ADD COLUMN statistics TEXT DEFAULT NULL;

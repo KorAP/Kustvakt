@@ -51,7 +51,7 @@ public class QueryDao {
     public int createQuery (String name, ResourceType type, QueryType queryType,
             CorpusAccess requiredAccess, String koralQuery, String definition,
             String description, String status, boolean isCached,
-            String createdBy, String query, String queryLanguage)
+            String createdBy, String query, String queryLanguage, String statistics)
             throws KustvaktException {
 
         QueryDO q = new QueryDO();
@@ -67,6 +67,7 @@ public class QueryDao {
         q.setCached(isCached);
         q.setQuery(query);
         q.setQueryLanguage(queryLanguage);
+        q.setStatistics(statistics);
 
         entityManager.persist(q);
         return q.getId();
@@ -75,7 +76,8 @@ public class QueryDao {
     public void editQuery (QueryDO queryDO, String name, ResourceType type,
             CorpusAccess requiredAccess, String koralQuery, String definition,
             String description, String status, boolean isCached,
-            String queryStr, String queryLanguage) throws KustvaktException {
+            String queryStr, String queryLanguage, String statistics) 
+    		throws KustvaktException {
 
         if (name != null && !name.isEmpty()) {
             queryDO.setName(name);
@@ -103,6 +105,9 @@ public class QueryDao {
         }
         if (queryLanguage != null && !queryLanguage.isEmpty()) {
             queryDO.setQueryLanguage(queryLanguage);
+        }
+        if (statistics != null && !statistics.isEmpty()) {
+            queryDO.setStatistics(statistics);
         }
         queryDO.setCached(isCached);
         entityManager.merge(queryDO);

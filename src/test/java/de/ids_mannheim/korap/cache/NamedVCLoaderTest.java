@@ -52,6 +52,19 @@ public class NamedVCLoaderTest extends SpringJerseyTest {
     }
     
     @Test
+    public void testVCName2 ()
+            throws IOException, QueryException, KustvaktException {
+        String vcId = "c";
+        vcLoader.loadVCToCache(vcId, "/vc/corp-w-gesamt.2017-i.17.10.17.jsonld");
+        assertTrue(VirtualCorpusCache.contains(vcId));
+        Map<String, DocBits> cachedData = VirtualCorpusCache.retrieve(vcId);
+        assertTrue(cachedData.size() > 0);
+        QueryDO vc = dao.retrieveQueryByName(vcId, "system");
+        assertNotNull(vc);
+        clean(vcId, vc);
+    }
+    
+    @Test
     public void testNamedVCLoader ()
             throws IOException, QueryException, KustvaktException {
         String vcId = "named-vc1";

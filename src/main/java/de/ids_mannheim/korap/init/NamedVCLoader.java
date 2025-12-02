@@ -159,6 +159,12 @@ public class NamedVCLoader implements Runnable {
                 // updateVCinDB
                 storeVCinDB(vcId, json, existingVC, apiVersion);
             }
+            else if (existingVC.getStatistics()== null) {
+            	jlog.info("Update statistics for VC: {}", vcId);
+            	String statistics = vcService.computeStatisticsForVC(existingVC, 
+            			QueryType.VIRTUAL_CORPUS, apiVersion);
+            	vcService.updateVCStatistics(existingVC,statistics);
+            }
         }
         catch (KustvaktException e) {
             // VC doesn't exist in the DB

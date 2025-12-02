@@ -67,6 +67,8 @@ public class QueryDO implements Comparable<QueryDO> {
     @OneToMany(mappedBy = "query", fetch = FetchType.LAZY, 
             cascade = CascadeType.REMOVE)
     private List<Role> roles;
+    
+    private String statistics;
 
     @Override
     public String toString () {

@@ -154,7 +154,7 @@ public class QueryService extends BasicService {
 		return dtos;
     }
     
-	private String computeStatisticsForVC (QueryDO query, QueryType queryType, 
+	public String computeStatisticsForVC (QueryDO query, QueryType queryType, 
 			double apiVersion)
 			throws KustvaktException {
 		if (config.isVcListStatisticsEnabled() && 
@@ -258,10 +258,12 @@ public class QueryService extends BasicService {
         String corpusQuery = newQuery.getCorpusQuery();
         String query = newQuery.getQuery();
         String queryLanguage = newQuery.getQueryLanguage();
+        String statistics = null;
         if (corpusQuery != null && !corpusQuery.isEmpty()) {
             koralQuery = serializeCorpusQuery(corpusQuery, apiVersion);
             requiredAccess = determineRequiredAccess(newQuery.isCached(),
                     queryName, koralQuery, apiVersion);
+            statistics = krill.getStatistics(koralQuery);
         }
         else if (query != null && !query.isEmpty() && queryLanguage != null
                 && !queryLanguage.isEmpty()) {
@@ -291,7 +293,7 @@ public class QueryService extends BasicService {
         queryDao.editQuery(existingQuery, queryName, type, requiredAccess,
                 koralQuery, newQuery.getDefinition(), newQuery.getDescription(),
                 newQuery.getStatus(), newQuery.isCached(), query,
-                queryLanguage);
+                queryLanguage, statistics);
     }
 
     private void publishQuery (int queryId, String queryCreator,
@@ -412,17 +414,23 @@ public class QueryService extends BasicService {
             jlog.debug("Storing query: " + queryName + "in the database ");
         }
 
+        String statistics = null;
+        if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
+        	statistics = krill.getStatistics(koralQuery); 
+        }
+        
         int queryId = 0;
         try {
             if (existingQuery==null) {
                 queryId = queryDao.createQuery(queryName, type, queryType,
                         requiredAccess, koralQuery, definition, description,
-                        status, isCached, queryCreator, query, queryLanguage);
+                        status, isCached, queryCreator, query, queryLanguage,
+                        statistics);
             }
             else {
                 queryDao.editQuery(existingQuery, queryName, type,
                         requiredAccess, koralQuery, definition, description,
-                        status, isCached, query, queryLanguage);
+                        status, isCached, query, queryLanguage, statistics);
             }
 
         }
@@ -443,7 +451,13 @@ public class QueryService extends BasicService {
             publishQuery(queryId, queryCreator, queryName);
         }
     }
-
+    
+	public void updateVCStatistics (QueryDO existingQuery, String statistics)
+			throws KustvaktException {
+		queryDao.editQuery(existingQuery, null, null, null, null, null, null,
+				null, existingQuery.isCached(), null, null, statistics);
+	}
+    
     public String serializeCorpusQuery (String corpusQuery, double apiVersion)
             throws KustvaktException {
         QuerySerializer serializer = new QuerySerializer(apiVersion);
@@ -568,7 +582,7 @@ public class QueryService extends BasicService {
             }
                 
             queryDao.editQuery(query, null, queryType, null, null,
-                    null, null, null, query.isCached(), null, null);
+                    null, null, null, query.isCached(), null, null, null);
         }
     }
     

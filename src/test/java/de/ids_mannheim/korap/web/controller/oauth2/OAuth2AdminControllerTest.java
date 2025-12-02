@@ -12,6 +12,8 @@ import jakarta.ws.rs.core.Response.Status;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +27,7 @@ import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Order(Integer.MAX_VALUE) // make sure this runs as last test as it removes tokens
 public class OAuth2AdminControllerTest extends OAuth2TestBase {
 

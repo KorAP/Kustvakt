@@ -1,3 +1,7 @@
+# version 0.80.1-SNAPSHOT
+
+- Calculate and store statistics for named VC.
+
 # version 0.80-SNAPSHOT
 
 - Introduced APIDeprecationFilter (#759)

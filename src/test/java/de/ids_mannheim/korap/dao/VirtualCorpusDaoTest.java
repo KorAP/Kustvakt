@@ -45,7 +45,7 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
         int id = dao.createQuery("system-vc-2", ResourceType.SYSTEM,
                 QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
                 "corpusSigle=GOE", "definition", "description", "experimental",
-                false, "test class", null, null);
+                false, "test class", null, null, null);
         // select vc
         List<QueryDO> vcList = dao.retrieveQueryByType(ResourceType.SYSTEM,
                 null, QueryType.VIRTUAL_CORPUS);
@@ -70,7 +70,7 @@ public class VirtualCorpusDaoTest extends VirtualCorpusTestBase {
                     dao.createQuery("system-vc", ResourceType.SYSTEM,
                             QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
                             "corpusSigle=GOE", "definition", "description",
-                            "experimental", false, "system", null, null);
+                            "experimental", false, "system", null, null, null);
                 });
 
         String msg = exception.getMessage();
