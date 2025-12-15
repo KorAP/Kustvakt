@@ -1,30 +1,46 @@
-# gitlab ci pipeline to build kustvakt docker container
-# automatically triggered on tag pushs or run manually
-#
-# Download latest container from artifacts and import it:
-#
-# curl -Ls 'https://gitlab.ids-mannheim.de/KorAP/kustvakt/-/jobs/artifacts/master/raw/kustvakt.tar.xz?job=build-docker' | docker load
-
 image: docker:latest
 
+variables:
+  FF_NETWORK_PER_BUILD: true
 services:
-  - docker:dind
+  - name: docker:dind
+    command: [--dns=127.0.0.11]
 
 build-docker:
+  variables:
+    VID: $CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
   rules:
     - if: $CI_COMMIT_TAG =~ /.+/
       variables:
         VID: $CI_COMMIT_TAG
     - when: manual
-      variables:
-        VID: $CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
   stage: build
   before_script:
     - apk update
     - apk add --no-cache git
   script:
     - docker build -f Dockerfile -t korap/kustvakt:$VID .
-    - docker save korap/kustvakt:$VID | xz -T0 -M16G -9 > kustvakt.tar.xz
+    - docker save korap/kustvakt:$VID | xz > kustvakt-$VID.tar.xz
   artifacts:
     paths:
-      - kustvakt.tar.xz
+      - kustvakt-$VID.tar.xz
+
+push-dockerhub:
+  stage: deploy
+  image: docker:latest
+  needs:
+    - job: build-docker
+      artifacts: true
+  dependencies:
+    - build-docker
+  rules:
+    - when: manual
+  script:
+    - apk update
+    - apk add --no-cache xz
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+    - export VID=$(ls kustvakt-*.tar.xz | sed -e 's/^kustvakt-//' -e 's/\.tar\.xz$//')
+    - xz -d -c kustvakt-$VID.tar.xz | docker load
+    - docker tag korap/kustvakt:$VID korap/kustvakt:latest
+    - docker push korap/kustvakt:$VID
+    - docker push korap/kustvakt:latest
