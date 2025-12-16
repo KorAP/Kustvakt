@@ -414,11 +414,8 @@ public class QueryService extends BasicService {
             jlog.debug("Storing query: " + queryName + "in the database ");
         }
 
-        String statistics = null;
-        if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
-        	statistics = krill.getStatistics(koralQuery); 
-        }
-        
+		String statistics = computeStatisticsForVC(queryType, isCached,
+				apiVersion, queryName, koralQuery);        
         int queryId = 0;
         try {
             if (existingQuery==null) {
@@ -451,6 +448,29 @@ public class QueryService extends BasicService {
             publishQuery(queryId, queryCreator, queryName);
         }
     }
+    
+	private String computeStatisticsForVC (QueryType queryType, boolean isCached,
+			double apiVersion, String queryName, String koralQuery)
+			throws KustvaktException {
+        if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
+        	if (isCached) {
+                String kq = updateKoralQueryForCachedVC (apiVersion, queryName);
+                return krill.getStatistics(kq);
+            }
+        	else {
+        		return krill.getStatistics(koralQuery); 
+        	}
+        }
+        return null;
+	}
+    
+	private String updateKoralQueryForCachedVC (double apiVersion,
+			String queryName) throws KustvaktException {
+    	KoralCollectionQueryBuilder koral = 
+        		new KoralCollectionQueryBuilder(apiVersion);
+        koral.with("referTo " + queryName);
+        return koral.toJSON();
+	}
     
 	public void updateVCStatistics (QueryDO existingQuery, String statistics)
 			throws KustvaktException {
@@ -493,14 +513,10 @@ public class QueryService extends BasicService {
             String koralQuery, double apiVersion) throws KustvaktException {
 
         if (isCached) {
-            KoralCollectionQueryBuilder koral = 
-            		new KoralCollectionQueryBuilder(apiVersion);
-            koral.with("referTo " + name);
-            koralQuery = koral.toJSON();
+            koralQuery = updateKoralQueryForCachedVC (apiVersion, name);
             if (DEBUG) {
                 jlog.debug("Determine vc access with vc ref: " + koralQuery);
             }
-
         }
 
 		if (findDocWithLicense(koralQuery, config.getAllOnlyRegex(),

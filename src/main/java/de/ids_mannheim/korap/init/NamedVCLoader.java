@@ -165,8 +165,10 @@ public class NamedVCLoader implements Runnable {
             			QueryType.VIRTUAL_CORPUS, apiVersion);
             	vcService.updateVCStatistics(existingVC,statistics);
             }
+            cacheVC(vcId, json, updateCache);
         }
         catch (KustvaktException e) {
+        	cacheVC(vcId, json, updateCache);
             // VC doesn't exist in the DB
             if (e.getStatusCode() == StatusCodes.NO_RESOURCE_FOUND) {
                 storeVCinDB(vcId, json, null, apiVersion);
@@ -174,9 +176,7 @@ public class NamedVCLoader implements Runnable {
             else {
                 throw new RuntimeException(e);
             }    
-        }
-        
-        cacheVC(vcId, json, updateCache);
+        }      
     }
 
     private String[] readFile (File file, String filename) throws IOException {

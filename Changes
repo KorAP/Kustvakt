@@ -1,5 +1,11 @@
 # version 1.0
 
+HOT PATCH: Reorder tasks for new VC.
+New VC should be cached first to avoid calculating leafs to compute statistics 
+when storing VC in NamedVCLoader. This allows using existing vc-cache 
+containing new vc.
+
+
 # version 0.80.1-SNAPSHOT
 
 - Calculate and store statistics for named VC.
