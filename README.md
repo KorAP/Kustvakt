@@ -31,14 +31,10 @@ git clone git@github.com:KorAP/Kustvakt.git
 
 Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository according to the required versions specified in ```Kustvakt/full/pom.xml```. For packaging Kustvakt, change into the `Kustvakt` folder.
 
-Packaging Kustvakt full version
+Since  Kustvakt version v1.0, both full and lite versions have been integrated in one jar.
+
 ```
 mvn clean package
-```
-
-Packaging Kustvakt lite version
-```
-mvn package -P lite
 ```
 
 The jar file is located in the ```target``` folder.
@@ -46,11 +42,20 @@ The jar file is located in the ```target``` folder.
 
 # Running Kustvakt Server
 
+By default, the lite version is run when running:
+
 ```
-java -jar target/Kustvakt-full-[version].jar    
+java -jar target/Kustvakt-[version].jar    
 ```
 
-will run Kustvakt full version with the example [kustvakt.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt.conf) configuration file included. See [Customizing kustvakt configuration](https://github.com/KorAP/Kustvakt/edit/master/README.md#customizing-kustvakt-configuration).
+To run the full version, add --full as an argument:
+
+```
+java -jar target/Kustvakt-[version].jar --full   
+```
+
+By default, Kustvakt full version runs with the example [kustvakt.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt.conf) configuration file included. The lite version uses [kustvakt-lite.conf](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/kustvakt-lite.conf) instead. See [Customizing kustvakt configuration](https://github.com/KorAP/Kustvakt/edit/master/README.md#customizing-kustvakt-configuration). 
+
 
 Kustvakt full version requires a Krill index and an [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). By default, Kustvakt uses the [sample-index](https://github.com/KorAP/Kustvakt/tree/master/sample-index) located at the same directory of the jar file, and [the embedded LDAP server](https://github.com/KorAP/Kustvakt/blob/master/src/main/resources/embedded-ldap-example.conf) example.
 
@@ -60,7 +65,7 @@ Kustvakt full version requires a Krill index and an [LDAP configuration](https:/
 Kustvakt can be run using an external Spring XML configuration file, e.g. using test-config-icc.xml located in data folder:
 
 ```
-java -jar target/Kustvakt-full-[version].jar --spring-config data/test-config-icc.xml 
+java -jar target/Kustvakt-[version].jar --full --spring-config data/test-config-icc.xml 
 ```
 
 ### Running Kustvakt with Docker
