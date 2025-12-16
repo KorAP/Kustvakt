@@ -256,10 +256,10 @@ public class SearchService extends BasicService {
             ObjectNode queryNode = (ObjectNode) JsonUtils.readTree(result);
             ObjectNode meta = (ObjectNode) queryNode.at("/meta");
             if (meta.isMissingNode()) {
-                queryNode.put("totalResults", Integer.valueOf(totalResults));
+                queryNode.put("totalResults", Long.valueOf(totalResults));
             }
             else {
-                meta.put("totalResults", Integer.valueOf(totalResults));
+                meta.put("totalResults", Long.valueOf(totalResults));
             }
             result = queryNode.toString();
         }
@@ -269,7 +269,7 @@ public class SearchService extends BasicService {
             boolean timeExceeded = node.at("/meta/timeExceeded").asBoolean();
             
             if (!timeExceeded && totalResults != null && !totalResults.isEmpty()
-                    && Integer.parseInt(totalResults) > 0)
+                    && Long.parseLong(totalResults) > 0)
                 totalResultCache.storeInCache(hashedKoralQuery, totalResults);
         }
         return result;
