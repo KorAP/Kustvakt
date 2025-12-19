@@ -568,6 +568,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
     protected String createExpiredAccessToken () throws KustvaktException {
         String authToken = codeGenerator.createRandomCode();
+        String refreshTokenStr = codeGenerator.createRandomCode();
 
         // create new access token
         OAuth2Client client = clientDao.retrieveClientById(publicClientId);
@@ -577,6 +578,15 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         Set<AccessScope> scopes = new HashSet<>();
         scopes.add(new AccessScope(OAuth2Scope.CREATE_VC));
 
+        // Create expired refresh token
+        refreshTokenDao.storeRefreshToken(refreshTokenStr, "marlin",
+                now.minusSeconds(10), client, scopes);
+        // Update the refresh token to be expired
+        de.ids_mannheim.korap.oauth2.entity.RefreshToken refreshToken =
+                refreshTokenDao.retrieveRefreshToken(refreshTokenStr);
+        refreshToken.setExpiryDate(now.minusSeconds(3));
+        refreshTokenDao.updateRefreshToken(refreshToken);
+
         AccessToken accessToken = new AccessToken();
         accessToken.setCreatedDate(now.minusSeconds(5));
         accessToken.setExpiryDate(now.minusSeconds(3));
@@ -585,6 +595,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         accessToken.setUserId("marlin");
         accessToken.setClient(client);
         accessToken.setUserAuthenticationTime(now.minusSeconds(5));
+        accessToken.setRefreshToken(refreshToken);
         tokenDao.storeAccessToken(accessToken);
         return authToken;
     }
