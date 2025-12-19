@@ -40,8 +40,8 @@ RUN rm -r Krill-* v*.zip
 
 # Kustvakt
 # --legacy-start
-RUN mvn clean package -P full && \
-    find target/Kustvakt-full-*.jar -exec mv {} /kustvakt/built/Kustvakt-full.jar ';'
+# RUN mvn clean package -P full && \
+#    find target/Kustvakt-full-*.jar -exec mv {} /kustvakt/built/Kustvakt-full.jar ';'
 # --legacy-end
 RUN mvn clean package && \
     find target/Kustvakt-*.jar -exec mv {} /kustvakt/built/Kustvakt.jar ';'
@@ -100,28 +100,9 @@ EXPOSE 8089
 ENTRYPOINT [ "java", "-jar"]
 CMD ["Kustvakt.jar"]
 
-# docker build -f Dockerfile -t korap/kustvakt:{nr} .
+# docker build -f Dockerfile -t korap/kustvakt:{nr} -t korap/kustvakt:{nr}-full .
 # docker build -f Dockerfile -t korap/example-index:{nr} --target example-index .
 # run lite version (default)
 # docker run --rm --net host -v [absolute-path-sample-index]:/kustvakt/index korap/kustvakt:{nr}
 # run full version 
 # docker run --rm --net host -v [absolute-path-sample-index]:/kustvakt/index korap/kustvakt:{nr} Kustvakt.jar --full
-
-# backward compatibility with older docker compose
-FROM eclipse-temurin:22-jre-alpine AS kustvakt-full
-RUN addgroup -S korap && \
-    adduser -S kustvakt -G korap && \
-    mkdir kustvakt && \
-    chown -R kustvakt.korap /kustvakt
-WORKDIR /kustvakt
-USER kustvakt
-RUN mkdir ./data 
-COPY --from=builder /kustvakt/built/Kustvakt-full.jar /kustvakt/
-COPY --from=builder /kustvakt/built/Kustvakt.jar /kustvakt
-COPY --from=builder /kustvakt/built/kustvakt.conf /kustvakt/data/
-COPY --from=builder /kustvakt/built/ldap.* /kustvakt/ldap/
-COPY --from=builder /kustvakt/built/Krill-Indexer.jar /kustvakt/
-EXPOSE 8089
-ENTRYPOINT [ "java", "-jar" ]
-CMD [ "Kustvakt-full.jar" ]
-# docker build -f Dockerfile -t korap/kustvakt:{version} --target kustvakt-full .
