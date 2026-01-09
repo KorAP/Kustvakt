@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserSettingProcessor;
 
 /**
  * @author hanl, margaretha
- * @date 30/06/2015
  */
 public class FoundryInject implements RewriteTask.IterableRewritePath {
 
@@ -27,19 +27,21 @@ public class FoundryInject implements RewriteTask.IterableRewritePath {
         if (koralNode.get("@type").equals("koral:span")) {
             if (!koralNode.isMissingNode("/wrap")) {
                 koralNode = koralNode.at("/wrap");
-                JsonNode term = rewriteQuery(koralNode, config, user, apiVersion).rawNode();
-                koralNode.replaceAt("/wrap", term,
+				JsonNode term = rewriteQuery(koralNode, config, user,
+						apiVersion).rawNode();
+				koralNode.replaceAt("/wrap", term,
                         new RewriteIdentifier("koral:term", "replace", ""));
             }
         }
         else if (koralNode.get("@type").equals("koral:term")
                 && !koralNode.has("foundry")) {
-            String layer;
+            String layer = "";
             if (koralNode.has("layer")) {
                 layer = koralNode.get("layer");
             }
             else {
-                layer = koralNode.get("key");
+				throw new KustvaktException(StatusCodes.MISSING_LAYER,
+						"Layer is missing.");
             }
             UserSettingProcessor settingProcessor = null;
             if (user != null) {

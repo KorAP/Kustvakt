@@ -42,6 +42,7 @@ public class StatusCodes {
     public static final int MISSING_ATTRIBUTE = 202;
     public static final int INVALID_ATTRIBUTE = 203;
     public static final int UNSUPPORTED_VALUE = 204;
+    public static final int MISSING_LAYER = 205;
 
     /**
      * 300 status codes for query language and serialization

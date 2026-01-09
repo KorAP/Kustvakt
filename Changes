@@ -1,3 +1,7 @@
+# version 1.0.1
+
+- Add an exception for missing layer.
+
 # version 1.0
 
 HOT PATCH 1: Reorder tasks for new VC.
