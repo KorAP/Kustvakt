@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS query_statistics_index ON query(statistics);

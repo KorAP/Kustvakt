@@ -1,6 +1,8 @@
 # version 1.0.1
 
 - Add an exception for missing layer.
+- Use database for querying VC statistics.
+
 
 # version 1.0
 

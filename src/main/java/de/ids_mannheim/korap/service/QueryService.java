@@ -157,7 +157,11 @@ public class QueryService extends BasicService {
 	public String computeStatisticsForVC (QueryDO query, QueryType queryType, 
 			double apiVersion)
 			throws KustvaktException {
-		if (config.isVcListStatisticsEnabled() && 
+		String statistics = query.getStatistics();
+		if (statistics != null && !statistics.isEmpty()) {
+			return statistics;
+		}
+		else if (config.isVcListStatisticsEnabled() && 
 				queryType.equals(QueryType.VIRTUAL_CORPUS)) {		
     		String json = "";
     		if (query.isCached()) {
