@@ -43,10 +43,10 @@ public class QueryConverter {
 
         if (statistics != null) {
             JsonNode node = JsonUtils.readTree(statistics);
-            dto.setNumberOfDoc(node.at("/documents").asInt());
-            dto.setNumberOfParagraphs(node.at("/paragraphs").asInt());
-            dto.setNumberOfSentences(node.at("/sentences").asInt());
-            dto.setNumberOfTokens(node.at("/tokens").asInt());
+            dto.setNumberOfDoc(node.at("/documents").asLong());
+            dto.setNumberOfParagraphs(node.at("/paragraphs").asLong());
+            dto.setNumberOfSentences(node.at("/sentences").asLong());
+            dto.setNumberOfTokens(node.at("/tokens").asLong());
         }
         return dto;
     }

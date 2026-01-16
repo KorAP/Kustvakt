@@ -2,6 +2,7 @@
 
 - Add an exception for missing layer.
 - Use database for querying VC statistics.
+- Fixed statistics conversion.
 
 
 # version 1.0
