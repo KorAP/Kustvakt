@@ -3,7 +3,7 @@
 - Add an exception for missing layer.
 - Use database for querying VC statistics.
 - Fixed statistics conversion.
-
+- Always update VC statistics at server start
 
 # version 1.0
 

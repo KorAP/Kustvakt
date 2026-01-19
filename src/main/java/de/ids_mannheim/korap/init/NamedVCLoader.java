@@ -158,14 +158,17 @@ public class NamedVCLoader implements Runnable {
                 updateCache = true;
                 // updateVCinDB
                 storeVCinDB(vcId, json, existingVC, apiVersion);
+                cacheVC(vcId, json, updateCache);
             }
-            else if (existingVC.getStatistics()== null) {
-            	jlog.info("Update statistics for VC: {}", vcId);
+            else {
+            	cacheVC(vcId, json, updateCache);
+            	
+                jlog.info("Update statistics for VC: {}", vcId);
+                existingVC.setStatistics(null);
             	String statistics = vcService.computeStatisticsForVC(existingVC, 
             			QueryType.VIRTUAL_CORPUS, apiVersion);
             	vcService.updateVCStatistics(existingVC,statistics);
-            }
-            cacheVC(vcId, json, updateCache);
+			}
         }
         catch (KustvaktException e) {
         	cacheVC(vcId, json, updateCache);
