@@ -8,7 +8,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jersey.version>4.0.0</jersey.version>
+		<jersey.version>4.0.1</jersey.version>
 		<hibernate.version>7.2.0.Final</hibernate.version>
 		<spring.version>7.0.2</spring.version>
 		<!-- spring6.version is used in jersey and defined here 
