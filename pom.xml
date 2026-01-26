@@ -20,7 +20,7 @@
 		<krill.version>[0.64.5,)</krill.version>
 		<koral.version>[0.47,)</koral.version>
 		<!-- Align JBoss Logging with Hibernate Validator 9 requirements -->
-		<jboss.logging.version>3.6.1.Final</jboss.logging.version>
+		<jboss.logging.version>3.6.2.Final</jboss.logging.version>
 	</properties>
 	
 	<profiles>
