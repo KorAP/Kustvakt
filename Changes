@@ -1,9 +1,11 @@
 # version 1.0.1
 
 - Add an exception for missing layer.
-- Use database for querying VC statistics.
+- Use database for querying statistics in VC List
 - Fixed statistics conversion.
 - Always update VC statistics at server start
+- Use database for statistics service (limited to full version 
+  and single VC reference)
 
 # version 1.0
 

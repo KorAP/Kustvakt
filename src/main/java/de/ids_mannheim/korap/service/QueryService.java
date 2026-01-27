@@ -68,7 +68,7 @@ import jakarta.ws.rs.core.Response.Status;
  *
  */
 @Service
-public class QueryService extends BasicService {
+public class QueryService extends BasicService implements QueryServiceInterface {
 
     public static Logger jlog = LogManager.getLogger(QueryService.class);
 
@@ -177,6 +177,29 @@ public class QueryService extends BasicService {
 		else {
 			return null;
 		}
+	}
+	
+	private String computeStatisticsForVC (QueryType queryType, boolean isCached,
+			double apiVersion, String queryName, String koralQuery)
+			throws KustvaktException {
+        if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
+        	if (isCached) {
+                String kq = updateKoralQueryForCachedVC (apiVersion, queryName);
+                return krill.getStatistics(kq);
+            }
+        	else {
+        		return krill.getStatistics(koralQuery); 
+        	}
+        }
+        return null;
+	}
+    
+	private String updateKoralQueryForCachedVC (double apiVersion,
+			String queryName) throws KustvaktException {
+    	KoralCollectionQueryBuilder koral = 
+        		new KoralCollectionQueryBuilder(apiVersion);
+        koral.with("referTo " + queryName);
+        return koral.toJSON();
 	}
 
     public void deleteQueryByName (String deletedBy, String queryName,
@@ -334,7 +357,7 @@ public class QueryService extends BasicService {
         }
 
         String koralQuery = computeKoralQuery(query, apiVersion);
-        storeQuery(username, queryName, query.getType(), query.getQueryType(),
+        storeQuery(null,username, queryName, query.getType(), query.getQueryType(),
                 koralQuery, query.getDefinition(), query.getDescription(),
                 query.getStatus(), query.isCached(), queryCreator,
                 query.getQuery(), query.getQueryLanguage(), apiVersion);
@@ -368,16 +391,6 @@ public class QueryService extends BasicService {
         return null;
     }
 
-    public void storeQuery (String username, String queryName,
-            ResourceType type, QueryType queryType, String koralQuery,
-            String definition, String description, String status,
-            boolean isCached, String queryCreator, String query,
-            String queryLanguage, double apiVersion) throws KustvaktException {
-        storeQuery(null, username, queryName, type, queryType, koralQuery,
-                definition, description, status, isCached, queryCreator, query,
-                queryLanguage, apiVersion);
-    }
-    
     public void storeQuery (QueryDO existingQuery, String username, String queryName,
             ResourceType type, QueryType queryType, String koralQuery,
             String definition, String description, String status,
@@ -418,6 +431,8 @@ public class QueryService extends BasicService {
             jlog.debug("Storing query: " + queryName + "in the database ");
         }
 
+        // EM: statistics is not updated for *non named-vc*, should we skip it 
+        // so statistics should always be computed on the fly for them?
 		String statistics = computeStatisticsForVC(queryType, isCached,
 				apiVersion, queryName, koralQuery);        
         int queryId = 0;
@@ -452,29 +467,6 @@ public class QueryService extends BasicService {
             publishQuery(queryId, queryCreator, queryName);
         }
     }
-    
-	private String computeStatisticsForVC (QueryType queryType, boolean isCached,
-			double apiVersion, String queryName, String koralQuery)
-			throws KustvaktException {
-        if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
-        	if (isCached) {
-                String kq = updateKoralQueryForCachedVC (apiVersion, queryName);
-                return krill.getStatistics(kq);
-            }
-        	else {
-        		return krill.getStatistics(koralQuery); 
-        	}
-        }
-        return null;
-	}
-    
-	private String updateKoralQueryForCachedVC (double apiVersion,
-			String queryName) throws KustvaktException {
-    	KoralCollectionQueryBuilder koral = 
-        		new KoralCollectionQueryBuilder(apiVersion);
-        koral.with("referTo " + queryName);
-        return koral.toJSON();
-	}
     
 	public void updateVCStatistics (QueryDO existingQuery, String statistics)
 			throws KustvaktException {
@@ -768,9 +760,10 @@ public class QueryService extends BasicService {
         QueryDO query = searchQueryByName(username, queryName, createdBy,
                 queryType);
 
-        String statistics = null;
+        String statistics = query.getStatistics();
         String json = "";
-		if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+		if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS) && 
+				(statistics == null || statistics.isEmpty())) {
 			if (query.isCached()) {
 				List<String> cqList = new ArrayList<>(1);
 				cqList.add("referTo " + query.getName());

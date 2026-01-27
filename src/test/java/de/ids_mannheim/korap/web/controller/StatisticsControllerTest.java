@@ -60,6 +60,22 @@ public class StatisticsControllerTest extends OAuth2TestBase {
         assertEquals(11,node.get("documents").asInt());
 	}
 
+    // EM: same results with login because availability rewrite is omitted 
+    // for statistics
+    @Test
+    public void testGetStatisticsProtectedVCWithoutLogin () throws KustvaktException {
+    	String corpusQuery = "availability=QAO-NC-LOC:ids";
+        Response response = target().path(API_VERSION).path("statistics")
+                .queryParam("cq", corpusQuery).request()
+                .get();
+        assert Status.OK.getStatusCode() == response.getStatus();
+        
+        String ent = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(2,node.get("documents").asInt());
+        assertEquals(69056, node.at("/tokens").asInt());
+	}
+
     @Test
     public void testStatisticsWithCq () throws KustvaktException {
         Response response = target().path(API_VERSION).path("statistics")
@@ -73,6 +89,19 @@ public class StatisticsControllerTest extends OAuth2TestBase {
         assertEquals(5687, node.at("/sentences").asInt());
         assertEquals(258, node.at("/paragraphs").asInt());
         assertTrue(node.at("/warnings").isMissingNode());
+    }
+
+    @Test
+    public void testGetStatisticsWithVC ()
+            throws IOException, KustvaktException {
+        String corpusQuery = "referTo system-vc";
+        Response response = target().path(API_VERSION).path("statistics")
+                .queryParam("cq", corpusQuery).request().get();
+        assert Status.OK.getStatusCode() == response.getStatus();
+        String ent = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(7,node.get("documents").asInt());
+        assertEquals(279402,node.get("tokens").asInt());
     }
 
 

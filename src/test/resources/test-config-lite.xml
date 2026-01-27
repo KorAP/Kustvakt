@@ -184,6 +184,8 @@
 	<!-- Services -->
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.DummyOAuth2ScopeServiceImpl" />
+	<bean id="queryService"
+		class="de.ids_mannheim.korap.service.DummyQueryServiceImpl" />
 
 	<!-- DAO -->
 	<bean id="adminDao"
