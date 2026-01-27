@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.web.input;
 
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
-import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.service.QueryServiceImpl;
 import de.ids_mannheim.korap.web.controller.QueryReferenceController;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import lombok.Setter;
  * @author margaretha
  * @see VirtualCorpusController
  * @see QueryReferenceController
- * @see QueryService
+ * @see QueryServiceImpl
  */
 @Getter
 @Setter

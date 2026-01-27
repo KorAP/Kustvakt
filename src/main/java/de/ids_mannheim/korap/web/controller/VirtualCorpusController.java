@@ -15,7 +15,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.service.QueryServiceImpl;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIDeprecationFilter;
@@ -72,7 +72,7 @@ public class VirtualCorpusController {
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
-    private QueryService service;
+    private QueryServiceImpl service;
     @Autowired
     private OAuth2ScopeService scopeService;
 

@@ -68,9 +68,9 @@ import jakarta.ws.rs.core.Response.Status;
  *
  */
 @Service
-public class QueryService extends BasicService implements QueryServiceInterface {
+public class QueryServiceImpl extends BasicService implements QueryServiceInterface {
 
-    public static Logger jlog = LogManager.getLogger(QueryService.class);
+    public static Logger jlog = LogManager.getLogger(QueryServiceImpl.class);
 
     public static boolean DEBUG = false;
 

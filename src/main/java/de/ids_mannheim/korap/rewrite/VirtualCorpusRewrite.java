@@ -9,7 +9,7 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.service.QueryServiceImpl;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.util.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -27,7 +27,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
     @Autowired
     private KustvaktConfiguration config;
     @Autowired
-    private QueryService queryService;
+    private QueryServiceImpl queryService;
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,

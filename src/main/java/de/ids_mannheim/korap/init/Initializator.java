@@ -16,7 +16,7 @@ import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.service.OAuth2InitClientService;
-import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.service.QueryServiceImpl;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.input.QueryJson;
@@ -43,7 +43,7 @@ public class Initializator {
     @Autowired
     private OAuth2InitClientService clientService;
     @Autowired
-    private QueryService queryService;
+    private QueryServiceImpl queryService;
     
     private double apiVersion = 1.1;
 

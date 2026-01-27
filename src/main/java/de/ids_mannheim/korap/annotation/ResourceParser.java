@@ -20,7 +20,7 @@ import de.ids_mannheim.korap.dao.ResourceDao;
 import de.ids_mannheim.korap.entity.AnnotationLayer;
 import de.ids_mannheim.korap.entity.Resource;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.service.QueryServiceImpl;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 
 /**
@@ -39,7 +39,7 @@ public class ResourceParser {
     @Autowired
     private AnnotationDao annotationDao;
     @Autowired
-    private QueryService queryService;
+    private QueryServiceImpl queryService;
 
     public static String RESOURCE_FILE = "resources.json";
     public static ObjectMapper mapper = new ObjectMapper();

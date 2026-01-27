@@ -10,7 +10,7 @@ import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.init.NamedVCLoader;
-import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.service.QueryServiceImpl;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
@@ -36,7 +36,7 @@ public class VirtualCorpusAdminController {
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
-    private QueryService service;
+    private QueryServiceImpl service;
 
     @Autowired
     private NamedVCLoader vcLoader;

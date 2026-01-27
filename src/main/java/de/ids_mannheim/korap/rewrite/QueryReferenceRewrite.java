@@ -10,7 +10,7 @@ import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.service.QueryServiceImpl;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
 
     @Autowired
-    private QueryService service;
+    private QueryServiceImpl service;
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,

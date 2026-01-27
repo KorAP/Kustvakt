@@ -22,7 +22,7 @@ import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.service.QueryServiceImpl;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.SearchKrill;
 
@@ -50,7 +50,7 @@ public class NamedVCLoader implements Runnable {
     @Autowired
     private SearchKrill searchKrill;
     @Autowired
-    private QueryService vcService;
+    private QueryServiceImpl vcService;
 
     public static Logger jlog = LogManager.getLogger(NamedVCLoader.class);
     public static boolean DEBUG = false;
