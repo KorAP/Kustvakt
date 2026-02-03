@@ -51,12 +51,15 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         assertTrue(VirtualCorpusCache.contains("named-vc1"));
         JsonNode node = testSearchWithRef_VC1();
         assertEquals(numOfMatches, node.at("/matches").size());
+        testSearchIncaseSensitivity_VC1(numOfMatches);
+        
         testStatisticsWithRef();
         numOfMatches = testSearchWithoutRef_VC2();
         vcLoader.loadVCToCache("named-vc2", "/vc/named-vc2.jsonld");
         assertTrue(VirtualCorpusCache.contains("named-vc2"));
         node = testSearchWithRef_VC2();
         assertEquals(numOfMatches, node.at("/matches").size());
+        testSearchIncaseSensitivity_VC2(numOfMatches);
         
         testDeleteVC("named-vc1", "system", admin);
         testDeleteVC("named-vc2", "system", admin);
@@ -96,6 +99,16 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         String ent = response.readEntity(String.class);
         return JsonUtils.readTree(ent);
     }
+    
+	private void testSearchIncaseSensitivity_VC1 (int numOfMatches) throws KustvaktException {
+		Response response = target().path(API_VERSION).path("search")
+				.queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+				.queryParam("cq", "referTo \"system/Named-VC1\"").request()
+				.get();
+		String ent = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(ent);
+		assertEquals(numOfMatches, node.at("/matches").size());
+	}
 
     private JsonNode testSearchWithRef_VC2 () throws KustvaktException {
         Response response = target().path(API_VERSION).path("search")
@@ -104,6 +117,17 @@ public class VirtualCorpusReferenceTest extends VirtualCorpusTestBase {
         String ent = response.readEntity(String.class);
         return JsonUtils.readTree(ent);
     }
+    
+    private void testSearchIncaseSensitivity_VC2 (int numOfMatches) 
+    		throws KustvaktException {
+		Response response = target().path(API_VERSION).path("search")
+				.queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+				.queryParam("cq", "referTo \"Named-VC2\"").request()
+				.get();
+		String ent = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(ent);
+		assertEquals(numOfMatches, node.at("/matches").size());
+	}
 
     private void testStatisticsWithRef () throws KustvaktException {
         String corpusQuery = "availability = /CC.*/ & referTo named-vc1";

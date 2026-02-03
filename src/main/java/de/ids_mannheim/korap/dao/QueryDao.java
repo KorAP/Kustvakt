@@ -201,7 +201,8 @@ public class QueryDao {
 
         Predicate condition = builder.and(
                 builder.equal(query.get(QueryDO_.createdBy), createdBy),
-                builder.equal(query.get(QueryDO_.name), queryName));
+                builder.equal(query.get(QueryDO_.name),
+                        queryName.toLowerCase()));
 
         criteriaQuery.select(query);
         criteriaQuery.where(condition);

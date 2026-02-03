@@ -44,6 +44,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         return node;
     }
 
+    // EM: can it handle multiple vc refs?
     private void findVCRef (String username, KoralNode koralNode)
             throws KustvaktException {
         if (koralNode.has("@type")
@@ -64,6 +65,9 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                         ownerExist = true;
                     }
                 }
+                
+                String originalVcName = new String(vcName);
+                vcName = vcName.toLowerCase();
 
                 String vcInCaching = config.getVcInCaching();
                 if (vcName.equals(vcInCaching)) {
@@ -74,6 +78,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                             koralNode.get("ref"));
                 }
 
+                // ref is not lower case
                 QueryDO vc = queryService.searchQueryByName(username, vcName,
                         vcOwner, QueryType.VIRTUAL_CORPUS);
                 if (!vc.isCached()) {
@@ -81,7 +86,10 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                 }
                 // required for named-vc since they are stored by filenames in the cache
                 else if (ownerExist) {
-                    removeOwner(vc.getKoralQuery(), vcOwner, koralNode);
+                    removeOwner(originalVcName, vcName, vcOwner, koralNode);
+                }
+                else if (!originalVcName.equals(vcName)) {
+                	lowerVCName(originalVcName, vcName, koralNode);
                 }
             }
 
@@ -98,11 +106,24 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         }
     }
 
-    private void removeOwner (String koralQuery, String vcOwner,
-            KoralNode koralNode) throws KustvaktException {
+	private void removeOwner (String originalVcName, String vcName, 
+			String vcOwner, KoralNode koralNode)
+			throws KustvaktException {
         JsonNode jsonNode = koralNode.rawNode();
         String ref = jsonNode.at("/ref").asText();
+        ref = ref.replace(originalVcName, vcName);
         String newRef = ref.substring(vcOwner.length() + 1, ref.length());
+        koralNode.replace("ref", newRef, new RewriteIdentifier("ref", ref, 
+        		"Ref has been replaced. The original value is described at "
+        		+ "the original property."));
+    }
+    
+	private void lowerVCName (String originalVcName, String vcName, 
+			KoralNode koralNode)
+			throws KustvaktException {
+        JsonNode jsonNode = koralNode.rawNode();
+        String ref = jsonNode.at("/ref").asText();
+        String newRef = ref.replace(originalVcName, vcName);
         koralNode.replace("ref", newRef, new RewriteIdentifier("ref", ref, 
         		"Ref has been replaced. The original value is described at "
         		+ "the original property."));
@@ -133,4 +154,5 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
 //                new RewriteIdentifier("ref", "", jsonNode.at("/ref").asText()));
 //        koralNode.setAll((ObjectNode) kq);
     }
+
 }

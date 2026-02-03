@@ -245,7 +245,8 @@ public class RoleDao {
                         cb.equal(groupRole.get(UserGroup_.name), groupName),
                         cb.equal(queryRole.get(QueryDO_.createdBy),
                                 queryCreator),
-                        cb.equal(queryRole.get(QueryDO_.name), queryName)));
+                        cb.equal(queryRole.get(QueryDO_.name),
+                                queryName.toLowerCase())));
 
        
         delete.where(deleteRole.get(Role_.id).in(subquery));

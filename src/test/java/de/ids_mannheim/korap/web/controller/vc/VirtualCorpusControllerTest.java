@@ -71,6 +71,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals("new_vc", node.get(1).get("name").asText());
         
         testCreateVC_sameName(testUser, "new_vc", ResourceType.PRIVATE);
+        testCreateVC_sameName(testUser, "NEW_VC", ResourceType.PRIVATE);
         
         // delete new VC
         deleteVC("new_vc", testUser, testUser);

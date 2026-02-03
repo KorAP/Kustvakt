@@ -81,6 +81,7 @@ public class BasicService {
                 }
             }
 
+            vcName = vcName.toLowerCase();
             String vcInCaching = config.getVcInCaching();
             if (vcName.equals(vcInCaching)) {
                 throw new KustvaktException(

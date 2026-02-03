@@ -1,3 +1,6 @@
+# version 1.1-SNAPSHOT
+- Change VC and query names to lowercase
+
 # version 1.0.1
 
 - Add an exception for missing layer.

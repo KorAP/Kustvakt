@@ -118,7 +118,6 @@ public class UserGroupDao {
         Root<UserGroupMember> memberRoot = cq.from(UserGroupMember.class);
         cq.select(memberRoot);
         cq.where(cb.equal(memberRoot.get(UserGroupMember_.group).get("id"), groupId));
-        @SuppressWarnings("unchecked")
         List<UserGroupMember> members = entityManager.createQuery(cq).getResultList();
         for (UserGroupMember m : members) {
             if (!entityManager.contains(m)) {
@@ -275,7 +274,8 @@ public class UserGroupDao {
         Predicate p = criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(UserGroup_.status),
                         UserGroupStatus.HIDDEN),
-                criteriaBuilder.equal(query_role.get(QueryDO_.name), queryName)
+                criteriaBuilder.equal(criteriaBuilder.lower(query_role.get(QueryDO_.name)),
+                        queryName.toLowerCase())
         );
 
         criteriaQuery.select(root);

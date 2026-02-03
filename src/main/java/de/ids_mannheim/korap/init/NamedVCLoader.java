@@ -147,6 +147,7 @@ public class NamedVCLoader implements Runnable {
     private void processVC (String vcId, String json, double apiVersion)
             throws IOException, QueryException {
         boolean updateCache = false;
+        vcId = vcId.toLowerCase();
         try {
             // if VC exists in the DB
             QueryDO existingVC = vcService.searchQueryByName("system", vcId, "system",

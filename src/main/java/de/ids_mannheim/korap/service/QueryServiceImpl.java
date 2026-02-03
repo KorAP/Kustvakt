@@ -75,7 +75,7 @@ public class QueryServiceImpl extends BasicService implements QueryServiceInterf
     public static boolean DEBUG = false;
 
     public static Pattern queryNamePattern = Pattern
-            .compile("[a-zA-Z0-9]+[a-zA-Z_0-9-.]*");
+            .compile("[a-z0-9]+[a-z_0-9-.]*");
 
     @Autowired
     private QueryDao queryDao;
@@ -258,6 +258,7 @@ public class QueryServiceImpl extends BasicService implements QueryServiceInterf
         verifyUsername(username, queryCreator);
         QueryDO query = queryDao.retrieveQueryByName(queryName, queryCreator);
 
+        queryName = queryName.toLowerCase();
         if (query == null) {
             storeQuery(queryJson, queryName, queryCreator, username, 
             		apiVersion);
