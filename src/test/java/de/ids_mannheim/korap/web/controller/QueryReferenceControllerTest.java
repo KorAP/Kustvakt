@@ -28,6 +28,21 @@ public class QueryReferenceControllerTest extends TestBase {
 
     private String system = "system";
     
+	private void testRetrieveQueryNotFound (String qName, String queryCreator,
+			String username, ResourceType resourceType)
+			throws KustvaktException {
+		Response response = target().path(API_VERSION).path("query")
+				.path("~" + queryCreator).path(qName).request()
+				.header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+						.createBasicAuthorizationHeaderValue(username, "pass"))
+				.get();
+		String entity = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(entity);
+		assertEquals(node.at("/errors/0/0").asInt(),
+				StatusCodes.NO_RESOURCE_FOUND);
+		assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+	}
+    
 	private void testRetrieveQueryByName (String qName, String query,
 			String queryCreator, String username,
 			ResourceType resourceType) throws KustvaktException {
@@ -40,7 +55,7 @@ public class QueryReferenceControllerTest extends TestBase {
         // System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(qName, node.at("/name").asText());
+        assertEquals(qName.toLowerCase(), node.at("/name").asText().toLowerCase());
         assertEquals(resourceType.displayName(), node.at("/type").asText());
         assertEquals(queryCreator, node.at("/createdBy").asText());
         assertEquals(query, node.at("/query").asText());
@@ -76,8 +91,17 @@ public class QueryReferenceControllerTest extends TestBase {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         testRetrieveQueryByName(qName, "der", testUser, testUser,
                 ResourceType.PRIVATE);
+//         test incase-sensitivity
+        testRetrieveQueryByName(qName.toUpperCase(), "der", testUser, testUser,
+                ResourceType.PRIVATE);
         testUpdateQuery(qName, testUser, testUser, ResourceType.PRIVATE);
+//         test incase-sensitivity
+		testUpdateQuery(qName.toUpperCase(), testUser, testUser,
+				ResourceType.PRIVATE);
+
         testDeleteQueryByName(qName, testUser, testUser);
+		testRetrieveQueryNotFound(qName, testUser, testUser,
+				ResourceType.PRIVATE);
     }
 
     @Test

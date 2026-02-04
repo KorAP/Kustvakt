@@ -21,6 +21,9 @@ import de.ids_mannheim.korap.utils.JsonUtils;
         assertTrue(node.at("/matches").size() > 0);
     }
 */
+// EM: Query reference in search is not yet implemented
+//     referTo only expects vc references in the current implementation
+//	   q and ql are required parameters
 public class QueryReferenceSearchTest {
     /*@Test
     public void testSearchWithVCRefEqual () throws KustvaktException {
