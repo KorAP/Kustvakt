@@ -59,7 +59,7 @@ public class KustvaktConfiguration {
     private String serverHost;
 
     private int maxTokenContext;
-    private int maxTokenMatch;
+//    private int maxTokenMatch; // EM: Not implemented yet
 
     private int maxhits;
     private int returnhits;
