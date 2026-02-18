@@ -8,8 +8,10 @@ import de.ids_mannheim.korap.config.LiteJerseyTest;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-/**
+/** 
  * Verifies unauthenticated requests are not rate-limited.
+ * 
+ * Implemented with AI assistance
  */
 public class RateLimitAnonymousTest extends LiteJerseyTest {
 

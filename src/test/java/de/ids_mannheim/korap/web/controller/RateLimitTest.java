@@ -2,7 +2,9 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -13,12 +15,23 @@ import de.ids_mannheim.korap.web.filter.RateLimitFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-/**
+/**  
  * Verifies authenticated rate limiting (HTTP 429) is applied after
  * auth.
+ * 
+ * Implemented with AI assistance
  */
 public class RateLimitTest extends OAuth2TestBase {
+	@Autowired
+    private RateLimitFilter rateLimitFilter;
 
+    @BeforeEach
+    public void clearRateLimitState() {
+        // Clear rate limit state before each test
+        if (rateLimitFilter != null) {
+            rateLimitFilter.clearBuckets();
+        }
+    }
 	@Test
 	public void testAuthenticatedRateLimitBearerToken ()
 			throws KustvaktException {
@@ -27,7 +40,7 @@ public class RateLimitTest extends OAuth2TestBase {
 		JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
 		String accessToken = node.at("/access_token").asText();
 		
-		for (long i = 0; i < RateLimitFilter.BURST_CAPACITY; i++) {
+		for (long i = 0; i < rateLimitFilter.getBurstCapacity(); i++) {
 			Response r = searchWithAccessToken(accessToken);
 			assertEquals(Status.OK.getStatusCode(), r.getStatus(),
 					"request " + i);

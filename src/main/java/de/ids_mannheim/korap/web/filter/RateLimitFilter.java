@@ -5,12 +5,17 @@ import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.utils.TimeUtils;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.WebApplicationException;
@@ -18,14 +23,16 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
+import lombok.Getter;
 
-/** Implemented with AI assistance
- * 
+/**
  * Simple in-memory rate limitation for authenticated users.
  * <p>
  * Keyed by bearer token (preferred) or username (fallback).
  * <p>
  * Note: In-memory means per-JVM only. For clustered deployments, use Redis/etc.
+ * 
+ * Implemented with AI assistance
  */
 @Component
 @Priority(Priorities.AUTHORIZATION)
@@ -34,53 +41,96 @@ public class RateLimitFilter implements ContainerRequestFilter {
     private static final Logger jlog = LogManager
             .getLogger(RateLimitFilter.class);
 
-    // Defaults: 60 requests per minute per key
-    // Keep these conservative and easy to change later via config injection.
-    private static final long REFILL_TOKENS = 60;
-    private static final Duration REFILL_PERIOD = Duration.ofMinutes(1);
-    public static final long BURST_CAPACITY = 60;
+    @Autowired
+    private KustvaktConfiguration config;
 
-    /**
-     * Prevent unbounded growth: keep at most this many distinct keys in-memory.
-     */
-    private static final int MAX_BUCKETS = 10_000;
-
-    /**
-     * Evict buckets that haven't been seen for this long.
-     */
-    private static final Duration BUCKET_TTL = Duration.ofHours(6);
+    // Rate limiting configuration (loaded from kustvakt.conf)
+    private long refillTokens;
+    private Duration refillPeriod;
+    @Getter
+    private long burstCapacity;
+    private int maxBuckets;
+    private Duration bucketTTL;
 
     private final ConcurrentHashMap<String, BucketEntry> buckets = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    private void initializeConfiguration() {
+        try {
+            Properties props = config.getProperties();
+            
+            // Handle case where properties might not be initialized yet
+            if (props == null) {
+                jlog.warn("KustvaktConfiguration properties not available, using default rate limiting values");
+                setDefaultValues();
+                return;
+            }
+            
+            // Load rate limiting settings from kustvakt.conf with sensible defaults
+            String refillTokensStr = props.getProperty("ratelimit.refill.tokens", "60");
+            this.refillTokens = Long.parseLong(refillTokensStr);
+
+            String refillPeriodStr = props.getProperty("ratelimit.refill.period", "1M");
+            this.refillPeriod = Duration.ofSeconds(TimeUtils.convertTimeToSeconds(refillPeriodStr));
+
+            String burstCapacityStr = props.getProperty("ratelimit.burst.capacity", "60");
+            this.burstCapacity = Long.parseLong(burstCapacityStr);
+
+            String maxBucketsStr = props.getProperty("ratelimit.max.buckets", "10000");
+            this.maxBuckets = Integer.parseInt(maxBucketsStr);
+
+            String bucketTTLStr = props.getProperty("ratelimit.bucket.ttl", "6H");
+            this.bucketTTL = Duration.ofSeconds(TimeUtils.convertTimeToSeconds(bucketTTLStr));
+
+            jlog.info("Rate limiting initialized: refillTokens={}, refillPeriod={}, burstCapacity={}, maxBuckets={}, bucketTTL={}",
+                    refillTokens, refillPeriod, burstCapacity, maxBuckets, bucketTTL);
+        } catch (Exception e) {
+            jlog.error("Failed to initialize rate limiting configuration, using defaults", e);
+            setDefaultValues();
+        }
+    }
+    
+    private void setDefaultValues() {
+        this.refillTokens = 60;
+        this.refillPeriod = Duration.ofMinutes(1);
+        this.burstCapacity = 60;
+        this.maxBuckets = 10000;
+        this.bucketTTL = Duration.ofHours(6);
+        jlog.info("Rate limiting initialized with defaults: refillTokens={}, refillPeriod={}, burstCapacity={}, maxBuckets={}, bucketTTL={}",
+                refillTokens, refillPeriod, burstCapacity, maxBuckets, bucketTTL);
+    }
 
     @Override
     public void filter (ContainerRequestContext request) {
         // Only apply to authenticated requests
         if (request.getSecurityContext() == null
                 || request.getSecurityContext().getUserPrincipal() == null) {
+            jlog.debug("Skipping rate limiting - no SecurityContext or UserPrincipal");
             return;
         }
 
         String key = resolveKey(request);
         if (key == null) {
+            jlog.debug("Skipping rate limiting - could not resolve key");
             return;
         }
+
+        jlog.debug("Applying rate limiting for key: {}", key);
 
         long now = System.currentTimeMillis();
 
         // Opportunistic cleanup to avoid memory growth.
-        // Do it only on inserts or if we grow too large.
-        if (buckets.size() > MAX_BUCKETS) {
+        if (buckets.size() > maxBuckets) {
             cleanupOldEntries(now);
         }
 
         BucketEntry entry = buckets.compute(key, (k, existing) -> {
             if (existing == null) {
-                // If we're still too large, try another cleanup pass before adding.
-                if (buckets.size() > MAX_BUCKETS) {
+                if (buckets.size() > maxBuckets) {
                     cleanupOldEntries(now);
                 }
-                return new BucketEntry(new TokenBucket(BURST_CAPACITY,
-                        REFILL_TOKENS, REFILL_PERIOD.toMillis()), now);
+                return new BucketEntry(new TokenBucket(burstCapacity,
+                        refillTokens, refillPeriod.toMillis()), now);
             }
             existing.lastSeenAtMillis = now;
             return existing;
@@ -90,6 +140,7 @@ public class RateLimitFilter implements ContainerRequestFilter {
             long retryAfterSeconds = Math
                     .max(1, entry.bucket.millisUntilNextToken() / 1000);
 
+            jlog.info("Rate limit exceeded for key: {}, retry after {} seconds", key, retryAfterSeconds);
             throw new WebApplicationException(Response.status(429)
                     .header("Retry-After", String.valueOf(retryAfterSeconds))
                     .entity("Rate limit exceeded")
@@ -97,13 +148,21 @@ public class RateLimitFilter implements ContainerRequestFilter {
         }
     }
 
+    /**
+     * Clear all rate limit buckets. For testing purposes only.
+     */
+    public void clearBuckets() {
+        buckets.clear();
+        jlog.info("Rate limit buckets cleared");
+    }
+
     private void cleanupOldEntries (long nowMillis) {
-        final long cutoff = nowMillis - BUCKET_TTL.toMillis();
+        final long cutoff = nowMillis - bucketTTL.toMillis();
         buckets.entrySet().removeIf(e -> e.getValue().lastSeenAtMillis < cutoff);
 
         // Still too big? Remove arbitrary entries (best-effort bound).
-        if (buckets.size() > MAX_BUCKETS) {
-            int toRemove = buckets.size() - MAX_BUCKETS;
+        if (buckets.size() > maxBuckets) {
+            int toRemove = buckets.size() - maxBuckets;
             for (String k : buckets.keySet()) {
                 buckets.remove(k);
                 if (--toRemove <= 0)
@@ -123,6 +182,8 @@ public class RateLimitFilter implements ContainerRequestFilter {
             }
         }
 
+        // Skip unauthenticated requests. DemoUserFilter sets username guest 
+        // for such requests.
         // Fallback to username/principal name
 //        String name = request.getSecurityContext().getUserPrincipal().getName();
 //        if (name != null && !name.isBlank()) {

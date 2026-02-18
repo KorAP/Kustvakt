@@ -6,7 +6,8 @@
 - Change Userdata to use String username instead of integer userId
 - Allow admin to create groups with name length less than 3 characters 
   to support existing groups from C2
-- Implemented rate limit for authenticated users (with AI assistance)
+- Implemented rate limit for authenticated users (AI assisted)
+- Customize rate limit settings in kustvakt.conf (AI assisted)
 
 # version 1.1
 
