@@ -1,0 +1,41 @@
+package de.ids_mannheim.korap.web.controller;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.controller.oauth2.OAuth2TestBase;
+import de.ids_mannheim.korap.web.filter.RateLimitFilter;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
+/**
+ * Verifies authenticated rate limiting (HTTP 429) is applied after
+ * auth.
+ */
+public class RateLimitTest extends OAuth2TestBase {
+
+	@Test
+	public void testAuthenticatedRateLimitBearerToken ()
+			throws KustvaktException {
+		Response response = requestTokenWithDoryPassword(superClientId,
+				clientSecret);
+		JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
+		String accessToken = node.at("/access_token").asText();
+		
+		for (long i = 0; i < RateLimitFilter.BURST_CAPACITY; i++) {
+			Response r = searchWithAccessToken(accessToken);
+			assertEquals(Status.OK.getStatusCode(), r.getStatus(),
+					"request " + i);
+			r.close();
+		}
+
+		Response limited = searchWithAccessToken(accessToken);
+		assertEquals(429, limited.getStatus());
+		limited.close();
+	}
+}

@@ -28,6 +28,7 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIDeprecationFilter;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
+import de.ids_mannheim.korap.web.filter.RateLimitFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
@@ -58,7 +59,7 @@ import jakarta.ws.rs.core.SecurityContext;
 @Controller
 @Path("/")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
-        DemoUserFilter.class})
+        DemoUserFilter.class, RateLimitFilter.class })
 public class SearchController {
 
     private static final boolean DEBUG = false;

@@ -6,10 +6,11 @@
 - Change Userdata to use String username instead of integer userId
 - Allow admin to create groups with name length less than 3 characters 
   to support existing groups from C2
+- Implemented rate limit for authenticated users (with AI assistance)
 
 # version 1.1
 
-- Change VC and query names to lowercase
+- Change VC and query names to lowercase (with AI assistance)
 - Implemented pipe response rewriting for match info API (#814)
 - Add pipe response for the metadata web-service.
 
