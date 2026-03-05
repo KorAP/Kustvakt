@@ -418,12 +418,14 @@ public class SearchController {
             @PathParam("docId") String docId,
             @PathParam("textId") String textId,
             @QueryParam("fields") String fields, 
+            @QueryParam("response-pipes") String responsePipes,
             @Context SecurityContext ctx,
             @Context HttpHeaders headers) throws KustvaktException {
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         try {
             String results = searchService.retrieveDocMetadata(corpusId, docId,
-                    textId, fields, tokenContext.getUsername(), headers);
+                    textId, fields, tokenContext.getUsername(), headers, 
+                    responsePipes);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {

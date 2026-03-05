@@ -46,6 +46,8 @@ public class SearchPipeTest extends SpringJerseyTest {
     private String glemmUri = "http://localhost:" + port + "/glemm";
 	private String termMapperUri = "http://localhost:" + port
 			+ "/term-mapper?foundry=corenlp";
+	private String termMapperUri2 = "http://localhost:" + port
+			+ "/term-mapper?fields=@all";
 
     public SearchPipeTest () throws URISyntaxException, IOException {
         pipeJson = IOUtils.toString(
@@ -127,6 +129,40 @@ public class SearchPipeTest extends SpringJerseyTest {
 				.path("GOE").path("AGA").path("01784").path("p36-37")
 				.queryParam("foundry", "tt")
 				.queryParam("response-pipes", termMapperUri)
+				.request().get();
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+		String entity = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(entity);
+		
+		assertTrue(node.at("/snippet").asText().startsWith(
+				"<span class=\"context-left\"></span><span class=\"match\">"
+				+ "<span title=\"corenlp/p:ART\">der</span> <span title="
+				+ "\"corenlp/p:ADJA\">alte</span> <span title="
+				+ "\"corenlp/p:ADJA\">freie</span> <span title="
+				+ "\"corenlp/p:NN\">Weg</span>"));
+	}
+	
+	@Test
+	public void testRetrieveMetadataWithResponsePipe ()
+			throws KustvaktException {
+		
+		mockClient.reset()
+        .when(request().withMethod("POST")
+        		.withPath("/term-mapper")
+        		.withQueryStringParameter("fields", "@all")
+                .withHeaders(
+                        new Header("Content-Type",
+                                "application/json; charset=utf-8"),
+                        new Header("Accept", "application/json")))
+        .respond(response()
+                .withHeader(new Header("Content-Type",
+                        "application/json; charset=utf-8"))
+                .withBody(termMapperJson).withStatusCode(200));
+
+		Response response = target().path(API_VERSION).path("corpus")
+				.path("GOE").path("AGA").path("01784")
+				.queryParam("fields", "@all")
+				.queryParam("response-pipes", termMapperUri2)
 				.request().get();
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 		String entity = response.readEntity(String.class);

@@ -574,7 +574,8 @@ public class SearchService extends BasicService {
     }
 
     public String retrieveDocMetadata (String corpusId, String docId,
-            String textId, String fields, String username, HttpHeaders headers)
+            String textId, String fields, String username, HttpHeaders headers, 
+            String responsePipes)
             throws KustvaktException {
         List<String> fieldList = null;
         if (fields != null && !fields.isEmpty()) {
@@ -587,6 +588,8 @@ public class SearchService extends BasicService {
         }
         String textSigle = searchKrill.getTextSigle(corpusId, docId, textId);
         String results = searchKrill.getFields(textSigle, fieldList, p);
+        
+        results = runPipes(results, responsePipes);
         
         return results;
     }
