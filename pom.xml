@@ -33,7 +33,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.6.1</version>
+						<version>3.6.2</version>
 						<executions>
 							<execution>
 								<id>all</id>
@@ -95,7 +95,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.6.1</version>
+						<version>3.6.2</version>
 						<executions>
 							<execution>
 								<id>full</id>
@@ -180,7 +180,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.6.1</version>
+				<version>3.6.2</version>
 				<executions>
 					<!-- option 1 -->
 					<execution>
