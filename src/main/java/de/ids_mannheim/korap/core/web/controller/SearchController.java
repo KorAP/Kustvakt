@@ -21,6 +21,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.server.KustvaktBaseServer;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
@@ -130,43 +131,54 @@ public class SearchController {
     //         scope without searching etc. In case not, it helps to compare queries in 
     //         different query languages.
     //     MH: ref query parameter removed!
-    //    @GET
-    //    @Path("{version}/query")
-    //    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response serializeQuery (@Context Locale locale,
-            @Context SecurityContext securityContext, @QueryParam("q") String q,
-            @Context ContainerRequestContext requestContext,
+    @GET
+    @Path("{version}/serialize")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response serializeQuery (@Context SecurityContext securityContext,
+    		@Context ContainerRequestContext requestContext,
+            @Context HttpServletRequest request, @Context HttpHeaders headers,
+            @Context Locale locale, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
-            @QueryParam("context") String context,
+            @QueryParam("context") String ctx,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
-            @QueryParam("page") Integer startPage,
+            @QueryParam("page") Integer pageInteger,
+            @QueryParam("fields") String fields,
+            @QueryParam("pipes") String pipes,
+            @QueryParam("response-pipes") String responsePipes,
             @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
-            @QueryParam("cq") String cq) {
-    	
+            @QueryParam("show-tokens") boolean showTokens,
+            @DefaultValue("true") @QueryParam("show-snippet") boolean showSnippet,
+            @QueryParam("cq") List<String> cq,
+            @QueryParam("engine") String engine) {
+
     	List<PathSegment> pathSegments = requestContext.getUriInfo()
     			.getPathSegments();
         String version = pathSegments.get(0).getPath();
-        double apiVersion = Double.parseDouble(version.substring(1));
+        double requestedVersion = Double.parseDouble(version.substring(1));
         
-        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
+
+        String result;
         try {
-            scopeService.verifyScope(ctx, OAuth2Scope.SERIALIZE_QUERY);
-            String result = searchService.serializeQuery(q, ql, v, cq,
-                    pageIndex, startPage, pageLength, context, cutoff,
-                    accessRewriteDisabled, apiVersion);
-            if (DEBUG) {
-                jlog.debug("Query: " + result);
-            }
-            return Response.ok(result).build();
+            scopeService.verifyScope(context, OAuth2Scope.SEARCH);
+            String username = context.getUsername();
+            User user = searchService.createUser(username, headers);
+            result = searchService.serializeQuery(user, requestedVersion, 
+            		engine, username,
+                    headers, q, ql, v, cq, fields, pipes, responsePipes, 
+                    pageIndex, pageInteger, ctx, pageLength, cutoff, 
+                    accessRewriteDisabled, showTokens, showSnippet);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
+
+        return Response.ok(result).build();
     }
 
-    //    This web service is DISABLED until there is a need for it. 
     @POST
     @Path("{version}/search")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

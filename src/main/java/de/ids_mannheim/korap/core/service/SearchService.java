@@ -78,56 +78,7 @@ public class SearchService extends BasicService {
     }
 
     @SuppressWarnings("unchecked")
-    public String serializeQuery (String q, String ql, String v, String cq,
-            Integer pageIndex, Integer startPage, Integer pageLength,
-            String context, Boolean cutoff, boolean accessRewriteDisabled,
-            double apiVersion)
-            throws KustvaktException {
-        QuerySerializer ss = new QuerySerializer(apiVersion).setQuery(q, ql, v);
-        if (cq != null)
-            ss.setCollection(cq);
-
-        MetaQueryBuilder meta = new MetaQueryBuilder();
-        if (pageIndex != null)
-            meta.addEntry("startIndex", pageIndex);
-        if (pageIndex == null && startPage != null)
-            meta.addEntry("startPage", startPage);
-        if (pageLength != null)
-            meta.addEntry("count", pageLength);
-        if (context != null)
-            meta.setSpanContext(context);
-        meta.addEntry("cutOff", cutoff);
-
-        ss.setMeta(meta.raw());
-        // return ss.toJSON();
-
-        String query = ss.toJSON();
-        query = rewriteHandler.processQuery(ss.toJSON(), null, apiVersion);
-        return query;
-    }
-
-    public String search (String jsonld, String username, HttpHeaders headers, 
-    		double apiVersion)
-            throws KustvaktException {
-
-        User user = createUser(username, headers);
-
-        JsonNode node = JsonUtils.readTree(jsonld);
-        node = node.at("/meta/snippets");
-        if (node != null && node.asBoolean()) {
-            user.setCorpusAccess(CorpusAccess.ALL);
-        }
-
-        String query = this.rewriteHandler.processQuery(jsonld, user, apiVersion);
-        // MH: todo: should be possible to add the meta part to
-        // the query serialization
-        // User user = controller.getUser(ctx.getUsername());
-        // jsonld = this.processor.processQuery(jsonld, user);
-        return searchKrill.search(query);
-    }
-
-    @SuppressWarnings("unchecked")
-	public String search (double apiVersion, String engine, 
+	public String serializeQuery (User user, double apiVersion, String engine, 
 			String username, HttpHeaders headers,
 			String q, String ql, String v, List<String> cqList, String fields,
 			String pipes, String responsePipes, Integer pageIndex,
@@ -139,8 +90,7 @@ public class SearchService extends BasicService {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "page must start from 1", "page");
         }
-
-        User user = createUser(username, headers);
+        
         CorpusAccess corpusAccess = user.getCorpusAccess();
 
         // EM: TODO: check if requested fields are public metadata. Currently 
@@ -175,48 +125,88 @@ public class SearchService extends BasicService {
             query = addWarning(query, StatusCodes.NOT_ALLOWED,
                     "Tokens cannot be shown without access.");
         }
+    	
+        query = rewriteHandler.processQuery(query, user, apiVersion);
+        return query;
+    }
 
-        // Query pipe rewrite
-        query = runPipes(query, pipes);
+    public String search (String jsonld, String username, HttpHeaders headers, 
+    		double apiVersion)
+            throws KustvaktException {
 
-        query = this.rewriteHandler.processQuery(query, user, apiVersion);
-        if (DEBUG) {
-            jlog.debug("the serialized query " + query);
+        User user = createUser(username, headers);
+
+        JsonNode node = JsonUtils.readTree(jsonld);
+        node = node.at("/meta/snippets");
+        if (node != null && node.asBoolean()) {
+            user.setCorpusAccess(CorpusAccess.ALL);
         }
 
-        int hashedKoralQuery = createTotalResultCacheKey(query);
-        boolean hasCutOff = hasCutOff(query);
-        if (config.isTotalResultCacheEnabled() && !hasCutOff) {
-            query = precheckTotalResultCache(hashedKoralQuery, query);
-        }
-        
-        KustvaktConfiguration.BACKENDS searchEngine = this.config
-                .chooseBackend(engine);
-        String result;
-        if (searchEngine.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
-            result = searchNeo4J(query, pageLength, meta, false);
-        }
-        else if (searchEngine.equals(KustvaktConfiguration.BACKENDS.NETWORK)) {
-            result = searchNetwork.search(query);
-        }
-        else {
-            result = searchKrill.search(query);
-        }
-        // jlog.debug("Query result: " + result);
-        
-        if (config.isTotalResultCacheEnabled()) {
-            result = afterCheckTotalResultCache(hashedKoralQuery, result);
-        }
-        
-        if (!hasCutOff) {
-            result = removeCutOff(result);
-        }
-        
-        checkApiVersion(result, apiVersion);
-        
-        // Response pipe rewrite
-        result = runPipes(result, responsePipes);
-        return result;
+        String query = this.rewriteHandler.processQuery(jsonld, user, apiVersion);
+        // MH: todo: should be possible to add the meta part to
+        // the query serialization
+        // User user = controller.getUser(ctx.getUsername());
+        // jsonld = this.processor.processQuery(jsonld, user);
+        return searchKrill.search(query);
+    }
+
+	public String search (double apiVersion, String engine, 
+			String username, HttpHeaders headers,
+			String q, String ql, String v, List<String> cqList, String fields,
+			String pipes, String responsePipes, Integer pageIndex,
+			Integer pageInteger, String ctx, Integer pageLength, Boolean cutoff,
+			boolean accessRewriteDisabled, boolean showTokens,
+			boolean showSnippet) throws KustvaktException {
+    	
+    	User user = createUser(username, headers);
+    	
+		String query = serializeQuery(user, apiVersion, engine, username, headers, q,
+				ql, v, cqList, fields, pipes, responsePipes, pageIndex,
+				pageInteger, ctx, pageLength, cutoff, accessRewriteDisabled,
+				showTokens, showSnippet);
+		// Query pipe rewrite
+		query = runPipes(query, pipes);
+
+		query = this.rewriteHandler.processQuery(query, user, apiVersion);
+		if (DEBUG) {
+			jlog.debug("the serialized query " + query);
+		}
+
+		int hashedKoralQuery = createTotalResultCacheKey(query);
+		boolean hasCutOff = hasCutOff(query);
+		if (config.isTotalResultCacheEnabled() && !hasCutOff) {
+			query = precheckTotalResultCache(hashedKoralQuery, query);
+		}
+
+		KustvaktConfiguration.BACKENDS searchEngine = this.config
+				.chooseBackend(engine);
+		String result;
+		// EM: disable Neo4J
+		//        if (searchEngine.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
+		//            result = searchNeo4J(query, pageLength, meta, false);
+		//        }
+		//        else 
+		if (searchEngine.equals(KustvaktConfiguration.BACKENDS.NETWORK)) {
+			result = searchNetwork.search(query);
+		}
+		else {
+			result = searchKrill.search(query);
+		}
+		// jlog.debug("Query result: " + result);
+
+		if (config.isTotalResultCacheEnabled()) {
+			result = afterCheckTotalResultCache(hashedKoralQuery, result);
+		}
+
+		if (!hasCutOff) {
+			result = removeCutOff(result);
+		}
+
+		checkApiVersion(result, apiVersion);
+
+		// Response pipe rewrite
+		result = runPipes(result, responsePipes);
+		return result;
 
     }
     

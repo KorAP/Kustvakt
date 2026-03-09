@@ -1,4 +1,6 @@
-# version 1.2
+# version 1.2-SNAPSHOT
+
+- Reactivate Query Serializer Web-service (#903)
 
 # version 1.1
 

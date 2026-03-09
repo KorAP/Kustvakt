@@ -38,7 +38,7 @@ public class BasicService {
         return combinedCorpusQuery;
     }
     
-    protected User createUser (String username, HttpHeaders headers)
+    public User createUser (String username, HttpHeaders headers)
             throws KustvaktException {
         User user = authenticationManager.getUser(username);
         authenticationManager.setAccessAndLocation(user, headers);
