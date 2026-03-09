@@ -2,7 +2,7 @@
 # Backward compatilibity is added to support older docker compose deployments
 
 # Use alpine linux as base image
-FROM eclipse-temurin:22-jdk-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 # Copy repository respecting .dockerignore
 COPY . /kustvakt
 WORKDIR /kustvakt
@@ -81,7 +81,7 @@ USER kustvakt
 CMD ["sh"]
 
 
-FROM eclipse-temurin:22-jre-alpine AS kustvakt
+FROM eclipse-temurin:21-jre-alpine AS kustvakt
 RUN addgroup -S korap && \
     adduser -S kustvakt -G korap && \
     mkdir kustvakt && \
