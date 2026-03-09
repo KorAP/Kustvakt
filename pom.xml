@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids-mannheim.korap.kustvakt</groupId>
 	<artifactId>Kustvakt</artifactId>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.1</version>
 	<properties>
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,8 +17,8 @@
 		<flyway.version>12.0.3</flyway.version>
 		<jetty.version>12.1.6</jetty.version>
 		<log4j.version>2.25.3</log4j.version>
-		<krill.version>[0.64.5,)</krill.version>
-		<koral.version>[0.47,)</koral.version>
+		<krill.version>[0.64.6,)</krill.version>
+		<koral.version>[0.48,)</koral.version>
 		<!-- Align JBoss Logging with Hibernate Validator 9 requirements -->
 		<jboss.logging.version>3.6.2.Final</jboss.logging.version>
 	</properties>

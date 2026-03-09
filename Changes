@@ -1,4 +1,4 @@
-# version 1.1-SNAPSHOT
+# version 1.1
 - Change VC and query names to lowercase
 - Implemented pipe response rewriting for match info API (#814)
 - Add pipe response for the metadata web-service.
