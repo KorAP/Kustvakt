@@ -32,14 +32,16 @@ public class KoralRewriteBuilder {
 	public KoralRewriteBuilder add (String op, RewriteIdentifier ri) {
 		KoralRewrite rewrite = new KoralRewrite();
 		rewrite.setOperation(op);
-		if (ri.getScope() != null) {
-			rewrite.setScope(ri.getScope());
-		}
-		if (ri.getOriginal() != null) {
-			rewrite.setOriginal(ri.getOriginal());
-		}
-		if (ri.getComment() != null) {
-			rewrite.setComment(ri.getComment());
+		if (ri != null) {
+    		if (ri.getScope() != null) {
+    			rewrite.setScope(ri.getScope());
+    		}
+    		if (ri.getOriginal() != null) {
+    			rewrite.setOriginal(ri.getOriginal());
+    		}
+    		if (ri.getComment() != null) {
+    			rewrite.setComment(ri.getComment());
+    		}
 		}
 		this.rewrites.add(rewrite);
 		return this;
@@ -57,9 +59,9 @@ public class KoralRewriteBuilder {
 			}
 			else if (node.isObject()) {
 				ObjectNode n = (ObjectNode) node;
-				List l = new LinkedList<>();
+				List<Object> l = new LinkedList<>();
 				l.add(JsonUtils.valueToTree(rewrite.map));
-				n.put("rewrites", JsonUtils.valueToTree(l));
+				n.set("rewrites", JsonUtils.valueToTree(l));
 			}
 			else {
 				//fixme: matches in result will land here. rewrites need to be placed under root node - though then there might be unclear where they belong to

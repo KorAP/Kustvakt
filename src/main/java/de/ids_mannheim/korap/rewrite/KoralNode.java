@@ -3,9 +3,6 @@ package de.ids_mannheim.korap.rewrite;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.ids_mannheim.korap.utils.JsonUtils;
-
-import java.util.*;
 
 /**
  * @author hanl
@@ -71,7 +68,7 @@ public class KoralNode {
             else if (value instanceof Integer)
                 n.put(name, (Integer) value);
             else if (value instanceof JsonNode)
-                n.put(name, (JsonNode) value);
+                n.set(name, (JsonNode) value);
 
             this.rewrites.add("override", ident);
         }
@@ -91,13 +88,8 @@ public class KoralNode {
                 !this.node.at(path).isMissingNode()) {
             ObjectNode n = (ObjectNode) this.node.at(path);
             n.removeAll();
-            n.putAll((ObjectNode) value);
-
-            String name = path;
-            if (ident != null)
-                name = ident.toString(); // scope is simply RewriteIdentifier ?? 
-
-            this.rewrites.add("override", name);
+            n.setAll((ObjectNode) value);
+            this.rewrites.add("override", ident);
         }
     }
     
@@ -174,7 +166,7 @@ public class KoralNode {
     }
 
     public void removeNode (RewriteIdentifier ident) {
-        this.rewrites.add("deletion", ident.toString());
+        this.rewrites.add("deletion", ident);
         this.remove = true;
     }
 
@@ -197,7 +189,7 @@ public class KoralNode {
 
     public KoralNode get (int i) {
         //        this.node = this.node.get(i);
-        return this.wrapNode(this.node.get(i));
+        return KoralNode.wrapNode(this.node.get(i));
     }
 
     public int asInt() {

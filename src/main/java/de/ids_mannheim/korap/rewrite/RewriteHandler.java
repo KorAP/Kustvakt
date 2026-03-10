@@ -103,7 +103,7 @@ public class RewriteHandler {
     public boolean add (Class<? extends RewriteTask> rewriter) {
         RewriteTask task;
         try {
-            Constructor c = rewriter.getConstructor();
+            Constructor<? extends RewriteTask> c = rewriter.getConstructor();
             task = (RewriteTask) c.newInstance();
         }
         catch (NoSuchMethodException | InvocationTargetException
@@ -202,7 +202,7 @@ public class RewriteHandler {
                 jlog.debug("Running rewrite process on query " + root);
             }
             if (root != null) {
-                Iterator<Map.Entry<String, JsonNode>> it = root.fields();
+                Iterator<Map.Entry<String, JsonNode>> it = root.properties().iterator();
                 while (it.hasNext()) {
                     Map.Entry<String, JsonNode> next = it.next();
                     processNode(next.getKey(), next.getValue(), result, apiVersion);

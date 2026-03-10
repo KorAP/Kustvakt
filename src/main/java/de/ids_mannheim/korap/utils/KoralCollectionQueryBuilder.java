@@ -164,7 +164,7 @@ public class KoralCollectionQueryBuilder {
                                     ? this.mergeOperator.toLowerCase()
                                     : "and", result, tobase);
                 }
-                ((ObjectNode) base).put(nodeName, result);
+                ((ObjectNode) base).set(nodeName, result);
                 return base;
             }
             return this.base;
@@ -219,7 +219,7 @@ public class KoralCollectionQueryBuilder {
             node.put("operation", "operation:" + op);
             ArrayNode ops = JsonUtils.createArrayNode();
             ops.addAll(Arrays.asList(groups));
-            node.put("operands", ops);
+            node.set("operands", ops);
             return node;
         }
 

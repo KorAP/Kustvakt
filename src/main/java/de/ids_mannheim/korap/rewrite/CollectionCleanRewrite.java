@@ -24,7 +24,7 @@ public class CollectionCleanRewrite implements RewriteTask.RewriteNodeAt {
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user, double apiVersion) {
         JsonNode jsonNode = process(node.rawNode());
-        return node.wrapNode(jsonNode);
+        return KoralNode.wrapNode(jsonNode);
     }
 
     private JsonNode process (JsonNode root) {
@@ -55,7 +55,7 @@ public class CollectionCleanRewrite implements RewriteTask.RewriteNodeAt {
                     ObjectNode ob = (ObjectNode) root;
                     ob.remove(Arrays.asList(
                             new String[] { "@type", "operation", "operands" }));
-                    ob.putAll((ObjectNode) sub);
+                    ob.setAll((ObjectNode) sub);
                 }
             }
         }

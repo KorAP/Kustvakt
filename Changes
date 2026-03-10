@@ -2,6 +2,7 @@
 
 - Reactivate Query Serializer Web-service (#903)
 - Fix deprecated URL constructor (AI assisted)
+- Fix Jackson and serialization deprecated methods (AI assisted)
 
 # version 1.1
 

@@ -23,7 +23,7 @@ public class IdWriter implements RewriteTask.RewriteKoralToken {
         if (node.get("@type").equals("koral:token")) {
             String s = extractToken(node.rawNode());
             if (s != null && !s.isEmpty())
-                node.put("idn", s + "_" + counter++);
+                node.set("idn", s + "_" + counter++, null);
         }
         return node;
     }
