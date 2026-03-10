@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.config;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.time.Instant;
@@ -56,7 +57,7 @@ public class JWTSigner {
 
     public JWTSigner (final byte[] secret, String issuer)
             throws MalformedURLException, JOSEException {
-        this(secret, new URL(issuer), 72 * 60 * 60);
+        this(secret, URI.create(issuer).toURL(), 72 * 60 * 60);
     }
 
     public SignedJWT createJWT (User user, Map<String, Object> attr) {

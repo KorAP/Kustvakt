@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
 import org.apache.http.HttpStatus;
@@ -34,7 +35,7 @@ public class SearchNetworkEndpoint {
         }
         else {
             try {
-                URL url = new URL(networkEndpointURL);
+                URL url = URI.create(networkEndpointURL).toURL();
                 HttpURLConnection connection = (HttpURLConnection) url
                         .openConnection();
                 connection.setRequestMethod("POST");

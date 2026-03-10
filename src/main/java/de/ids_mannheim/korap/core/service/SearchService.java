@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -320,7 +321,7 @@ public class SearchService extends BasicService {
                 String pipeURL = pipeArray[i];
                 if (pipeURL.startsWith(config.getPipeHost())) {
                     try {
-                        URL url = new URL(pipeURL);
+                        URL url = URI.create(pipeURL).toURL();
                         HttpURLConnection connection = (HttpURLConnection) url
                                 .openConnection();
                         connection.setRequestMethod("POST");

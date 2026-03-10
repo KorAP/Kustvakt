@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.config;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,7 +114,7 @@ public class FullConfiguration extends KustvaktConfiguration {
         if (!issuerStr.startsWith("http")) {
             issuerStr = "http://" + issuerStr;
         }
-        setIssuer(new URL(issuerStr));
+        setIssuer(URI.create(issuerStr).toURL());
     }
 
     private void setOAuth2Configuration (Properties properties) {
