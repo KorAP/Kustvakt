@@ -23,7 +23,7 @@ public class FoundryRewrite extends FoundryInject {
         String username = user.getUsername();
         String jsonSettings = settingService.retrieveDefaultSettings(username);
         if (jsonSettings != null) {
-            UserSettingProcessor processor = new UserSettingProcessor(
+            UserSettingProcessor processor = new UserSettingProcessor(username,
                     jsonSettings);
             user.setUserSettingProcessor(processor);
         }

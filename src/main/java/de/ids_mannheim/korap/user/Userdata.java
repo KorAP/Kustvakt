@@ -18,32 +18,26 @@ public abstract class Userdata {
 
     public DataFactory dataFactory = DataFactory.getFactory();
 
-    @Deprecated
-    @Getter
-    @Setter
-    private Integer id;
     @Getter(AccessLevel.PRIVATE)
     private Object data;
-    @Deprecated
     @Getter
     @Setter
-    private Integer userId;
+    private String username;
 
     public Userdata () {
-        this(-1);
+    	this.data = dataFactory.convertData(null);
     }
-
-    // EM: replace with username
-    @Deprecated
-    public Userdata (Integer userid) {
-        this.userId = userid;
-        this.id = -1;
-        this.data = dataFactory.convertData(null);
+    
+    public Userdata (String username) {
+    	this.username = username;
+    	this.data = dataFactory.convertData(null);
     }
-
-    public Userdata (String data) {
+    
+    public Userdata (String username, String data) {
+    	this.username = username;
         this.data = dataFactory.convertData(data);
     }
+    
 
     public int size () {
         return dataFactory.size(this.data);
@@ -78,7 +72,7 @@ public abstract class Userdata {
     public void checkRequired () throws KustvaktException {
         String[] fields = findMissingFields();
         if (findMissingFields().length != 0) {
-            throw new KustvaktException(userId, StatusCodes.MISSING_PARAMETER,
+            throw new KustvaktException(username, StatusCodes.MISSING_PARAMETER,
                     "User data object not valid. Object has missing fields!",
                     Arrays.asList(fields).toString());
         }

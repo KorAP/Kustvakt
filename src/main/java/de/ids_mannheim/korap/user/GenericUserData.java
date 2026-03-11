@@ -6,7 +6,7 @@ package de.ids_mannheim.korap.user;
 public class GenericUserData extends Userdata {
 
     public GenericUserData () {
-        super(-1);
+        super();
     }
 
     @Override

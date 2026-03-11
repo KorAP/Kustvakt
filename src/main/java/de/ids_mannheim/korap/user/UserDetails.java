@@ -8,13 +8,13 @@ import de.ids_mannheim.korap.config.Attributes;
  *       persistence issue with query request
  */
 public class UserDetails extends Userdata {
-
-    public UserDetails () {
+	
+	public UserDetails () {
 
     }
 
-    public UserDetails (Integer userid) {
-        super(userid);
+    public UserDetails (String username) {
+        super(username);
     }
 
     //todo: make configurable!

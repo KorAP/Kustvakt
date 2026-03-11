@@ -57,7 +57,7 @@ public class DefaultSettingService {
         username = verifiyUsername(username, contextUsername);
         validateSettingMap(map);
 
-        UserSettingProcessor processor = new UserSettingProcessor();
+        UserSettingProcessor processor = new UserSettingProcessor(username);
         processor.readQuietly(map, false);
 
         DefaultSetting defaultSetting = settingDao
@@ -67,7 +67,7 @@ public class DefaultSettingService {
             return HttpStatus.SC_CREATED;
         }
         else {
-            updateDefaultSetting(defaultSetting, processor);
+            updateDefaultSetting(username, defaultSetting, processor);
             return HttpStatus.SC_OK;
         }
     }
@@ -78,9 +78,9 @@ public class DefaultSettingService {
         settingDao.createDefaultSetting(username, jsonSettings);
     }
 
-    public void updateDefaultSetting (DefaultSetting setting,
+    public void updateDefaultSetting (String username, DefaultSetting setting,
             UserSettingProcessor newProcessor) throws KustvaktException {
-        UserSettingProcessor processor = new UserSettingProcessor(
+        UserSettingProcessor processor = new UserSettingProcessor(username,
                 setting.getSettings());
         processor.update(newProcessor);
 
@@ -113,7 +113,8 @@ public class DefaultSettingService {
                 .retrieveDefaultSetting(username);
 
         String jsonSettings = defaultSetting.getSettings();
-        UserSettingProcessor processor = new UserSettingProcessor(jsonSettings);
+        UserSettingProcessor processor = new UserSettingProcessor(username,
+        		jsonSettings);
         processor.removeField(key);
         String json = processor.serialize();
 

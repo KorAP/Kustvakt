@@ -66,7 +66,7 @@ public class UserdataTest {
     // EM: below are tests from MH
     @Test
     public void testDataValidation () {
-        Userdata data = new UserDetails(1);
+        Userdata data = new UserDetails("1");
         data.setField(Attributes.COUNTRY, "Germany");
         String[] req = data.requiredFields();
         String[] r = data.findMissingFields();
@@ -88,7 +88,7 @@ public class UserdataTest {
 
     @Test
     public void testUserdataRequiredFields () throws KustvaktException {
-        UserDetails details = new UserDetails(-1);
+        UserDetails details = new UserDetails("g");
         Map<String, Object> m = new HashMap<>();
         m.put(Attributes.FIRSTNAME, "first");
         m.put(Attributes.LASTNAME, "last");
@@ -126,7 +126,7 @@ public class UserdataTest {
     @Test
     public void testUserDataRequiredFieldsException () {
         assertThrows(KustvaktException.class, () -> {
-            UserDetails details = new UserDetails(-1);
+            UserDetails details = new UserDetails("g");
             Map<String, Object> m = new HashMap<>();
             m.put(Attributes.FIRSTNAME, "first");
             m.put(Attributes.LASTNAME, "last");
@@ -141,7 +141,7 @@ public class UserdataTest {
 
     @Test
     public void testUserDataPointerFunction () throws KustvaktException {
-        UserDetails details = new UserDetails(-1);
+        UserDetails details = new UserDetails("g");
         Map<String, Object> m = new HashMap<>();
         m.put(Attributes.FIRSTNAME, "first");
         m.put(Attributes.LASTNAME, "last");
@@ -158,12 +158,12 @@ public class UserdataTest {
 
     @Test
     public void testUserDataUpdate () {
-        UserDetails details = new UserDetails(-1);
+        UserDetails details = new UserDetails("g");
         details.setField(Attributes.FIRSTNAME, "first");
         details.setField(Attributes.LASTNAME, "last");
         details.setField(Attributes.ADDRESS, "address");
         details.setField(Attributes.EMAIL, "email");
-        UserDetails details2 = new UserDetails(-1);
+        UserDetails details2 = new UserDetails("g");
         details2.setField(Attributes.COUNTRY, "Germany");
         details.update(details2);
         assertEquals("first", details.get(Attributes.FIRSTNAME));

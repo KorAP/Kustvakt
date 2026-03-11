@@ -7,19 +7,17 @@ import de.ids_mannheim.korap.config.Attributes;
  * @date 28/01/2016
  */
 public class UserSettingProcessor extends Userdata {
-
-    public UserSettingProcessor () {
-
+	public UserSettingProcessor () {
+        super();
     }
-
-    @Deprecated
-    public UserSettingProcessor (Integer userid) {
-        super(userid);
+	
+	public UserSettingProcessor (String username) {
+        super(username);
     }
 
     // EM: added
-    public UserSettingProcessor (String data) {
-        super(data);
+    public UserSettingProcessor (String username,String data) {
+        super(username, data);
     }
 
     @Override

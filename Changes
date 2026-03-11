@@ -3,6 +3,7 @@
 - Reactivate Query Serializer Web-service (#903)
 - Fix deprecated URL constructor (AI assisted)
 - Fix Jackson and serialization deprecated methods (AI assisted)
+- Change Userdata to use String username instead of integer userId
 
 # version 1.1
 
