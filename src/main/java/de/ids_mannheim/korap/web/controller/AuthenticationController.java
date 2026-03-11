@@ -15,7 +15,6 @@ import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.constant.TokenType;
@@ -23,8 +22,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -88,24 +85,24 @@ public class AuthenticationController {
      * 
      * @return String
      */
-    @Deprecated
-    @GET
-    @Path("bootstrap")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response bootstrap () {
-        Map m = new HashMap();
-        //        m.put("settings", new UserSettings().toObjectMap());
-        m.put("ql", BeansFactory.getKustvaktContext().getConfiguration()
-                .getQueryLanguages());
-        m.put("SortTypes", null); // types of sorting that are supported!
-        m.put("version", ServiceInfo.getInfo().getVersion());
-        try {
-            return Response.ok(JsonUtils.toJSON(m)).build();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-    }
+//    @Deprecated
+//    @GET
+//    @Path("bootstrap")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response bootstrap () {
+//        Map m = new HashMap();
+//        //        m.put("settings", new UserSettings().toObjectMap());
+//        m.put("ql", BeansFactory.getKustvaktContext().getConfiguration()
+//                .getQueryLanguages());
+//        m.put("SortTypes", null); // types of sorting that are supported!
+//        m.put("version", ServiceInfo.getInfo().getVersion());
+//        try {
+//            return Response.ok(JsonUtils.toJSON(m)).build();
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//    }
 
     // fixme: moved to user
     @GET

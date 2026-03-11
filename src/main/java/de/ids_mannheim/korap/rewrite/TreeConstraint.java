@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.ids_mannheim.korap.config.BeanInjectable;
+
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 

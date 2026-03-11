@@ -1,7 +1,5 @@
 package de.ids_mannheim.korap.utils;
 
-import de.ids_mannheim.korap.config.BeanInjectable;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

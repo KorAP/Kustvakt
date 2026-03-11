@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import de.ids_mannheim.korap.config.Configurable;
-import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 
@@ -12,7 +11,7 @@ import de.ids_mannheim.korap.interfaces.EncryptionIface;
  * @author hanl
  * @date 05/06/2015
  */
-@Configurable(ContextHolder.KUSTVAKT_ENCRYPTION)
+@Configurable("kustvakt_encryption")
 public class DefaultEncryption implements EncryptionIface {
 
     private SecureRandom randomizer;
