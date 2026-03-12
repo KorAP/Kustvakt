@@ -172,14 +172,16 @@ as Kustvakt itself – be under the [BSD-2 License](https://raw.githubuserconten
 
 # Publication
 
+Margaretha Illig, Eliza / Diewald, Nils / Kamocki, Paweł/Kupietz, Marc (2025): Managing Access to Language Resources in a Corpus Analysis Platform. In: Kontino, Thalassia / Vandeghinste, Vincent (Eds.): Selected papers from the CLARIN Annual Conference 2024. Barcelona, Spain, 15–17 October 2024. (Linköping Electronic Conference Proceedings 216) Linköping: Linköping University Electronic Press, 2025. P. 101-112. https://doi.org/10.3384/ecp216.09
+
 Margaretha Illig, Eliza / Diewald, Nils / Kamocki, Paweł / Kupietz, Marc (2024):
-Managing Access to Language Resources in a Corpus Analysis Platform. In: Vandeghinste, Vincent / Kontino, Thalassia (Ed.): CLARIN Annual Conference Proceedings. Barcelona: CLARIN. S. 163-167.  
+Managing Access to Language Resources in a Corpus Analysis Platform. In: Vandeghinste, Vincent / Kontino, Thalassia (Eds.): CLARIN Annual Conference Proceedings. Barcelona: CLARIN. P. 163-167.  
 
-Kupietz, Marc / Diewald, Nils / Margaretha, Eliza (2022): Building Paths to Corpus Data. A Multi-Level Least Effort and Maximum Return Approach. In: Fišer, Darja / Witt, Andreas (Ed.): CLARIN: The Infrastructure for Language Resources, Berlin, Boston: De Gruyter, 2022, S. 163-190. https://doi.org/10.1515/9783110767377-007
+Kupietz, Marc / Diewald, Nils / Margaretha, Eliza (2022): Building Paths to Corpus Data. A Multi-Level Least Effort and Maximum Return Approach. In: Fišer, Darja / Witt, Andreas (Eds.): CLARIN: The Infrastructure for Language Resources, Berlin, Boston: De Gruyter, 2022, P. 163-190. https://doi.org/10.1515/9783110767377-007
 
-Diewald, Nils / Hanl, Michael / Margaretha, Eliza / Bingel, Joachim / Kupietz, Marc / Bański, Piotr / Witt, Andreas (2016): KorAP Architecture – Diving in the Deep Sea of Corpus Data. In: Calzolari, Nicoletta / Choukri, Khalid / Declerck, Thierry / Goggi, Sara/Grobelnik, Marko / Maegaard, Bente / Mariani, Joseph / Mazo, Helene / Moreno, Asuncion / Odijk, Jan / Piperidis, Stelios (Ed.): Proceedings of the Tenth International Conference on Language Resources and Evaluation (LREC 2016), Portorož, Slovenia. Paris: European Language Resources Association (ELRA), 2016. S. 3586-3591. 
+Diewald, Nils / Hanl, Michael / Margaretha, Eliza / Bingel, Joachim / Kupietz, Marc / Bański, Piotr / Witt, Andreas (2016): KorAP Architecture – Diving in the Deep Sea of Corpus Data. In: Calzolari, Nicoletta / Choukri, Khalid / Declerck, Thierry / Goggi, Sara/Grobelnik, Marko / Maegaard, Bente / Mariani, Joseph / Mazo, Helene / Moreno, Asuncion / Odijk, Jan / Piperidis, Stelios (Eds.): Proceedings of the Tenth International Conference on Language Resources and Evaluation (LREC 2016), Portorož, Slovenia. Paris: European Language Resources Association (ELRA), 2016. P. 3586-3591. 
 
-Bański, Piotr / Diewald, Nils, Hanl, Michael, Kupietz, Marc / Witt, Andreas (2014): Access Control by Query Rewriting. The Case of KorAP. In: Proceedings of the Ninth Conference on International Language Resources and Evaluation (LREC’14). European Language Resources Association (ELRA), 2014. S. 3817-3822.
+Bański, Piotr / Diewald, Nils, Hanl, Michael, Kupietz, Marc / Witt, Andreas (2014): Access Control by Query Rewriting. The Case of KorAP. In: Proceedings of the Ninth Conference on International Language Resources and Evaluation (LREC’14). European Language Resources Association (ELRA), 2014. P. 3817-3822.
 
 
 # References
