@@ -198,7 +198,10 @@ public class UserGroupService {
      */
     public boolean createUpdateUserGroup (String groupName, String description,
             String createdBy) throws KustvaktException {
-        ParameterChecker.checkNameValue(groupName, "groupName");
+    	
+    	if (!adminDao.isAdmin(createdBy)) {
+    		ParameterChecker.checkNameValue(groupName, "groupName");
+        }        
         ParameterChecker.checkStringValue(createdBy, "createdBy");
 
         if (!groupNamePattern.matcher(groupName).matches()) {

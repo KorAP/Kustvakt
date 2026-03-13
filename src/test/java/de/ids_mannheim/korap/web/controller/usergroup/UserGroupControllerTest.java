@@ -80,6 +80,20 @@ public class UserGroupControllerTest extends UserGroupTestBase {
             node.at("/errors/0/1").asText());
         assertEquals("groupName", node.at("/errors/0/2").asText());
     }
+    
+    @Test
+    public void testCreateGroupShortNameAdmin ()
+            throws KustvaktException {
+        String groupName = "ab";
+        Response response = target().path(API_VERSION).path("group")
+                .path("@" + groupName).request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(admin, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .put(Entity.form(new Form()));
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+		deleteGroupByName(groupName,admin);
+    }
 
     @Test
     public void testUserGroup () throws KustvaktException {
