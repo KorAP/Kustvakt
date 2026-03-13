@@ -207,19 +207,45 @@ public class LdapAuth3 {
             lc = new LDAPConnection();
         }
         
-        try {
-        	// timeout - 18.06.25/FB
-            lc.connect(ldapConfig.host, ldapConfig.port, ldapConfig.ldapTimeout);
-            
-            jlog.debug("{}: connect: successfull.", ldapConfig.useSSL ? "LDAPS" : "LDAP");
+        boolean connected = false;
+        LDAPException lastException = null;
+
+        String[] hosts = ldapConfig.host.split("[,\\s]+");
+        for (String hostString : hosts) {
+            if (hostString.isEmpty()) continue;
+
+            String host = hostString;
+            int port = ldapConfig.port;
+
+            if (hostString.contains(":")) {
+                String[] parts = hostString.split(":");
+                host = parts[0].trim();
+                try {
+                    port = Integer.parseInt(parts[1].trim());
+                } catch (NumberFormatException e) {
+                    jlog.warn("Invalid parsing port for LDAP server {}: {}", hostString, e.getMessage());
+                }
             }
-        catch (LDAPException e) {
-            String fullStackTrace = org.apache.commons.lang3.exception.ExceptionUtils
-                    .getStackTrace(e);
+
+            try {
+                // timeout - 18.06.25/FB
+                lc.connect(host, port, ldapConfig.ldapTimeout);
+                jlog.debug("{}: connect to {}:{} successful.", ldapConfig.useSSL ? "LDAPS" : "LDAP", host, port);
+                connected = true;
+                break; // Successfully connected
+            } catch (LDAPException e) {
+                lastException = e;
+                jlog.warn("Connecting to LDAP Server {}:{} failed: {}", host, port, e.getMessage());
+            }
+        }
+
+        if (!connected) {
+            String fullStackTrace = lastException != null ? org.apache.commons.lang3.exception.ExceptionUtils
+                    .getStackTrace(lastException) : "No valid hosts specified";
             jlog.error("Connecting to LDAP Server: failed: '{}'!\n", fullStackTrace);
-            
+
             ldapTerminate(lc);
-            return new LdapAuth3Result(null, isTimeout(e) ? LDAP_AUTH_RTIMEOUT : LDAP_AUTH_RCONNECT);
+            return new LdapAuth3Result(null, lastException != null && isTimeout(lastException) ? LDAP_AUTH_RTIMEOUT : LDAP_AUTH_RCONNECT);
         }
         
         jlog.debug("isConnected={}.\n", lc.isConnected() ? "yes" : "no");

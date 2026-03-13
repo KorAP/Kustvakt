@@ -30,6 +30,10 @@ public class LdapAuth3Test {
 
     public static final String TEST_LDAPS_TS_CONF = "src/test/resources/test-ldaps-with-truststore.conf";
 
+    public static final String TEST_LDAP_FALLBACK_CONF = "src/test/resources/test-ldap-fallback.conf";
+    public static final String TEST_LDAP_FALLBACK_FAIL_CONF = "src/test/resources/test-ldap-fallback-fail.conf";
+    public static final String TEST_LDAP_FALLBACK_PORT_CONF = "src/test/resources/test-ldap-fallback-port.conf";
+
     public static final String TEST_LDAP_USERS_LDIF = "src/test/resources/test-ldap-users.ldif";
 
     private static final String keyStorePath = "src/test/resources/keystore.p12";
@@ -244,5 +248,31 @@ public class LdapAuth3Test {
         LDAPConfig ldapConfig = new LDAPConfig(TEST_LDAPS_CONF);
         assertEquals(3269, ldapConfig.port);
         assertEquals("localhost", ldapConfig.host);
+    }
+
+    @Test
+    public void loginWithFallbackWorks () throws LDAPException {
+        // `test-ldap-fallback.conf` defines `host = invalid.local, localhost`
+        // Should connect to localhost successfully after failing on invalid.local
+        assertEquals(LDAP_AUTH_ROK,
+                LdapAuth3.login("testuser", "password", TEST_LDAP_FALLBACK_CONF));
+    }
+
+    @Test
+    public void loginWithFallbackFails () throws LDAPException {
+        // `test-ldap-fallback-fail.conf` defines `host = invalid1.local, invalid2.local`
+        // Should return LDAP_AUTH_RCONNECT or LDAP_AUTH_RTIMEOUT depending on network
+        int rc = LdapAuth3.login("testuser", "password", TEST_LDAP_FALLBACK_FAIL_CONF);
+        assertTrue(rc == LDAP_AUTH_RCONNECT || rc == LDAP_AUTH_RTIMEOUT,
+                "Expected connection failure, but got code=" + rc);
+    }
+
+    @Test
+    public void loginWithFallbackAndPortWorks () throws LDAPException {
+        // `test-ldap-fallback-port.conf` defines `host = invalid.local, localhost:3268`
+        // and a default port of 1111 which is wrong
+        // Should connect to localhost on port 3268 specifically
+        assertEquals(LDAP_AUTH_ROK,
+                LdapAuth3.login("testuser", "password", TEST_LDAP_FALLBACK_PORT_CONF));
     }
 }
