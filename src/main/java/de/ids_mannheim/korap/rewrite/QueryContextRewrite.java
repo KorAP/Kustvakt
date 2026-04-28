@@ -7,38 +7,58 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.dao.UserGroupDao;
+import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 @Component
 public class QueryContextRewrite implements RewriteTask.RewriteQuery {
 
+    private static final String LARGE_CONTEXT_GROUP = "LargeContextGroup";
+
     @Autowired
-    private KustvaktConfiguration config;
+    private UserGroupService userGroupService;
+
+    @Autowired
+    private UserGroupDao userGroupDao;
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user, double apiVersion) throws KustvaktException {
-        
-        if (config.getMaxTokenContext() > 0) {
+
+        int maxContext = isInLargeContextGroup(user)
+                ? config.getMaxTokenContextLarge()
+                : config.getMaxTokenContext();
+        if (maxContext > 0) {
             boolean isContextCut = false;
             KoralNode context = node.at("/meta/context");
-            isContextCut = cutContext(context, "left");
-            isContextCut = cutContext(context, "right") || isContextCut;
+            isContextCut = cutContext(context, "left", maxContext);
+            isContextCut = cutContext(context, "right", maxContext) || isContextCut;
             if (isContextCut) context.buildRewrites();
         }
         return node;
     }
+
+    private boolean isInLargeContextGroup (User user)
+            throws KustvaktException {
+        if (user == null) return false;
+        UserGroup group = userGroupDao.retrieveGroupByName(LARGE_CONTEXT_GROUP,
+                false);
+        if (group == null) return false;
+        return userGroupService.isMember(user.getUsername(), group);
+    }
     
-    private boolean cutContext (KoralNode context, String position) 
+    private boolean cutContext (KoralNode context, String position,
+            int maxContextLength)
             throws KustvaktException {
         KoralNode contextPosition = context.at("/" + position);
         String type = contextPosition.at("/0").asText();
 
         if (type.equals("token")) {
             int length = contextPosition.at("/1").asInt();
-            int maxContextLength = config.getMaxTokenContext();
             if (length > maxContextLength) {
                 JsonNode sourceNode = JsonUtils
                         .readTree(contextPosition.toString());

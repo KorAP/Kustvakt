@@ -164,8 +164,8 @@ public class UserGroupControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(2, node.size());
-        assertEquals("HIDDEN", node.get(0).at("/status").asText());
+        assertEquals(3, node.size());
+        assertEquals("HIDDEN", node.get(1).at("/status").asText());
 
         deleteGroupByName(doryGroupName, "dory");
     }

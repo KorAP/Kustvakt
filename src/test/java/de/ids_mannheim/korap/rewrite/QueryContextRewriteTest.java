@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -14,7 +16,10 @@ import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class QueryContextRewriteTest extends SpringJerseyTest {
     
@@ -23,6 +28,10 @@ public class QueryContextRewriteTest extends SpringJerseyTest {
     
     @Autowired
     private KustvaktConfiguration config;
+
+    private static final String LARGE_CONTEXT_GROUP = "LargeContextGroup";
+    private static final String LARGE_CONTEXT_GROUP_ADMIN = "korap_admin";
+    private static final String TEST_USER = "largeContextTestUser";
 
     @Test
     public void testCutTokenContext () throws KustvaktException, Exception {
@@ -43,6 +52,62 @@ public class QueryContextRewriteTest extends SpringJerseyTest {
         context = node.at("/matches/0/context");
         assertEquals(config.getMaxTokenContext(), context.at("/left/1").asInt());
         assertEquals(config.getMaxTokenContext(), context.at("/right/1").asInt());
+    }
+    
+    /** AI generated
+     * @throws KustvaktException
+     */
+    @Test
+    public void testCutTokenContextLarge ()
+            throws KustvaktException {
+        // add test user to LargeContextGroup via web service
+        Form form = new Form();
+        form.param("members", TEST_USER);
+        Response addResponse = target().path(API_VERSION).path("group")
+                .path("@" + LARGE_CONTEXT_GROUP).path("member").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(
+                                LARGE_CONTEXT_GROUP_ADMIN, "pass"))
+                .put(Entity.form(form));
+        assertEquals(Status.OK.getStatusCode(), addResponse.getStatus());
+
+        try {
+            Response searchResponse = target().path(API_VERSION).path("search")
+                    .queryParam("q", "Sonne")
+                    .queryParam("ql", "poliqarp")
+                    .queryParam("context", "60-token,60-token")
+                    .request()
+                    .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                            .createBasicAuthorizationHeaderValue(
+                                    TEST_USER, "pass"))
+                    .get();
+            String ent = searchResponse.readEntity(String.class);
+            JsonNode node = JsonUtils.readTree(ent);
+
+            JsonNode context = node.at("/meta/context");
+            assertEquals(config.getMaxTokenContextLarge(),
+                    context.at("/left/1").asInt());
+            assertEquals(config.getMaxTokenContextLarge(),
+                    context.at("/right/1").asInt());
+
+            // match context
+            context = node.at("/matches/0/context");
+            assertEquals(config.getMaxTokenContextLarge(),
+                    context.at("/left/1").asInt());
+            assertEquals(config.getMaxTokenContextLarge(),
+                    context.at("/right/1").asInt());
+        }
+        finally {
+            // remove test user from group via web service
+            Response deleteResponse = target().path(API_VERSION).path("group")
+                    .path("@" + LARGE_CONTEXT_GROUP)
+                    .path("~" + TEST_USER).request()
+                    .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                            .createBasicAuthorizationHeaderValue(
+                                    LARGE_CONTEXT_GROUP_ADMIN, "pass"))
+                    .delete();
+            assertEquals(Status.OK.getStatusCode(), deleteResponse.getStatus());
+        }
     }
 
     @Test
@@ -79,6 +144,7 @@ public class QueryContextRewriteTest extends SpringJerseyTest {
         assertEquals("right", context.at("/rewrites/1/scope").asText());
         assertEquals("token", context.at("/rewrites/1/original/0").asText());
         assertEquals(60, context.at("/rewrites/1/original/1").asInt());
-        
     }
+
+    
 }

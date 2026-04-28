@@ -58,9 +58,14 @@ public class KustvaktConfiguration {
 
     private String serverHost;
 
+	// The maximum number of tokens allowed in the context of a match result. 
+    // The context will be cut in QueryContextRewrite, if it exceeds 
+    // this number. A value of 0 means no limit.
     private int maxTokenContext;
 //    private int maxTokenMatch; // EM: Not implemented yet
 
+    private int maxTokenContextLarge;
+    
     private int maxhits;
     private int returnhits;
     private String keystoreLocation;
@@ -240,6 +245,9 @@ public class KustvaktConfiguration {
 
         maxTokenContext = Integer.parseInt(properties.getProperty(
                 "max.token.context.size", "0"));
+        
+        maxTokenContextLarge = Integer.parseInt(properties.getProperty(
+                "max.token.context.size.large", "0"));
         
         // Timeout validity in milis
         guestTimeout = Integer.parseInt(properties.getProperty(

@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.init;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.EnumSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,15 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
+import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dao.AdminDao;
+import de.ids_mannheim.korap.dao.UserGroupDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.service.OAuth2InitClientService;
 import de.ids_mannheim.korap.service.QueryServiceImpl;
+import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.input.QueryJson;
@@ -44,6 +49,10 @@ public class Initializator {
     private OAuth2InitClientService clientService;
     @Autowired
     private QueryServiceImpl queryService;
+    @Autowired
+    private UserGroupService userGroupService;
+    @Autowired
+    private UserGroupDao userGroupDao;
     
     private double apiVersion = 1.1;
 
@@ -59,7 +68,8 @@ public class Initializator {
             clientService.createInitialSuperClient(
                     OAuth2InitClientService.OUTPUT_FILENAME);
         }
-
+        createLargeContextGroup ();
+        
         vcLoader.apiVersion = apiVersion;
         Thread t = new Thread(vcLoader);
         t.start();
@@ -85,6 +95,48 @@ public class Initializator {
 		q.setQueryType(QueryType.QUERY);
 		queryService.handlePutRequest("system", "system", "system-q", q, 
 				apiVersion);
+
+		createLargeContextGroup ();
+	}
+	
+	private void createLargeContextGroup () throws KustvaktException {
+		String groupName = "LargeContextGroup";
+		String groupAdmin = "korap_admin";
+		String description = "Users allowed to access search results with "
+				+ "larger contexts";
+        boolean groupExists = false;
+        try {
+        	userGroupService.retrieveUserGroupByName(groupName);
+            groupExists = true;
+        }
+        catch (KustvaktException e) {
+            if (e.getStatusCode() != StatusCodes.NO_RESOURCE_FOUND) {
+                throw e;
+            }
+        }
+
+        if (!groupExists) {
+            try {
+                userGroupDao.createGroup(groupName, description, groupAdmin,
+                        UserGroupStatus.ACTIVE);
+                userGroupService.retrieveUserGroupByName(groupName);
+            }
+            // handle DB exceptions, e.g. unique constraint
+            catch (Exception e) {
+                Throwable cause = e;
+                Throwable lastCause = null;
+                while ((cause = cause.getCause()) != null
+                        && !cause.equals(lastCause)) {
+                    if (cause instanceof SQLException) {
+                        break;
+                    }
+                    lastCause = cause;
+                }
+                throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
+                        cause.getMessage());
+            }
+        }
+
 	}
 
     public void initResourceTest () throws IOException, KustvaktException {
