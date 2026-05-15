@@ -17,7 +17,7 @@
 		<flyway.version>12.6.1</flyway.version>
 		<jetty.version>12.1.8</jetty.version>
 		<log4j.version>2.26.0</log4j.version>
-		<krill.version>[0.64.6,)</krill.version>
+		<krill.version>[0.65,)</krill.version>
 		<koral.version>[0.48,)</koral.version>
 		<!-- Align JBoss Logging with Hibernate Validator 9 requirements -->
 		<jboss.logging.version>3.6.3.Final</jboss.logging.version>
