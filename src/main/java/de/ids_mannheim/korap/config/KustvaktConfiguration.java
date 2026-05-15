@@ -65,6 +65,7 @@ public class KustvaktConfiguration {
 //    private int maxTokenMatch; // EM: Not implemented yet
 
     private int maxTokenContextLarge;
+    private boolean largeContextGroupEnabled;
     
     private int maxhits;
     private int returnhits;
@@ -248,6 +249,9 @@ public class KustvaktConfiguration {
         
         maxTokenContextLarge = Integer.parseInt(properties.getProperty(
                 "max.token.context.size.large", "0"));
+        
+        largeContextGroupEnabled = Boolean.parseBoolean(properties.getProperty(
+                "large.context.group.enabled", "false"));
         
         // Timeout validity in milis
         guestTimeout = Integer.parseInt(properties.getProperty(

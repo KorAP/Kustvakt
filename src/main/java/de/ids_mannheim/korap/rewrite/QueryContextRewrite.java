@@ -30,7 +30,9 @@ public class QueryContextRewrite implements RewriteTask.RewriteQuery {
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user, double apiVersion) throws KustvaktException {
 
-        int maxContext = isInLargeContextGroup(user)
+        boolean useLargeContext = config.isLargeContextGroupEnabled()
+                && isInLargeContextGroup(user);
+        int maxContext = useLargeContext
                 ? config.getMaxTokenContextLarge()
                 : config.getMaxTokenContext();
         if (maxContext > 0) {

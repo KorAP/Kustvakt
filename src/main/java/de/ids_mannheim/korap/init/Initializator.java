@@ -68,7 +68,9 @@ public class Initializator {
             clientService.createInitialSuperClient(
                     OAuth2InitClientService.OUTPUT_FILENAME);
         }
-        createLargeContextGroup ();
+        if (config.isLargeContextGroupEnabled()) {
+            createLargeContextGroup();
+        }
         
         vcLoader.apiVersion = apiVersion;
         Thread t = new Thread(vcLoader);
@@ -96,7 +98,9 @@ public class Initializator {
 		queryService.handlePutRequest("system", "system", "system-q", q, 
 				apiVersion);
 
-		createLargeContextGroup ();
+		if (config.isLargeContextGroupEnabled()) {
+			createLargeContextGroup();
+		}
 	}
 	
 	private void createLargeContextGroup () throws KustvaktException {
