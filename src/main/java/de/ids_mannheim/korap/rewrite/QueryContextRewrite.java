@@ -10,6 +10,7 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.dao.UserGroupDao;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -45,10 +46,17 @@ public class QueryContextRewrite implements RewriteTask.RewriteQuery {
     private boolean isInLargeContextGroup (User user)
             throws KustvaktException {
         if (user == null) return false;
-        UserGroup group = userGroupDao.retrieveGroupByName(LARGE_CONTEXT_GROUP,
+        try {
+        	UserGroup group = userGroupDao.retrieveGroupByName(LARGE_CONTEXT_GROUP,
                 false);
-        if (group == null) return false;
-        return userGroupService.isMember(user.getUsername(), group);
+        	return userGroupService.isMember(user.getUsername(), group);
+        	
+        }catch (KustvaktException e) {
+			if (e.getStatusCode() == StatusCodes.NO_RESOURCE_FOUND) {
+				return false;
+			}
+			throw e;
+		}
     }
     
     private boolean cutContext (KoralNode context, String position,

@@ -159,9 +159,8 @@
 
 	<!-- <bean id="initializator"
 		class="de.ids_mannheim.korap.init.Initializator"
-		init-method="initTestWithoutAvailability">
-	</bean>
-    -->
+		init-method="initTest">
+	</bean> -->
     
 	<!-- Krill -->
 	<bean id="search_krill"
