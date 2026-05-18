@@ -6,6 +6,7 @@
 - Make large context group optional and disabled by default [AI-assisted]
 - Add tests for large context group config [AI-assisted]
 - Make rate-limit optional and enabled by default [AI-assisted]
+- Improve APIVersionFilter to avoid IndexOutOfBoundsException on empty path segments [AI assisted]
 
 # version 1.2-SNAPSHOT
 

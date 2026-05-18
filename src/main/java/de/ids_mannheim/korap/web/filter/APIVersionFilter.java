@@ -27,6 +27,9 @@ public class APIVersionFilter implements ContainerRequestFilter {
 
     public void filter (ContainerRequestContext request) {
         List<PathSegment> pathSegments = request.getUriInfo().getPathSegments();
+        if (pathSegments.isEmpty()) {
+            throw new NotFoundException();
+        }
         String version = pathSegments.get(0).getPath();
 
         if (!config.getSupportedVersions().contains(version)) {
