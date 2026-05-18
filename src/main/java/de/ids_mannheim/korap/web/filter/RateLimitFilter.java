@@ -23,6 +23,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 import lombok.Getter;
 
 /**
@@ -34,6 +35,7 @@ import lombok.Getter;
  * 
  * Implemented with AI assistance
  */
+@Provider
 @Component
 @Priority(Priorities.AUTHORIZATION)
 public class RateLimitFilter implements ContainerRequestFilter {
@@ -45,6 +47,7 @@ public class RateLimitFilter implements ContainerRequestFilter {
     private KustvaktConfiguration config;
 
     // Rate limiting configuration (loaded from kustvakt.conf)
+    private boolean enabled;
     private long refillTokens;
     private Duration refillPeriod;
     @Getter
@@ -67,6 +70,14 @@ public class RateLimitFilter implements ContainerRequestFilter {
             }
             
             // Load rate limiting settings from kustvakt.conf with sensible defaults
+            String enabledStr = props.getProperty("ratelimit.enabled", "true");
+            this.enabled = Boolean.parseBoolean(enabledStr);
+
+            if (!enabled) {
+                jlog.info("Rate limiting is disabled (ratelimit.enabled=false)");
+                return;
+            }
+
             String refillTokensStr = props.getProperty("ratelimit.refill.tokens", "60");
             this.refillTokens = Long.parseLong(refillTokensStr);
 
@@ -91,6 +102,7 @@ public class RateLimitFilter implements ContainerRequestFilter {
     }
     
     private void setDefaultValues() {
+        this.enabled = true;
         this.refillTokens = 60;
         this.refillPeriod = Duration.ofMinutes(1);
         this.burstCapacity = 60;
@@ -102,6 +114,9 @@ public class RateLimitFilter implements ContainerRequestFilter {
 
     @Override
     public void filter (ContainerRequestContext request) {
+        if (!enabled) {
+            return;
+        }
         // Only apply to authenticated requests
         if (request.getSecurityContext() == null
                 || request.getSecurityContext().getUserPrincipal() == null) {
@@ -154,6 +169,18 @@ public class RateLimitFilter implements ContainerRequestFilter {
     public void clearBuckets() {
         buckets.clear();
         jlog.info("Rate limit buckets cleared");
+    }
+
+    /**
+     * Enable or disable rate limiting at runtime. For testing purposes only.
+     */
+    public void setEnabled (boolean enabled) {
+        this.enabled = enabled;
+        jlog.info("Rate limiting enabled set to: {}", enabled);
+    }
+
+    public boolean isEnabled () {
+        return enabled;
     }
 
     private void cleanupOldEntries (long nowMillis) {
