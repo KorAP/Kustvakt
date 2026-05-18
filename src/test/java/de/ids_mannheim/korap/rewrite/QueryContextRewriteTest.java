@@ -55,10 +55,13 @@ public class QueryContextRewriteTest extends SpringJerseyTest {
     }
     
     /** AI generated
-     * @throws KustvaktException
+     * 
+     * When large.context.group.enabled = true, a member of the
+     * LargeContextGroup must receive the larger maxTokenContextLarge limit.
+     * @throws KustvaktExceptiona
      */
     @Test
-    public void testCutTokenContextLarge ()
+    public void testLargeContextEnabledForGroupMember ()
             throws KustvaktException {
         // add test user to LargeContextGroup via web service
         Form form = new Form();
@@ -107,6 +110,123 @@ public class QueryContextRewriteTest extends SpringJerseyTest {
                                     LARGE_CONTEXT_GROUP_ADMIN, "pass"))
                     .delete();
             assertEquals(Status.OK.getStatusCode(), deleteResponse.getStatus());
+        }
+    }
+
+
+
+    /**
+     * When large.context.group.enabled = true, a user who is NOT a
+     * member of the LargeContextGroup must still be capped at the
+     * regular maxTokenContext limit.
+     */
+    @Test
+    public void testLargeContextEnabledForNonMember ()
+            throws KustvaktException {
+        config.setLargeContextGroupEnabled(true);
+        // TEST_USER is not added to the group here
+        Response searchResponse = target().path(API_VERSION).path("search")
+                .queryParam("q", "Sonne")
+                .queryParam("ql", "poliqarp")
+                .queryParam("context", "60-token,60-token")
+                .request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(
+                                TEST_USER, "pass"))
+                .get();
+        String ent = searchResponse.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+
+        // non-member must receive the regular limit
+        JsonNode context = node.at("/meta/context");
+        assertEquals(config.getMaxTokenContext(),
+                context.at("/left/1").asInt());
+        assertEquals(config.getMaxTokenContext(),
+                context.at("/right/1").asInt());
+    }
+
+    /**
+     * When large.context.group.enabled = false, a member of the
+     * LargeContextGroup must still be capped at the regular
+     * maxTokenContext limit.
+     */
+    @Test
+    public void testLargeContextDisabledForGroupMember ()
+            throws KustvaktException {
+        // add test user to LargeContextGroup
+        Form form = new Form();
+        form.param("members", TEST_USER);
+        Response addResponse = target().path(API_VERSION).path("group")
+                .path("@" + LARGE_CONTEXT_GROUP).path("member").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(
+                                LARGE_CONTEXT_GROUP_ADMIN, "pass"))
+                .put(Entity.form(form));
+        assertEquals(Status.OK.getStatusCode(), addResponse.getStatus());
+
+        // disable the feature flag
+        config.setLargeContextGroupEnabled(false);
+        try {
+            Response searchResponse = target().path(API_VERSION).path("search")
+                    .queryParam("q", "Sonne")
+                    .queryParam("ql", "poliqarp")
+                    .queryParam("context", "60-token,60-token")
+                    .request()
+                    .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                            .createBasicAuthorizationHeaderValue(
+                                    TEST_USER, "pass"))
+                    .get();
+            String ent = searchResponse.readEntity(String.class);
+            JsonNode node = JsonUtils.readTree(ent);
+
+            // must be capped at regular limit, NOT the large limit
+            JsonNode context = node.at("/meta/context");
+            assertEquals(config.getMaxTokenContext(),
+                    context.at("/left/1").asInt());
+            assertEquals(config.getMaxTokenContext(),
+                    context.at("/right/1").asInt());
+        }
+        finally {
+            // restore feature flag
+            config.setLargeContextGroupEnabled(true);
+            // remove test user from group
+            Response deleteResponse = target().path(API_VERSION).path("group")
+                    .path("@" + LARGE_CONTEXT_GROUP)
+                    .path("~" + TEST_USER).request()
+                    .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                            .createBasicAuthorizationHeaderValue(
+                                    LARGE_CONTEXT_GROUP_ADMIN, "pass"))
+                    .delete();
+            assertEquals(Status.OK.getStatusCode(), deleteResponse.getStatus());
+        }
+    }
+
+    /**
+     * When large.context.group.enabled = false, an anonymous (null)
+     * user must also be capped at the regular maxTokenContext.
+     */
+    @Test
+    public void testLargeContextDisabledForAnonymousUser ()
+            throws KustvaktException {
+        config.setLargeContextGroupEnabled(false);
+        try {
+            Response response = target().path(API_VERSION).path("search")
+                    .queryParam("q", "Sonne")
+                    .queryParam("ql", "poliqarp")
+                    .queryParam("context", "60-token,60-token")
+                    .request()
+                    .get();
+            String ent = response.readEntity(String.class);
+            JsonNode node = JsonUtils.readTree(ent);
+
+            JsonNode context = node.at("/meta/context");
+            assertEquals(config.getMaxTokenContext(),
+                    context.at("/left/1").asInt());
+            assertEquals(config.getMaxTokenContext(),
+                    context.at("/right/1").asInt());
+        }
+        finally {
+            config.setLargeContextGroupEnabled(true);
         }
     }
 

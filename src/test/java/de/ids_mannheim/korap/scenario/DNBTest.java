@@ -69,7 +69,6 @@ public class DNBTest extends SpringJerseyTest {
                 .queryParam("context", "30-token,30-token").request().get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         String entity = r.readEntity(String.class);
-        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(KrillProperties.maxTokenContextSize,
