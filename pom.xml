@@ -678,7 +678,7 @@
 		<dependency>
 			<groupId>com.unboundid</groupId>
 			<artifactId>unboundid-ldapsdk</artifactId>
-			<version>7.0.4</version>
+			<version>7.0.5</version>
 		</dependency>
 
 		<!-- OAuth -->
