@@ -43,7 +43,7 @@ push-dockerhub:
     - apk add --no-cache xz
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
     - CLEAN_TAG="${CI_COMMIT_TAG:1}"
-    - ARTIFACT=kustvakt-$VID.tar.xz
+    - ARTIFACT=kustvakt-$CI_COMMIT_TAG.tar.xz
     - xz -d -c "$ARTIFACT" | docker load
     - docker tag korap/kustvakt:$CLEAN_TAG korap/kustvakt:latest
     - docker push korap/kustvakt:$CLEAN_TAG
