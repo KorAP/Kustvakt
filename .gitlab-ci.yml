@@ -24,7 +24,7 @@ build-docker:
     - docker save korap/kustvakt:$VID | xz > kustvakt-$VID.tar.xz
   artifacts:
     paths:
-      - kustvakt-$CLEAN_TAG.tar.xz
+      - kustvakt-$VID.tar.xz
 
 push-dockerhub:
   stage: deploy
