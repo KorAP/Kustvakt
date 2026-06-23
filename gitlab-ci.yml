@@ -34,13 +34,18 @@ push-dockerhub:
   dependencies:
     - build-docker
   rules:
-    - when: manual
+    - if: $CI_COMMIT_TAG =~ /^[vV]\d+/   # Only runs if tag starts with V or v
+      when: manual
+    - when: never    
   script:
     - apk update
     - apk add --no-cache xz
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-    - export VID=$(ls kustvakt-*.tar.xz | sed -e 's/^kustvakt-//' -e 's/\.tar\.xz$//')
-    - xz -d -c kustvakt-$VID.tar.xz | docker load
-    - docker tag korap/kustvakt:$VID korap/kustvakt:latest
-    - docker push korap/kustvakt:$VID
-    - docker push korap/kustvakt:latest
+    - CLEAN_TAG=$(echo "${CI_COMMIT_TAG}" | sed 's/^[vV]//')
+    - echo ${CLEAN_TAG}
+    - ARTIFACT=kustvakt-${CLEAN_TAG}.tar.xz
+    - xz -d -c "$ARTIFACT" | docker load
+    - docker tag korap/kustvakt:$CLEAN_TAG korap/kustvakt:latest
+    - docker push korap/kustvakt:$CLEAN_TAG
+    - docker push korap/kustavkt:latest
+  
