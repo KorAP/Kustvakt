@@ -12,7 +12,7 @@ build-docker:
   rules:
     - if: $CI_COMMIT_TAG =~ /.+/
       variables:
-        VID: $CI_COMMIT_TAG
+        VID: "${CI_COMMIT_TAG:1}"
     - when: manual
   stage: build
   before_script:
