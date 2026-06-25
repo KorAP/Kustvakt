@@ -23,7 +23,8 @@ build-docker:
   script:
     - CLEAN_TAG="${CI_COMMIT_TAG:1}"
     - docker build -f Dockerfile -t korap/kustvakt:$CLEAN_TAG .
-    - docker save korap/kustvakt:$CLEAN_TAG | xz > kustvakt-$CLEAN_TAG.tar.xz
+    - ARTIFACT=kustvakt-${CLEAN_TAG}.tar.xz
+    - docker save korap/kustvakt:$CLEAN_TAG | xz > $ARTIFACT
   artifacts:
     paths:
       - kustvakt-*.tar.xz
