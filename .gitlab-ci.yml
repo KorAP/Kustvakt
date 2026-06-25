@@ -50,5 +50,5 @@ push-dockerhub:
     - xz -d -c "$ARTIFACT" | docker load
     - docker tag korap/kustvakt:$CLEAN_TAG korap/kustvakt:latest
     - docker push korap/kustvakt:$CLEAN_TAG
-    - docker push korap/kustavkt:latest
+    - docker push korap/kustvakt:latest
   
