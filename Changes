@@ -6,6 +6,7 @@
 - Fix LDAP bind with found DN for passwords with special characters [AI-assisted]
 - Use glibc-based JRE 25 Docker image to fix SQLite writes on old hosts [AI-assisted]
 - Upgrade to Java 25
+- Create draft releases automatically when pushing tags starting with v [AI assisted] 
 
 # version 1.3
 
