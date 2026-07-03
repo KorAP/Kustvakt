@@ -15,7 +15,7 @@
   },
   "servers": [
     {
-      "url": "https://korap.ids-mannheim.de/api/v1.0"
+      "url": "https://korap.ids-mannheim.de/api/v1.1"
     }
   ],
   "tags": [
@@ -28,6 +28,21 @@
     }
   ],
   "paths": {
+    "/info": {
+      "get": {
+        "tags": [
+          "info"
+        ],
+        "summary": "Retrieve information about the backend.",
+        "description": "Retrieve information about KorAP backend including the supported API versions, and the component versions of Kustvakt (access management), Krill (the search engine) and Koral (query translator).",
+        "operationId": "info",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
     "/search": {
       "get": {
         "tags": [
@@ -439,7 +454,7 @@
         "flows": {
           "authorizationCode": {
             "authorizationUrl": "https://korap.ids-mannheim.de/settings/oauth/authorize",
-            "tokenUrl": "https://korap.ids-mannheim.de/api/v1.0/oauth2/token",
+            "tokenUrl": "https://korap.ids-mannheim.de/api/v1.1/oauth2/token",
             "scopes": {
               "search": "search query",
               "match_info": "retrieve match annotations"
@@ -452,7 +467,7 @@
         "flows": {
           "authorizationCode": {
             "authorizationUrl": "https://korap.ids-mannheim.de/instance/test/settings/oauth/authorize",
-            "tokenUrl": "https://korap.ids-mannheim.de/instance/test/api/v1.0/oauth2/token",
+            "tokenUrl": "https://korap.ids-mannheim.de/instance/test/api/v1.1/oauth2/token",
             "scopes": {
               "search": "search query",
               "match_info": "retrieve match annotations"
