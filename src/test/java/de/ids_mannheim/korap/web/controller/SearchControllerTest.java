@@ -49,14 +49,6 @@ public class SearchControllerTest extends SpringJerseyTest {
         return node;
     }
 
-    private String createJsonQuery () {
-        QuerySerializer s = new QuerySerializer(apiVersion);
-        s.setQuery("[orth=der]", "poliqarp");
-        s.setCollection("corpusSigle=GOE");
-        s.setQuery("Wasser", "poliqarp");
-        return s.toJSON();
-    }
-
     @Test
     public void testApiWelcomeMessage () {
         Response response = target().path(API_VERSION).path("").request().get();
@@ -395,75 +387,5 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("base/s:s", node.at("/meta/context").asText());
         assertNotEquals("/meta/version", "${project.version}");
     }
-
-    // EM: The API is disabled
-    @Disabled
-    @Test
-    public void testSearchSimpleCQL () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer(apiVersion);
-        s.setQuery("(der) or (das)", "CQL");
-        Response response = target().path(API_VERSION).path("search").request()
-                .post(Entity.json(s.toJSON()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String ent = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertNotEquals(0, node.path("matches").size());
-        // assertEquals(17027, node.at("/meta/totalResults").asInt());
-    }
-
-    // EM: The API is disabled
-    @Test
-    @Disabled
-    public void testSearchRawQuery () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("search").request()
-                .post(Entity.json(createJsonQuery()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String ent = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertNotEquals(0, node.path("matches").size());
-        assertEquals(freeCorpusAccess,
-                node.at(CORPUS_PATH+"/rewrites/0/scope").asText());
-    }
-
-    // EM: The API is disabled
-    @Test
-    @Disabled
-    public void testSearchPostAll () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("search").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "10.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue("kustvakt",
-                                        "kustvakt2015"))
-                .post(Entity.json(createJsonQuery()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String ent = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertNotEquals(0, node.path("matches").size());
-        assertEquals(allCorpusAccess,
-                node.at(CORPUS_PATH+"/rewrites/0/scope").asText());
-    }
-
-    // EM: The API is disabled
-    @Test
-    @Disabled
-    public void testSearchPostPublic () throws KustvaktException {
-        Response response = target().path(API_VERSION).path("search").request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue("kustvakt",
-                                        "kustvakt2015"))
-                .post(Entity.json(createJsonQuery()));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String ent = response.readEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertNotEquals(0, node.path("matches").size());
-        assertEquals(publicCorpusAccess,
-                node.at(CORPUS_PATH+"/rewrites/0/scope").asText());
-    }
+    
 }
