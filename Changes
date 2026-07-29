@@ -1,6 +1,7 @@
 # version 1.4
 
 - Reenable and update search POST tests [AI-assisted]
+- Add a test for show-tokens param in match info web-service.
 
 # version 1.3
 
