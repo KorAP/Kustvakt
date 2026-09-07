@@ -510,7 +510,8 @@ public class SearchService extends BasicService {
             String textId, String matchId, boolean info, Set<String> foundries,
             String username, HttpHeaders headers, Set<String> layers, 
 			boolean spans, boolean snippet, boolean tokens,
-			boolean sentenceExpansion, boolean highlights, boolean isDeprecated,
+			boolean extendToSentence, boolean extendToMax, 
+			boolean highlights, boolean isDeprecated,
 			String responsePipes)
 			throws KustvaktException {
         String matchid = searchKrill.getMatchId(corpusId, docId, textId,
@@ -541,14 +542,16 @@ public class SearchService extends BasicService {
             }
         }
         else {
-            sentenceExpansion = false;
+            extendToSentence = false;
+            extendToMax = false;
             spans = false;
             info = false;
             highlights = true;
         };
 
         results = searchKrill.getMatch(matchid, info, foundryList, layerList,
-                spans, snippet, tokens, highlights, sentenceExpansion, p, isDeprecated);
+                spans, snippet, tokens, highlights, extendToSentence, 
+                extendToMax, p, isDeprecated);
         //        }
         //        catch (Exception e) {
         //            jlog.error("Exception in the MatchInfo service encountered!", e);

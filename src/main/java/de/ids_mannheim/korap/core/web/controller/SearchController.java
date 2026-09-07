@@ -78,6 +78,52 @@ public class SearchController {
     private OAuth2ScopeService scopeService;
     @Autowired
     private KustvaktConfiguration config;
+    
+    // -- Refactored code for handling expansion parameter  
+    // to avoid duplication in legacy method: getMatchInfo and retrieveMatchInfo()
+    // AI assisted (Claude Haiku 4.5)
+    
+    /**
+     * Inner class to encapsulate expansion configuration
+     */
+    private static class ExpansionConfig {
+        public Boolean expandToSentence;
+        public Boolean expandToMax;
+
+        public ExpansionConfig(Boolean expandToSentence, Boolean expandToMax) {
+            this.expandToSentence = expandToSentence;
+            this.expandToMax = expandToMax;
+        }
+    }
+
+    /**
+     * Parses the expansion parameter and returns the expansion configuration.
+     * 
+     * @param expansion the expansion parameter value (may be null)
+     * @return ExpansionConfig containing expandToSentence and expandToMax flags
+     */
+    private ExpansionConfig parseExpansionParameter(String expansion) {
+        Boolean expandToSentence = true;
+        Boolean expandToMax = false;
+
+        if (expansion != null) {
+            expansion = expansion.toLowerCase();
+            if (expansion.equals("off") ||
+            		// legacy support
+            		expansion.equals("false") || expansion.equals("null")) {
+                expandToSentence = false;
+            } else if (expansion.equals("sentence")) {
+                expandToSentence = true;
+            } else if (expansion.equals("max")) {
+                expandToSentence = false;
+                expandToMax = true;
+            }
+        }
+
+        return new ExpansionConfig(expandToSentence, expandToMax);
+    }
+    
+    // -- end --
 
     @GET
     @Path("{version}")
@@ -324,12 +370,12 @@ public class SearchController {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
+        
+        // Parse expansion parameter
+        ExpansionConfig expansionConfig = parseExpansionParameter(expansion);
+        Boolean expandToSentence = expansionConfig.expandToSentence;
+        Boolean expandToMax = expansionConfig.expandToMax;
 
-        Boolean expandToSentence = true;
-        if (expansion != null
-                && (expansion.equals("false") || expansion.equals("null"))) {
-            expandToSentence = false;
-        }
         spans = spans != null ? spans : false;
         Boolean snippet = true;
         Boolean tokens = false;
@@ -349,13 +395,16 @@ public class SearchController {
             String results = searchService.retrieveMatchInfo(corpusId, docId,
                     textId, matchId, true, foundries,
                     tokenContext.getUsername(), headers, layers, spans, snippet,
-                    tokens, expandToSentence, highlights, true, responsePipes);
+                    tokens, expandToSentence, expandToMax, highlights, true, 
+                    responsePipes);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
+    
+    
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -385,11 +434,11 @@ public class SearchController {
             throw kustvaktResponseHandler.throwit(e);
         }
 
-        Boolean expandToSentence = true;
-        if (expansion != null
-                && (expansion.equals("false") || expansion.equals("null"))) {
-            expandToSentence = false;
-        }
+        // Parse expansion parameter
+        ExpansionConfig expansionConfig = parseExpansionParameter(expansion);
+        Boolean expandToSentence = expansionConfig.expandToSentence;
+        Boolean expandToMax = expansionConfig.expandToMax;
+        
         spans = spans != null ? spans : false;
         Boolean snippet = true;
         Boolean tokens = false;
@@ -409,7 +458,8 @@ public class SearchController {
             String results = searchService.retrieveMatchInfo(corpusId, docId,
                     textId, matchId, true, foundries,
                     tokenContext.getUsername(), headers, layers, spans, snippet,
-                    tokens, expandToSentence, highlights, false, responsePipes);
+                    tokens, expandToSentence, expandToMax, highlights, false, 
+                    responsePipes);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {
@@ -417,6 +467,8 @@ public class SearchController {
         }
 
     }
+    
+    
 
     /*
      * Returns the meta data fields of a certain document

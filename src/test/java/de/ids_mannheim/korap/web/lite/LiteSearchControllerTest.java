@@ -206,7 +206,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testMatchInfoWithoutExtension () throws KustvaktException {
+    public void testMatchInfoExtension () throws KustvaktException {
         Response response = target().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
                 .queryParam("foundry", "-").queryParam("spans", "false")
@@ -221,6 +221,46 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertEquals("<span class=\"context-left\"><span class=\"more\"></span></span><span class=\"match\"><mark>gefüttert; der Ort ist sehr zerschossen; dann über die Schiffbrücke</mark></span><span class=\"context-right\"><span class=\"more\"></span></span>",
             node.at("/snippet").asText());
         assertEquals("Belagerung von Mainz", node.at("/title").asText());
+        
+        String snippet = node.at("/snippet").asText();
+        
+        testMatchInfoExtensionOff(snippet);
+        testMatchInfoExtensionSentence(snippet);
+        testMatchInfoExtensionMax(snippet);
+    }
+    
+    public void testMatchInfoExtensionOff (String snippet) throws KustvaktException {
+        Response response = target().path(API_VERSION)
+                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
+                .queryParam("foundry", "-").queryParam("spans", "false")
+                .queryParam("expand", "off").request().get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String ent = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(snippet, node.at("/snippet").asText());
+    }
+    
+    public void testMatchInfoExtensionSentence (String snippet) throws KustvaktException {
+        Response response = target().path(API_VERSION)
+                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
+                .queryParam("foundry", "-").queryParam("spans", "false")
+                .queryParam("expand", "sentence").request().get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String ent = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);        
+        assertTrue(node.at("/snippet").asText().length() > snippet.length());
+    }
+    
+    public void testMatchInfoExtensionMax (String snippet) throws KustvaktException {
+        Response response = target().path(API_VERSION)
+                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
+                .queryParam("foundry", "-").queryParam("spans", "false")
+                .queryParam("expand", "max").request().get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String ent = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);        
+        assertTrue(node.at("/snippet").asText().length() > snippet.length());
+        // same results as sentence expansion
     }
 
     @Test

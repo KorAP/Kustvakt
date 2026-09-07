@@ -7,6 +7,7 @@
 - Use glibc-based JRE 25 Docker image to fix SQLite writes on old hosts [AI-assisted]
 - Upgrade to Java 25
 - Create draft releases automatically when pushing tags starting with v [AI assisted] 
+- Introduce extend options: max, sentence, off in match service. [AI-assisted]
 
 # version 1.3
 

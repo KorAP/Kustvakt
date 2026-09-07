@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.scenario;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -82,5 +84,44 @@ public class DNBTest extends SpringJerseyTest {
         assertEquals(24,
                 node.at("/matches/0/tokens/right").size());
     }
+    
+	private int createMatchInfoRequest (String expand) throws KustvaktException {
+		Response response = target().path(API_VERSION).path("corpus")
+                .path("GOE").path("AGA").path("01784").path("p4115-4116")
+                .queryParam("foundry", "opennlp")
+                .queryParam("expand", expand)
+//                .queryParam("spans", "true")
+                .queryParam("show-tokens", "true")
+                .request().get();
+		
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+		String entity = response.readEntity(String.class);
+		JsonNode node = JsonUtils.readTree(entity);
+		assertNotNull(node);
+		
+		JsonNode tokensMatch = node.at("/tokens/match");
+		assertNotNull(tokensMatch);
+		assertTrue(tokensMatch.isArray());
+
+		return tokensMatch.size();
+	}
+	
+	@Test
+	public void testMatchInfoExpand () throws KustvaktException {
+		// sentence 4080-4125
+		
+		// krill.match.max.token=12
+		// krill.context.max.token=25
+        // krill.kwic.max.token = 51
+		// krill.match.expansion.includeContextSize = true
+		// cap = 12 + 25 = 37
+		// half context cap = 37 - 1 (match length) / 2 = 18
+		// max leftContext = 18
+		// rightContext = 9
+		// total = 18+9+1
+		assertEquals(28, createMatchInfoRequest("sentence"));		
+		assertEquals(45, createMatchInfoRequest("max"));
+		assertEquals(1, createMatchInfoRequest("off"));
+	}
 
 }

@@ -5,10 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -16,42 +15,44 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class MatchInfoControllerTest extends SpringJerseyTest {
 
-	 @Test
-	    public void testGetMatchInfoShowTokens () throws KustvaktException {
-	        Response response = target().path(API_VERSION).path("corpus")
-	                .path("GOE").path("AGA").path("01784").path("p4145-4146")
-	                .queryParam("foundry", "opennlp")
-	                .queryParam("show-tokens", "true")
-	                .request().get();
-	        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-	        String entity = response.readEntity(String.class);
-	        JsonNode node = JsonUtils.readTree(entity);
-	        assertNotNull(node);
-	        
-	        // Check expected JSON structure
-	        assertTrue(node.at("/hasSnippet").asBoolean());
-	        assertTrue(node.at("/hasTokens").asBoolean());
-	        
-	        // Check snippet contains expected content
-	        String snippet = node.at("/snippet").asText();
-	        assertNotNull(snippet);
-	        assertTrue(snippet.contains("<span class=\"context-left\"></span><span class=\"match\">"));
-	        assertTrue(snippet.contains("<span title=\"opennlp/p:PPER\">es</span>"));
-	        assertTrue(snippet.contains("<mark><span title=\"opennlp/p:NN\">Wasser</span></mark>"));
-	        
-	        // Check tokens match array
-	        JsonNode tokensMatch = node.at("/tokens/match");
-	        assertNotNull(tokensMatch);
-	        assertTrue(tokensMatch.isArray());
-	        assertEquals(29, tokensMatch.size());
-	        assertEquals("es", tokensMatch.get(0).asText());
-	        assertEquals("war", tokensMatch.get(1).asText());
-	        assertEquals("Wasser", tokensMatch.get(20).asText());
-	        assertEquals("erreichten", tokensMatch.get(28).asText());
-	    }
+	@Test
+    public void testGetMatchInfoShowTokens () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus")
+                .path("GOE").path("AGA").path("01784").path("p4145-4146")
+                .queryParam("foundry", "opennlp")
+                .queryParam("show-tokens", "true")
+                .request().get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node);
+        
+        // Check expected JSON structure
+        assertTrue(node.at("/hasSnippet").asBoolean());
+        assertTrue(node.at("/hasTokens").asBoolean());
+        
+        // Check snippet contains expected content
+        String snippet = node.at("/snippet").asText();
+        assertNotNull(snippet);
+        assertTrue(snippet.contains("<span class=\"context-left\"></span><span class=\"match\">"));
+        assertTrue(snippet.contains("<span title=\"opennlp/p:PPER\">es</span>"));
+        assertTrue(snippet.contains("<mark><span title=\"opennlp/p:NN\">Wasser</span></mark>"));
+        
+        // Check tokens match array
+        JsonNode tokensMatch = node.at("/tokens/match");
+        assertNotNull(tokensMatch);
+        assertTrue(tokensMatch.isArray());
+        assertEquals(29, tokensMatch.size());
+        assertEquals("es", tokensMatch.get(0).asText());
+        assertEquals("war", tokensMatch.get(1).asText());
+        assertEquals("Wasser", tokensMatch.get(20).asText());
+        assertEquals("erreichten", tokensMatch.get(28).asText());
+    }
 	 
     @Test
     public void testGetMatchInfoPublicCorpus () throws KustvaktException {

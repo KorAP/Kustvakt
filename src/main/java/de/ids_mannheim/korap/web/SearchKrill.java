@@ -203,15 +203,15 @@ public class SearchKrill {
     public String getMatch (String id, boolean info, List<String> foundries,
             List<String> layers, boolean includeSpans, boolean includeSnippet,
             boolean includeTokens, boolean includeHighlights,
-            boolean sentenceExpansion, Pattern licensePattern, 
-            boolean isDeprecated)
+            boolean extendToSentence, boolean extendToMax, 
+            Pattern licensePattern, boolean isDeprecated)
             throws KustvaktException {
         Match km;
         if (index != null) {
             try {
                 km = index.getMatchInfo(id, "tokens", info, foundries, layers,
                         includeSpans, includeSnippet, includeTokens,
-                        includeHighlights, sentenceExpansion);
+                        includeHighlights, extendToSentence, extendToMax);
                 String availability = km.getAvailability();
                 checkAvailability(licensePattern, availability, id);
             }
