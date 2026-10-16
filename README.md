@@ -72,6 +72,32 @@ java -jar target/Kustvakt-[version].jar --full --spring-config data/test-config-
 
 Kustvakt is available at Docker Hub. Please see the instructions to run the Kustvakt container at the [DockerHub page](https://hub.docker.com/r/korap/kustvakt).
 
+### Migrating Docker deployments to v1.0 and later
+
+Since v1.0, there is only one Docker image for both versions. The tags `korap/kustvakt:[version]` and `korap/kustvakt:[version]-full` refer to the same image, which runs the **lite** version by default, i.e. without authentication and access policies. The tag `latest-full` is no longer updated and still points to a pre-1.0 full image.
+
+Deployments of the full version therefore need to be adjusted:
+
+1. Start the full version explicitly, e.g. in `compose.yaml`:
+
+   ```yaml
+   kustvakt:
+     image: "korap/kustvakt:[version]"
+     command: ["Kustvakt.jar", "--full"]
+   ```
+
+2. Kustvakt reads its configuration from `/kustvakt/data/kustvakt.conf` (lite: `/kustvakt/data/kustvakt-lite.conf`), where the image provides defaults adapted to Docker. A configuration mounted at the former location `/kustvakt/kustvakt.conf` is ignored.
+
+3. If a host directory is mounted at `/kustvakt/data` to persist the database (`db.sqlite`) and the super client file (`super_client_info`), it hides these defaults and Kustvakt falls back to the configuration in the jar, which does not fit the container (e.g. `krill.indexDir = sample-index`). In this case, copy the image's configuration to the host directory and adjust it there (e.g. `ldap.config`, `availability.regex.*`):
+
+   ```
+   docker run --rm --entrypoint cat korap/kustvakt:[version] /kustvakt/data/kustvakt.conf > data/kustvakt.conf
+   ```
+
+4. Make sure Kustvakt and Kalamar use the same `super_client_info`, e.g. by sharing the mounted data folder.
+
+To check which version is running, look for `Loading kustvakt configuration from data/kustvakt.conf` (not `kustvakt-lite.conf`) in `data/logs/kustvakt.log`. The lite version also creates `data/liteDB.sqlite` instead of `data/db.sqlite`. In the full version, searches without login contain the rewrite comment `Free corpus access policy has been added.`
+
 
 ### Generating an OAuth2 super client
 
