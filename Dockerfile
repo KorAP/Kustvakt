@@ -81,11 +81,13 @@ USER kustvakt
 CMD ["sh"]
 
 
-FROM eclipse-temurin:21-jre-alpine AS kustvakt
-RUN addgroup -S korap && \
-    adduser -S kustvakt -G korap && \
+# Not Alpine: musl >= 1.2.6 breaks SQLite writes under Docker on old
+# hosts like CentOS 7 (pwritev2 gets EPERM instead of ENOSYS)
+FROM eclipse-temurin:25-jre AS kustvakt
+RUN groupadd --system korap && \
+    useradd --system -g korap kustvakt && \
     mkdir kustvakt && \
-    chown -R kustvakt.korap /kustvakt
+    chown -R kustvakt:korap /kustvakt
 WORKDIR /kustvakt
 USER kustvakt
 RUN mkdir ./ldap && \
@@ -97,7 +99,7 @@ COPY --from=builder /kustvakt/built/kustvakt-lite.conf /kustvakt/data/
 COPY --from=builder /kustvakt/built/ldap.* /kustvakt/ldap/
 COPY --from=builder /kustvakt/built/Krill-Indexer.jar /kustvakt/
 EXPOSE 8089
-ENTRYPOINT [ "java", "-jar"]
+ENTRYPOINT [ "java", "--enable-native-access=ALL-UNNAMED", "-jar"]
 CMD ["Kustvakt.jar"]
 
 # docker build -f Dockerfile -t korap/kustvakt:{nr} -t korap/kustvakt:{nr}-full .
