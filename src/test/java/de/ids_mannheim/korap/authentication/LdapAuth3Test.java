@@ -24,6 +24,10 @@ public class LdapAuth3Test {
 
     public static final String TEST_LDAP_CONF = "src/test/resources/test-ldap.conf";
 
+    public static final String TEST_LDAP_BIND_CONF = "src/test/resources/test-ldap-bind.conf";
+
+    private static final String SPECIAL_CHARS_PASSWORD = "ä(b)c\\d*";
+
     public static final String TEST_LDAPS_CONF = "src/test/resources/test-ldaps.conf";
 
     public static final String TEST_LDAP_TIMEOUT_CONF = "src/test/resources/test-ldap-timeout.conf";
@@ -195,6 +199,56 @@ public class LdapAuth3Test {
                 LdapAuth3.login("testuser", "passw*", TEST_LDAPS_TS_CONF));
         assertEquals(LDAP_AUTH_ROK,
                 LdapAuth3.login("testuser", "password", TEST_LDAPS_TS_CONF));
+    }
+
+    @Test
+    public void passwordWithSpecialCharsWorks () throws LDAPException {
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("specialchars",
+                SPECIAL_CHARS_PASSWORD, TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN,
+                LdapAuth3.login("specialchars", "*", TEST_LDAP_CONF));
+    }
+
+    // binding with the found DN (no ${password} in searchFilter)
+
+    @Test
+    public void bindWithAsteriskInPasswordWorks () throws LDAPException {
+        assertEquals(LDAP_AUTH_ROK,
+                LdapAuth3.login("test", "top*ecret", TEST_LDAP_BIND_CONF));
+    }
+
+    @Test
+    public void bindWithSpecialCharsInPasswordWorks () throws LDAPException {
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("specialchars",
+                SPECIAL_CHARS_PASSWORD, TEST_LDAP_BIND_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("specialchars@example.org",
+                SPECIAL_CHARS_PASSWORD, TEST_LDAP_BIND_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("specialcharsProfile",
+                SPECIAL_CHARS_PASSWORD, TEST_LDAP_BIND_CONF));
+    }
+
+    @Test
+    public void bindWithWrongPasswordFails () throws LDAPException {
+        assertEquals(LDAP_AUTH_RUNKNOWN,
+                LdapAuth3.login("test", "top*", TEST_LDAP_BIND_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN,
+                LdapAuth3.login("test", "*", TEST_LDAP_BIND_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("specialchars",
+                "\\c3\\a4\\28b\\29c\\5cd\\2a", TEST_LDAP_BIND_CONF));
+    }
+
+    @Test
+    public void bindWithEmptyPasswordFails () throws LDAPException {
+        assertEquals(LDAP_AUTH_RUNKNOWN,
+                LdapAuth3.login("test", "", TEST_LDAP_BIND_CONF));
+    }
+
+    @Test
+    public void bindAppliesExtraFilters () throws LDAPException {
+        assertEquals(LDAP_AUTH_RLOCKED, LdapAuth3.login("nameOfBlockedUser",
+                "cGFzc3dvcmQ=", TEST_LDAP_BIND_CONF));
+        assertEquals(LDAP_AUTH_RNOTREG, LdapAuth3.login("not_registered_user",
+                "cGFzc3dvcmQ=", TEST_LDAP_BIND_CONF));
     }
 
     @Test

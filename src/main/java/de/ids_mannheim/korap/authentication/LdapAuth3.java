@@ -130,6 +130,8 @@ public class LdapAuth3 {
     	
         LDAPConfig ldapConfig = new LDAPConfig(ldapConfigFilename);
 
+        // the filter needs the encoded password, binding the original one
+        String bindPassword = password;
         login = Filter.encodeValue(login);
         password = Filter.encodeValue(password);
 
@@ -143,8 +145,9 @@ public class LdapAuth3 {
             }
         }
 
-        LdapAuth3Result ldapAuth3Result = search(login, password, ldapConfig,
-                !ldapConfig.searchFilter.contains("${password}"), true);
+        LdapAuth3Result ldapAuth3Result = search(login, password, bindPassword,
+                ldapConfig, !ldapConfig.searchFilter.contains("${password}"),
+                true);
         SearchResult srchRes = ldapAuth3Result.getSearchResultValue();
 
         if (ldapAuth3Result.getErrorCode() != 0 || srchRes == null
@@ -163,7 +166,17 @@ public class LdapAuth3 {
     public static LdapAuth3Result search (String login, String password,
             LDAPConfig ldapConfig, boolean bindWithFoundDN,
             boolean applyExtraFilters) {
-    	
+        return search(login, password, password, ldapConfig, bindWithFoundDN,
+                applyExtraFilters);
+    }
+
+    // password is inserted into the search filter and must be filter-encoded,
+    // bindPassword is used unencoded to bind with the found DN
+    @NotNull
+    private static LdapAuth3Result search (String login, String password,
+            String bindPassword, LDAPConfig ldapConfig, boolean bindWithFoundDN,
+            boolean applyExtraFilters) {
+
         Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("login", login);
         valuesMap.put("password", password);
@@ -298,6 +311,12 @@ public class LdapAuth3 {
         }
 
         if (bindWithFoundDN) {
+            // an empty password would result in an unauthenticated bind
+            if (bindPassword == null || bindPassword.isEmpty()) {
+                jlog.error("login user '{}': empty password.", login);
+                ldapTerminate(lc);
+                return new LdapAuth3Result(null, LDAP_AUTH_RUNKNOWN);
+            }
             String matchedDN = srchRes.getSearchEntries().get(0).getDN();
             if (DEBUGLOG)
                 System.out.printf("Requested bind for found user %s' failed.\n",
@@ -306,13 +325,16 @@ public class LdapAuth3 {
                 // bind to server:
                 if (DEBUGLOG)
                     System.out.printf("Binding with '%s' ...\n", matchedDN);
-                BindResult bindResult = lc.bind(matchedDN, password);
+                BindResult bindResult = lc.bind(matchedDN, bindPassword);
                 if (DEBUGLOG)
                     System.out.print("Binding: OK.\n");
                 if (!bindResult.getResultCode().equals(ResultCode.SUCCESS)) {
                     ldapTerminate(lc);
                     return new LdapAuth3Result(null, LDAP_AUTH_RUNKNOWN);
                 }
+                // apply the extra filters with the rights of the search user,
+                // the found user may not be allowed to read the attributes
+                lc.bind(ldapConfig.sLoginDN, ldapConfig.sPwd);
             }
             catch (LDAPException e) {
 

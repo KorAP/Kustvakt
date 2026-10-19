@@ -73,3 +73,11 @@ registered: TRUE
 extraProfile: extraProfile
 extraPassword: extraPassword
 uid: uid
+
+dn: uid=specialchars,ou=people,dc=example,dc=com
+mail: specialchars@example.org
+# password: ä(b)c\d*
+userPassword:: w6QoYiljXGQq
+registered: TRUE
+extraProfile: specialcharsProfile
+uid: specialchars
