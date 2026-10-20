@@ -36,7 +36,7 @@ jobs:
           java-version: 21
 
       - name: Build and install Krill
-        run: mvn --file Krill/pom.xml install
+        run: mvn --file Krill/pom.xml install -DskipTests
 
       - name: Build and install Koral
         run: mvn --file Koral/pom.xml install
