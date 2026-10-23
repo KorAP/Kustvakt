@@ -138,6 +138,9 @@ public class KustvaktConfiguration {
     private String pipeHost; 
 
     public KustvaktConfiguration (Properties properties) throws Exception {
+        // kept for components that read their own settings, e.g.
+        // RateLimitFilter
+        this.properties = properties;
         load(properties);
         //        readPipesFile("pipes");
         KrillProperties.setProp(properties);

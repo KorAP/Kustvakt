@@ -35,6 +35,12 @@ public class RateLimitTest extends OAuth2TestBase {
         }
     }
 	@Test
+	public void testRateLimitSettingsFromConfig () {
+		// kustvakt-test.conf sets 5, the built-in default is 60
+		assertEquals(5, rateLimitFilter.getBurstCapacity());
+	}
+
+	@Test
 	public void testAuthenticatedRateLimitBearerToken ()
 			throws KustvaktException {
 		Response response = requestTokenWithDoryPassword(superClientId,
