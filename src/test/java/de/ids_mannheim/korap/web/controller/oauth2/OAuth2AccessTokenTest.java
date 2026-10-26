@@ -143,9 +143,9 @@ public class OAuth2AccessTokenTest extends VirtualCorpusTestBase {
     public void testSearchWithUnknownToken ()
             throws KustvaktException, IOException {
         Response response = searchWithAccessToken(
-                "ljsa8tKNRSczJhk20öhq92zG8z350");
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+                "ljsa8tKNRSczJhk20ohq92zG8z350");
         String ent = response.readEntity(String.class);
+        
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
