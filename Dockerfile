@@ -2,7 +2,7 @@
 # Backward compatilibity is added to support older docker compose deployments
 
 # Use alpine linux as base image
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM eclipse-temurin:25-jdk-alpine AS builder
 # Copy repository respecting .dockerignore
 COPY . /kustvakt
 WORKDIR /kustvakt
