@@ -18,6 +18,38 @@ jobs:
           java-version: '25'
           cache: 'maven'
 
+      - name: Read Krill and Koral versions from pom.xml
+        id: deps
+        run: |
+          KRILL_RANGE=$(grep -oPm1 '(?<=<krill.version>)[^<]+' pom.xml)
+          KORAL_RANGE=$(grep -oPm1 '(?<=<koral.version>)[^<]+' pom.xml)
+
+          KRILL_VERSION=$(echo "$KRILL_RANGE" | sed -E 's/^[[(]([^,]+).*/\1/')
+          KORAL_VERSION=$(echo "$KORAL_RANGE" | sed -E 's/^[[(]([^,]+).*/\1/')
+
+          echo "krill_tag=v$KRILL_VERSION" >> "$GITHUB_OUTPUT"
+          echo "koral_tag=v$KORAL_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check out Koral
+        uses: actions/checkout@v6
+        with:
+          repository: KorAP/Koral
+          ref: ${{ steps.deps.outputs.koral_tag }}
+          path: deps/Koral
+
+      - name: Install Koral to local Maven cache
+        run: mvn -B -f deps/Koral/pom.xml -DskipTests install
+
+      - name: Check out Krill
+        uses: actions/checkout@v6
+        with:
+          repository: KorAP/Krill
+          ref: ${{ steps.deps.outputs.krill_tag }}
+          path: deps/Krill
+
+      - name: Install Krill to local Maven cache
+        run: mvn -B -f deps/Krill/pom.xml -DskipTests install
+
       - name: Build jar
         run: mvn -B package
 
