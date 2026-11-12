@@ -18,6 +18,26 @@ jobs:
           java-version: '25'
           cache: 'maven'
 
+      - name: Check out Koral
+        uses: actions/checkout@v6
+        with:
+          repository: KorAP/Koral
+          ref: v0.48
+          path: deps/Koral
+
+      - name: Install Koral to local Maven cache
+        run: mvn -B -f deps/Koral/pom.xml -DskipTests install
+
+      - name: Check out Krill
+        uses: actions/checkout@v6
+        with:
+          repository: KorAP/Krill
+          ref: v0.66
+          path: deps/Krill
+
+      - name: Install Krill to local Maven cache
+        run: mvn -B -f deps/Krill/pom.xml -DskipTests install
+
       - name: Build jar
         run: mvn -B package
 
