@@ -1,3 +1,9 @@
+# version 1.4.1
+
+- Use a compact, pinned Corretto 25.0.5.1.2 Docker runtime fixing CVE-2026-114938 (Java4Shell). [AI-assisted]
+- Retain glibc-based runtime compatibility with older Docker hosts and SQLite. [AI-assisted]
+- Run Maven tests on the linked Java 25 runtime module set. [AI-assisted]
+
 # version 1.4
 
 - Fix rate limit settings in kustvakt.conf being ignored in favour of the defaults [AI-assisted]
