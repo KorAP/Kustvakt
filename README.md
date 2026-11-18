@@ -72,6 +72,13 @@ java -jar target/Kustvakt-[version].jar --full --spring-config data/test-config-
 
 Kustvakt is available at Docker Hub. Please see the instructions to run the Kustvakt container at the [DockerHub page](https://hub.docker.com/r/korap/kustvakt).
 
+The Docker image uses a compact Java 25 runtime linked from Corretto
+25.0.5.1.2, which includes the fix for CVE-2026-114938 (Java4Shell).
+Base images are pinned by digest, and Maven tests run on the linked runtime's
+module set. The final image remains glibc-based for compatibility with older
+Docker hosts and SQLite. TLS, LDAP, locale and JVM diagnostic support are
+retained; the compiler and Maven are confined to the build stages.
+
 ### Migrating Docker deployments to v1.0 and later
 
 Since v1.0, there is only one Docker image for both versions. The tags `korap/kustvakt:[version]` and `korap/kustvakt:[version]-full` refer to the same image, which runs the **lite** version by default, i.e. without authentication and access policies. The tag `latest-full` is no longer updated and still points to a pre-1.0 full image.
